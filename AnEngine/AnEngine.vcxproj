@@ -23,8 +23,10 @@
     <ClInclude Include="src\AnEngine\include\Application.hpp" />
     <ClInclude Include="src\AnEngine\include\Core.hpp" />
     <ClInclude Include="src\AnEngine\include\EntryPoint.hpp" />
+    <ClInclude Include="src\AnEngine\include\Log.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AnEngine\cpp\Log.cpp" />
     <ClCompile Include="src\AnEngine\cpp\Application.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -114,13 +116,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>AE_WIN;AE_DLL;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>AE_WIN;AE_DLL;AE_DEBUG;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)AnEngine\src\AnEngine\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)AnEngine\src\AnEngine\include\;$(SolutionDir)AnEngine\vendor\spdlog\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

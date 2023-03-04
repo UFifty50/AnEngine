@@ -6,6 +6,9 @@
 
 #include "AnEngine/include/Application.hpp"
 
+// ---Log---
+#include "AnEngine/include/Log.hpp"
+
 // ---Entry Point---
 #include "AnEngine/include/EntryPoint.hpp"
 
