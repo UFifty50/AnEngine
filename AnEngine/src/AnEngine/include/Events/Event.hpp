@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <ostream>
 #include <functional>
 #include "Core.hpp"
 
@@ -75,7 +76,7 @@ namespace AnEngine {
 
         template<typename T>
         bool dispatch(EventFn<T> eventFunc) {
-            if event.getEventType() == T::getStaticType()) {
+            if (event.getEventType() == T::getStaticType()) {
                 event.handled = eventFunc(*(T*)&event);
                 return true;
             }

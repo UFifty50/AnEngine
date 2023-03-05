@@ -8,6 +8,9 @@
 
 // ---Events---
 #include "AnEngine/include/Events/Event.hpp"
+#include "AnEngine/include/Events/ApplicationEvent.hpp"
+#include "AnEngine/include/Events/KeyEvent.hpp"
+#include "AnEngine/include/Events/MouseEvent.hpp"
 
 // ---Log---
 #include "AnEngine/include/Log.hpp"

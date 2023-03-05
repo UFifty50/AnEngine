@@ -63,7 +63,7 @@ project "Sandbox"
     files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
 
     includedirs { 
-        "%{prj.name}/src/SandBox/include/",
+        "%{prj.name}/src/include/",
         "AnEngine/src",
         "AnEngine/vendor/spdlog/include/"
     }

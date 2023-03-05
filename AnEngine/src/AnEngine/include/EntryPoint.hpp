@@ -8,12 +8,12 @@ extern AnEngine::Application* AnEngine::CreateApplication();
 
 int main(int argc, char** argv) {
     AnEngine::Log::init();
-    AE_CORE_DEBUG("This is a debug message");
-    AE_CORE_INFO("This is an info message");
-    AE_CRITICAL("This is a critical message");
+    AE_CORE_DEBUG("Core debug");
+    AE_ERROR("Client error");
 
     auto app = AnEngine::CreateApplication();
     app->Run();
+    while (true);
     delete app;
 }
 

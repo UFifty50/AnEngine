@@ -3,6 +3,7 @@
 
 
 #include "Core.hpp"
+#include "Events/Event.hpp"
 
 namespace AnEngine {
     class AE_API Application {
