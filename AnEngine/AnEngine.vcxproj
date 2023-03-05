@@ -160,6 +160,10 @@ copy /B /Y ..\bin\Dist-windows-x86_64\AnEngine\AnEngine.dll ..\bin\Dist-windows-
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\AnEngine.hpp" />
+    <ClInclude Include="src\AnEngine\include\Events\ApplicationEvent.hpp" />
+    <ClInclude Include="src\AnEngine\include\Events\Event.hpp" />
+    <ClInclude Include="src\AnEngine\include\Events\KeyEvent.hpp" />
+    <ClInclude Include="src\AnEngine\include\Events\MouseEvent.hpp" />
     <ClInclude Include="src\AnEngine\include\Application.hpp" />
     <ClInclude Include="src\AnEngine\include\Core.hpp" />
     <ClInclude Include="src\AnEngine\include\EntryPoint.hpp" />

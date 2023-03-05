@@ -25,6 +25,10 @@
     <ClInclude Include="src\AnEngine\include\Log.hpp">
       <Filter>AnEngine\include</Filter>
     </ClInclude>
+    <ClInclude Include="src\AnEngine\include\Events\Event.hpp" />
+    <ClInclude Include="src\AnEngine\include\Events\KeyEvent.hpp" />
+    <ClInclude Include="src\AnEngine\include\Events\MouseEvent.hpp" />
+    <ClInclude Include="src\AnEngine\include\Events\ApplicationEvent.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AnEngine\cpp\Application.cpp">
