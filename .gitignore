@@ -434,3 +434,5 @@ FodyWeavers.xsd
 
 
 .vcxproj*
+/AnEngine/AnEngine.vcxproj
+/AnEngine/AnEngine.vcxproj.filters
