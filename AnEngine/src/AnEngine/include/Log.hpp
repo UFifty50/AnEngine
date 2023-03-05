@@ -32,8 +32,10 @@ namespace AnEngine {
 #define AE_CORE_ERROR(...)    ::AnEngine::Log::getCoreLogger()->error(__VA_ARGS__)
 #define AE_CORE_CRITICAL(...) ::AnEngine::Log::getCoreLogger()->critical(__VA_ARGS__)
 
-#ifdef AE_DEBUG
+#ifdef AE_DEBUG_FLAG
    #define AE_CORE_DEBUG(...) ::AnEngine::Log::getCoreLogger()->debug(__VA_ARGS__)
+#else
+   #define AE_CORE_DEBUG
 #endif
 
 
@@ -46,6 +48,8 @@ namespace AnEngine {
 
 #ifdef _DEBUG
    #define AE_DEBUG(...)      ::AnEngine::Log::getClientLogger()->debug(__VA_ARGS__)
+#else
+   #define AE_DEBUG
 #endif
 
 

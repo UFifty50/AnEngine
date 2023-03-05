@@ -1,42 +1,37 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="AnEngine">
+      <UniqueIdentifier>{2A35E534-1602-4040-3F1B-2EE82B4775CE}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="AnEngine\cpp">
+      <UniqueIdentifier>{FC338BE1-E896-1A86-911C-533C7D5EE608}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="AnEngine\include">
+      <UniqueIdentifier>{9DE64124-89DF-6076-B211-46FB9E694082}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AnEngine.hpp" />
     <ClInclude Include="src\AnEngine\include\Application.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>AnEngine\include</Filter>
     </ClInclude>
     <ClInclude Include="src\AnEngine\include\Core.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AnEngine.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>AnEngine\include</Filter>
     </ClInclude>
     <ClInclude Include="src\AnEngine\include\EntryPoint.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>AnEngine\include</Filter>
     </ClInclude>
     <ClInclude Include="src\AnEngine\include\Log.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>AnEngine\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AnEngine\cpp\Application.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AnEngine\cpp</Filter>
     </ClCompile>
     <ClCompile Include="src\AnEngine\cpp\Log.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AnEngine\cpp</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
