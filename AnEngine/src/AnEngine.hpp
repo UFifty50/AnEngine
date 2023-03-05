@@ -3,7 +3,7 @@
 #ifndef ANENGINE_HPP
 #define ANENGINE_HPP
 
-// ---virtual application---
+// ---virtual base application---
 #include "AnEngine/include/Application.hpp"
 
 // ---Events---
