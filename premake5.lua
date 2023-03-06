@@ -4,6 +4,11 @@ workspace "AnEngine"
 
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+includeDir = {}
+includeDir['GLFW'] = "AnEngine/vendor/GLFW/include"
+
+include "AnEngine/vendor/GLFW"
+
 project "AnEngine"
     location "AnEngine"
     kind "SharedLib"
@@ -18,7 +23,13 @@ project "AnEngine"
     includedirs { 
         "%{prj.name}/src/AnEngine/include/",
         "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include/"
+        "%{prj.name}/vendor/spdlog/include/",
+        "%{includeDir.GLFW}"
+    }
+
+    links {
+        "GLFW",
+        "opengl32.lib"
     }
 
     filter "system:windows"
