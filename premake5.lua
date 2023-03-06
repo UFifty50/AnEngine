@@ -11,9 +11,13 @@ project "AnEngine"
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
     objdir ("bin/intermediate/" .. outputDir .. "/%{prj.name}")
 
+    pchheader "aepch.hpp"
+    pchsource "AnEngine/src/aepch.cpp"
+
     files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
     includedirs { 
         "%{prj.name}/src/AnEngine/include/",
+        "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include/"
     }
 

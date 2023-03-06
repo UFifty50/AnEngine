@@ -1,8 +1,7 @@
 #ifndef APPLICATION_EVENT_HPP
 #define APPLICATION_EVENT_HPP
 
-
-#include <sstream>
+#include "aepch.hpp"
 #include "Event.hpp"
 
 namespace AnEngine {

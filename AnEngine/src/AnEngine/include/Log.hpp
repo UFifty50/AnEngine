@@ -1,8 +1,7 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
-#include <memory>
-
+#include "aepch.hpp"
 #include "Core.hpp"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"

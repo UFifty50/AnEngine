@@ -1,7 +1,7 @@
 #ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
-
+#include "aepch.hpp"
 #include "Core.hpp"
 #include "Events/Event.hpp"
 
