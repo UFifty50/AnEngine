@@ -435,3 +435,4 @@ FodyWeavers.xsd
 
 *.vcxproj*
 *.sln*
+!vendor/
