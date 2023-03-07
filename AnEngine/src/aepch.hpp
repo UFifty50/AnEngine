@@ -19,5 +19,11 @@
 #endif
 
 
+#include "Log.hpp"
+#include "Core.hpp"
+
+#include "Events/ApplicationEvent.hpp"
+#include "Events/KeyEvent.hpp"
+#include "Events/MouseEvent.hpp"
 
 #endif

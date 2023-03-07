@@ -22,6 +22,7 @@ project "AnEngine"
     files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
     includedirs { 
         "%{prj.name}/src/AnEngine/include/",
+        "%{prj.name}/src/Platform/Windows/include/",
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include/",
         "%{includeDir.GLFW}"
@@ -53,14 +54,23 @@ project "AnEngine"
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG" }
+        links {
+            "msvcrtd.lib"
+        }
         symbols "On"
 
     filter "configurations:Release"
         defines { "AE_RELEASE" }
+        links {
+            "msvcrt.lib"
+        }
         optimize "On"
 
     filter "configurations:Dist"
         defines { "AE_DIST" }
+        links {
+            "msvcrt.lib"
+        }
         optimize "On"
 
     filter { "system:windows", "configurations:Release" }
