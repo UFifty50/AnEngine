@@ -46,8 +46,6 @@ project "AnEngine"
         "GLFW",
         "Glad",
         "ImGui",
-        "dl",
-        "pthread"
     }
 
     filter "system:linux"
@@ -67,7 +65,9 @@ project "AnEngine"
             "GLEW",
             "GLU",
             "GL",
-            "X11"
+            "X11",
+            "dl",
+            "pthread"
         }
 
         defines { 
