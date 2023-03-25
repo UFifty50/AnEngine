@@ -1,5 +1,5 @@
-#ifndef WIN32_WINDOW
-#define WIN32_WINDOW
+#ifndef WIN32WINDOW_HPP
+#define WIN32WINDOW_HPP
 
 #include "Window.hpp"
 #include <GLFW/glfw3.h>

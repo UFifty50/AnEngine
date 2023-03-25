@@ -23,3 +23,8 @@ project "Glad"
 
 	filter { "system:windows", "configurations:Release" }
 		buildoptions "/MT"
+
+    filter "system:linux"
+        pic "On"
+        systemversion "latest"
+        staticruntime "On"

@@ -10,7 +10,6 @@ namespace AnEngine {
     class AE_API Application {
     private:
         static Application* instance;
-    private:
         std::unique_ptr<Window> window;
         bool running = true;
         LayerStack layerStack;

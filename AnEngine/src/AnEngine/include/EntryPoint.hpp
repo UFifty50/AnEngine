@@ -3,7 +3,6 @@
 
 #include "Application.hpp"
 
-#ifdef AE_WIN
 
 extern AnEngine::Application* AnEngine::CreateApplication();
 
@@ -14,10 +13,7 @@ int main(int argc, char** argv) {
 
     auto app = AnEngine::CreateApplication();
     app->Run();
-    while (true);
     delete app;
 }
-
-#endif
 
 #endif

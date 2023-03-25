@@ -432,7 +432,8 @@ FodyWeavers.xsd
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,c++
 
+Makefile
 
 *.vcxproj*
 *.sln*
-!vendor/
+!vendor/premake/premake5.exe

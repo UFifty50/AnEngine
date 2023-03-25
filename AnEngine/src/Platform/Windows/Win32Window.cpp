@@ -1,11 +1,10 @@
 #include "aepch.hpp"
-#include "Win32Window.hpp"
+#include <glad/glad.h>
 
+#include "Win32Window.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
-
-#include <glad/glad.h>
 
 
 namespace AnEngine {
@@ -100,6 +99,15 @@ namespace AnEngine {
                         break;
                     }
                 }
+            }
+        );
+
+        glfwSetCharCallback(
+            window,
+            [](GLFWwindow* win, unsigned int keycode) {
+                WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
+                KeyTypedEvent event(keycode);
+                data.eventCallback(event);
             }
         );
 

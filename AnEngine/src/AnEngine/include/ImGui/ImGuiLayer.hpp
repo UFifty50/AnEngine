@@ -1,14 +1,24 @@
 #ifndef IMGUILAYER_HPP
 #define IMGUILAYER_HPP
 
-#include "AnEngine/include/Core.hpp"
-#include "AnEngine/include/Layer.hpp"
-#include "AnEngine/include/Events/Event.hpp"
+#include "Layer.hpp"
+#include "Events/ApplicationEvent.hpp"
+#include "Events/KeyEvent.hpp"
+#include "Events/MouseEvent.hpp"
 
 
 namespace AnEngine {
     class AE_API ImGuiLayer : public Layer {
     private:
+        bool onMouseButtonPressedEvent(MouseButtonPressedEvent& e);
+        bool onMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
+        bool onMouseMovedEvent(MouseMovedEvent& e);
+        bool onMouseScrolledEvent(MouseScrolledEvent& e);
+        bool onKeyPressedEvent(KeyPressedEvent& e);
+        bool onKeyReleasedEvent(KeyReleasedEvent& e);
+        bool onKeyTypedEvent(KeyTypedEvent& e);
+        bool onWindowResizeEvent(WindowResizeEvent& e);
+
         float prevTime = 0.0f;
 
     public:

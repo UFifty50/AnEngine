@@ -4,8 +4,8 @@
 
 #include "imgui.h"
 #include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace AnEngine {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {
