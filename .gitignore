@@ -434,6 +434,8 @@ FodyWeavers.xsd
 
 Makefile
 
+*.tar
+*.tar.*
 *.vcxproj*
 *.sln*
 !vendor/premake/premake5.exe
