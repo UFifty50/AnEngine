@@ -8,7 +8,12 @@
 
 
 namespace AnEngine {
+    Application* Application::Application::instance = nullptr;
+
     Application::Application() {
+        AE_CORE_ASSERT(!instance, "Application already exists!");
+        instance = this;
+
         window = std::unique_ptr<Window>(Window::create());
         window->setEventCallback(BIND_EVENT_FN(onEvent));
     }
@@ -17,10 +22,12 @@ namespace AnEngine {
 
     void Application::pushLayer(Layer* layer) {
         layerStack.pushLayer(layer);
+        layer->onAttach();
     }
 
     void Application::pushOverlay(Layer* overlay) {
         layerStack.pushOverlay(overlay);
+        overlay->onAttach();
     }
 
     void Application::onEvent(Event& e) {

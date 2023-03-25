@@ -9,6 +9,8 @@
 namespace AnEngine {
     class AE_API Application {
     private:
+        static Application* instance;
+    private:
         std::unique_ptr<Window> window;
         bool running = true;
         LayerStack layerStack;
@@ -22,6 +24,9 @@ namespace AnEngine {
         void onEvent(Event& e);
         void pushLayer(Layer* layer);
         void pushOverlay(Layer* overlay);
+
+        static inline Application& get() { return *instance; }
+        inline Window& getWindow() { return *window; }
 
         void Run();
     };

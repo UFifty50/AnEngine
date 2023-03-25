@@ -8,6 +8,7 @@
 
 // ---Layers---
 #include "AnEngine/include/Layer.hpp"
+#include "AnEngine/include/ImGui/ImGuiLayer.hpp"
 
 // ---Events---
 #include "AnEngine/include/Events/Event.hpp"

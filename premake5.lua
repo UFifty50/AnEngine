@@ -7,7 +7,7 @@ outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 includeDir = {}
 includeDir['GLFW'] = "AnEngine/vendor/GLFW/include"
 includeDir['Glad'] = "AnEngine/vendor/Glad/include"
-includeDir['ImGui'] = "AnEngine/vendor/ImGui/include"
+includeDir['ImGui'] = "AnEngine/vendor/ImGui/"
 
 include "AnEngine/vendor/GLFW"
 include "AnEngine/vendor/Glad"
@@ -27,6 +27,7 @@ project "AnEngine"
     includedirs { 
         "%{prj.name}/src/AnEngine/include/",
         "%{prj.name}/src/Platform/Windows/include/",
+        "%{prj.name}/src/Platform/OpenGL/include/",
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include/",
         "%{includeDir.GLFW}",
