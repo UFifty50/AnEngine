@@ -1,9 +1,9 @@
 #ifndef WIN32_WINDOW
 #define WIN32_WINDOW
 
-
-#include <GLFW/glfw3.h>
 #include "Window.hpp"
+#include <GLFW/glfw3.h>
+
 
 namespace AnEngine {
     class Win32Window : public Window {

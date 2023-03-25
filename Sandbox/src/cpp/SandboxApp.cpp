@@ -1,9 +1,25 @@
 #include <AnEngine.hpp>
 
 
+class ExampleLayer : public AnEngine::Layer {
+public:
+    ExampleLayer() : Layer("Example") {}
+
+    void onUpdate() override {
+        AE_INFO("ExampleLayer::Update");
+    }
+
+    void onEvent(AnEngine::Event& event) override {
+        AE_TRACE("{0}", event);
+    }
+};
+
 class Sandbox : public AnEngine::Application {
-    public:
-	Sandbox() {}
+public:
+    Sandbox() {
+        pushLayer(new ExampleLayer());
+    }
+
 	~Sandbox() {}
 
 	void Run() {

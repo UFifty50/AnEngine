@@ -46,12 +46,10 @@ namespace AnEngine {
 
 
     class AE_API Event {
-        friend class EventDispatcher;
-
-    protected:
+   //     friend class EventDispatcher;
+    public:
         bool handled = false;
 
-    public:
         virtual EventType getEventType() const = 0;
         virtual const char* getName() const = 0;
         virtual int getCategoryFlags() const = 0;

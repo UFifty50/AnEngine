@@ -6,8 +6,12 @@ outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 includeDir = {}
 includeDir['GLFW'] = "AnEngine/vendor/GLFW/include"
+includeDir['Glad'] = "AnEngine/vendor/Glad/include"
+includeDir['ImGui'] = "AnEngine/vendor/ImGui/include"
 
 include "AnEngine/vendor/GLFW"
+include "AnEngine/vendor/Glad"
+include "AnEngine/vendor/ImGui"
 
 project "AnEngine"
     location "AnEngine"
@@ -25,11 +29,15 @@ project "AnEngine"
         "%{prj.name}/src/Platform/Windows/include/",
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include/",
-        "%{includeDir.GLFW}"
+        "%{includeDir.GLFW}",
+        "%{includeDir.Glad}",
+        "%{includeDir.ImGui}"
     }
 
     links {
         "GLFW",
+        "Glad",
+        "ImGui",
         "opengl32.lib"
     }
 
@@ -37,10 +45,12 @@ project "AnEngine"
         cppdialect "C++20"
         staticruntime "On"
         systemversion "latest"
+        buildoptions { "/external:W0" }
 
         defines { 
             "AE_WIN",
-            "AE_DLL"
+            "AE_DLL",
+            "GLFW_INCLUDE_NONE"
         }
 
         prebuildcommands {
@@ -54,27 +64,34 @@ project "AnEngine"
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG" }
-        links {
-            "msvcrtd.lib"
-        }
         symbols "On"
 
     filter "configurations:Release"
         defines { "AE_RELEASE" }
-        links {
-            "msvcrt.lib"
-        }
         optimize "On"
 
     filter "configurations:Dist"
         defines { "AE_DIST" }
+        optimize "On"
+
+    filter { "system:windows", "configurations:Debug" }
+        links {
+            "msvcrtd.lib"
+        }
+        buildoptions { "/MDd" }
+
+    filter { "system:windows", "configurations:Release" }
         links {
             "msvcrt.lib"
         }
-        optimize "On"
+        buildoptions { "/MD", "/W4" }
 
-    filter { "system:windows", "configurations:Release" }
-        buildoptions { "/MT", "/W4" }
+    filter { "system:windows", "configurations:Dist" }
+        links {
+            "msvcrt.lib"
+        }
+        buildoptions { "/MD", "/W4" }
+
 
 project "Sandbox"
     location "Sandbox"
@@ -97,6 +114,7 @@ project "Sandbox"
         cppdialect "C++20"
         staticruntime "On"
         systemversion "latest"
+        buildoptions { "/external:W0" }
 
         defines { 
             "AE_WIN",
@@ -114,5 +132,19 @@ project "Sandbox"
         defines { "AE_DIST" }
         optimize "On"
 
+    filter { "system:windows", "configurations:Debug" }
+        links {
+            "msvcrtd.lib"
+        }
+
     filter { "system:windows", "configurations:Release" }
-        buildoptions { "/MT", "/W3" }
+        links {
+            "msvcrt.lib"
+        }
+        buildoptions { "/W4" }
+
+    filter { "system:windows", "configurations:Dist" }
+        links {
+            "msvcrt.lib"
+        }
+        buildoptions { "/W4" }

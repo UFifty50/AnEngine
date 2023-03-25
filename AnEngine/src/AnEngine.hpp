@@ -6,6 +6,9 @@
 // ---virtual base application---
 #include "AnEngine/include/Application.hpp"
 
+// ---Layers---
+#include "AnEngine/include/Layer.hpp"
+
 // ---Events---
 #include "AnEngine/include/Events/Event.hpp"
 #include "AnEngine/include/Events/ApplicationEvent.hpp"

@@ -4,7 +4,7 @@
 #include "Events/ApplicationEvent.hpp"
 #include "Log.hpp"
 
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 
 namespace AnEngine {
@@ -15,10 +15,24 @@ namespace AnEngine {
 
     Application::~Application() {}
 
+    void Application::pushLayer(Layer* layer) {
+        layerStack.pushLayer(layer);
+    }
+
+    void Application::pushOverlay(Layer* overlay) {
+        layerStack.pushOverlay(overlay);
+    }
+
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(onWindowClose));
-        AE_CORE_DEBUG(e);
+
+        for (auto it = layerStack.end(); it != layerStack.begin();) {
+            (*--it)->onEvent(e);
+            if (e.handled) {
+                break;
+            }
+        }
     }
 
     bool Application::onWindowClose(WindowCloseEvent& e) {
@@ -30,6 +44,10 @@ namespace AnEngine {
         while (running) {
             glClearColor(1, 0, 1, 1);
             glClear(GL_COLOR_BUFFER_BIT);
+
+            for (Layer* layer : layerStack) {
+                layer->onUpdate();
+            }
             window->onUpdate();
         }
      }

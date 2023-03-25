@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 #include <algorithm>
+#include <ranges>
 
 #include <vector>
 #include <string>

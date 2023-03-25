@@ -1,6 +1,7 @@
 #ifndef ENTRYPOINT_HPP
 #define ENTRYPOINT_HPP
 
+#include "Application.hpp"
 
 #ifdef AE_WIN
 

@@ -5,6 +5,8 @@
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
 
+#include <glad/glad.h>
+
 
 namespace AnEngine {
     static bool GLFWinitialised = false;
@@ -47,6 +49,8 @@ namespace AnEngine {
             nullptr
         );
         glfwMakeContextCurrent(window);
+        int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+        AE_CORE_ASSERT(status, "Failed to initialise Glad!");
         glfwSetWindowUserPointer(window, &data);
         setVSync(true);
 
