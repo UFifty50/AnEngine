@@ -46,6 +46,8 @@ project "AnEngine"
         "GLFW",
         "Glad",
         "ImGui",
+        "dl",
+        "pthread"
     }
 
     filter "system:linux"
