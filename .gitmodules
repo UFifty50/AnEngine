@@ -8,3 +8,6 @@
 	path = AnEngine/vendor/ImGui
 	url = https://github.com/UFifty50/imgui-premake.git
 	branch = docking
+[submodule "AnEngine/vendor/glm"]
+	path = AnEngine/vendor/glm
+	url = https://github.com/g-truc/glm

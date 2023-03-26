@@ -9,6 +9,7 @@ includeDir = {}
 includeDir['GLFW'] = "AnEngine/vendor/GLFW/include"
 includeDir['Glad'] = "AnEngine/vendor/Glad/include"
 includeDir['ImGui'] = "AnEngine/vendor/ImGui/"
+includeDir['glm'] = "AnEngine/vendor/glm/"
 
 group "Dependencies"
     include "AnEngine/vendor/GLFW"
@@ -28,7 +29,12 @@ project "AnEngine"
     pchheader "aepch.hpp"
     pchsource "AnEngine/src/aepch.cpp"
 
-    files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
+    files {
+        "%{prj.name}/src/**.hpp",
+        "%{prj.name}/src/**.cpp",
+        "%{prj.name}/vendor/glm/glm/**.hpp",
+        "%{prj.name}/vendor/glm/glm/**.inl"
+    }
     removefiles { "%{prj.name}/src/Platform/**" }
     files {
         "%{prj.name}/src/Platform/OpenGL/**.hpp",
@@ -42,7 +48,8 @@ project "AnEngine"
         "%{prj.name}/vendor/spdlog/include/",
         "%{includeDir.GLFW}",
         "%{includeDir.Glad}",
-        "%{includeDir.ImGui}"
+        "%{includeDir.ImGui}",
+        "%{includeDir.glm}"
     }
 
     links {
@@ -149,7 +156,8 @@ project "Sandbox"
         "AnEngine/src",
         "AnEngine/src/AnEngine/include/",
         "%{prj.name}/src/Platform/",
-        "AnEngine/vendor/spdlog/include/"
+        "AnEngine/vendor/spdlog/include/",
+        "%{includeDir.glm}"
     }
 
     filter "system:Linux"

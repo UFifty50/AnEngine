@@ -25,7 +25,7 @@ public:
         pushOverlay(new AnEngine::ImGuiLayer());
     }
 
-	~Sandbox() {}
+    ~Sandbox() {}
 };
 
 AnEngine::Application* AnEngine::CreateApplication() {
