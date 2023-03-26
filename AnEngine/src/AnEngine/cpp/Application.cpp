@@ -2,6 +2,7 @@
 #include "Application.hpp"
 
 #include "Events/ApplicationEvent.hpp"
+#include "Input.hpp"
 #include "Log.hpp"
 
 #include <glad/glad.h>
@@ -55,6 +56,10 @@ namespace AnEngine {
             for (Layer* layer : layerStack) {
                 layer->onUpdate();
             }
+
+            auto[x, y] = Input::getMousePosition();
+            AE_CORE_DEBUG("{0}, {1}", x, y);
+
             window->onUpdate();
         }
      }

@@ -34,6 +34,8 @@ namespace AnEngine {
         inline void setEventCallback(const EventCallbackFn& callback) override { data.eventCallback = callback; }
         void setVSync(bool enabled) override;
         bool VSyncEnabled() const override;
+
+        inline virtual void* getNativeWindow() const override { return window; }
     };
 }
 

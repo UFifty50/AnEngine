@@ -1,7 +1,7 @@
 #include "aepch.hpp"
 #include <glad/glad.h>
 
-#include "Win32Window.hpp"
+#include "Windows/window/Win32Window.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"

@@ -35,6 +35,8 @@ namespace AnEngine {
         virtual void setVSync(bool enabled) = 0;
         virtual bool VSyncEnabled() const = 0;
 
+        virtual void* getNativeWindow() const = 0;
+
         // platform specific
         static Window* create(const WindowProperties& props = WindowProperties());
     };

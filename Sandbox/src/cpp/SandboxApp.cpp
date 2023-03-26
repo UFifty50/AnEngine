@@ -22,10 +22,6 @@ public:
     }
 
 	~Sandbox() {}
-
-	void Run() {
-		while (true);
-	}
 };
 
 AnEngine::Application* AnEngine::CreateApplication() {

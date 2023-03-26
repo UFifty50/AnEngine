@@ -10,15 +10,17 @@ includeDir['GLFW'] = "AnEngine/vendor/GLFW/include"
 includeDir['Glad'] = "AnEngine/vendor/Glad/include"
 includeDir['ImGui'] = "AnEngine/vendor/ImGui/"
 
-include "AnEngine/vendor/GLFW"
-include "AnEngine/vendor/Glad"
-include "AnEngine/vendor/ImGui"
+group "Dependencies"
+    include "AnEngine/vendor/GLFW"
+    include "AnEngine/vendor/Glad"
+    include "AnEngine/vendor/ImGui"
 
+group ""
 project "AnEngine"
     location "AnEngine"
     kind "SharedLib"
-    language "C++"
     staticruntime "off"
+    language "C++"
 
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
     objdir ("bin/intermediate/" .. outputDir .. "/%{prj.name}")
@@ -35,6 +37,7 @@ project "AnEngine"
 
     includedirs { 
         "%{prj.name}/src/AnEngine/include/",
+        "%{prj.name}/src/Platform/",
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include/",
         "%{includeDir.GLFW}",
@@ -51,7 +54,6 @@ project "AnEngine"
     filter "system:linux"
         pic "On"
         cppdialect "C++20"
-        staticruntime "On"
         systemversion "latest"
 
         files {
@@ -128,22 +130,13 @@ project "AnEngine"
         runtime "Release"
         optimize "On"
 
-    filter { "system:windows", "configurations:Debug" }
-        buildoptions { "/MDd" }
-
-    filter { "system:windows", "configurations:Release" }
-
-        buildoptions { "/MD", "/W4" }
-
-    filter { "system:windows", "configurations:Dist" }
-        buildoptions { "/MD", "/W4" }
-
 
 project "Sandbox"
     location "Sandbox"
     kind "ConsoleApp"
-    language "C++"
     staticruntime "off"
+    language "C++"
+
     links { "AnEngine" }
 
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
@@ -155,14 +148,14 @@ project "Sandbox"
         "%{prj.name}/src/include/",
         "AnEngine/src",
         "AnEngine/src/AnEngine/include/",
+        "%{prj.name}/src/Platform/",
         "AnEngine/vendor/spdlog/include/"
     }
 
     filter "system:Linux"
-        cppdialect "C++20"
-        staticruntime "On"
-        systemversion "latest"
         pic "On"
+        cppdialect "C++20"
+        systemversion "latest"
 
         defines { 
             "AE_LINUX",
@@ -191,12 +184,3 @@ project "Sandbox"
         defines { "AE_DIST" }
         runtime "Release"
         optimize "On"
-
-    filter { "system:windows", "configurations:Debug" }
-        buildoptions "/MDd"
-
-    filter { "system:windows", "configurations:Release" }
-        buildoptions { "/MD", "/W4" }
-
-    filter { "system:windows", "configurations:Dist" }
-        buildoptions { "/MD", "/W4" }
