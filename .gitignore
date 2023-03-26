@@ -439,3 +439,4 @@ Makefile
 *.vcxproj*
 *.sln*
 !vendor/premake/premake5.exe
+/Sandbox/imgui.ini

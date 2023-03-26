@@ -16,6 +16,15 @@
 #include "AnEngine/include/Events/KeyEvent.hpp"
 #include "AnEngine/include/Events/MouseEvent.hpp"
 
+// ---Input---
+#include "AnEngine/include/Input.hpp"
+
+// ---KeyCodes---
+#include "AnEngine/include/KeyCodes.hpp"
+#include "AnEngine/include/MouseButtonCodes.hpp"
+#include "AnEngine/include/JoystickButtonCodes.hpp"
+#include "AnEngine/include/GamepadCodes.hpp"
+
 // ---Log---
 #include "AnEngine/include/Log.hpp"
 

@@ -7,10 +7,14 @@ public:
 
     void onUpdate() override {
         AE_INFO("ExampleLayer::Update");
+
+        if (AnEngine::Input::isKeyPressed(AE_KEY_ENTER)) {
+            AE_ERROR("ENTER is pressed (poll)!");
+        }
     }
 
     void onEvent(AnEngine::Event& event) override {
-        AE_TRACE("{0}", event);
+     //   AE_TRACE("{0}", event);
     }
 };
 
