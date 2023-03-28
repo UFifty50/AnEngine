@@ -24,11 +24,9 @@ jobs:
       run: make config=debug all
 
     - name: package
-      uses: TheDoctor0/zip-release@0.7.1
-      with:
-        filename: "AnEngine-dbg.zip"
-        path: "bin/Debug-linux-x86_64/"
-        directory: "bin/Debug-linux-x86_64/"
+      run: |
+        cd bin/Debug-linux-x86_64/
+        zip -r AnEngine-dbg.linux.zip .
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
@@ -54,11 +52,9 @@ jobs:
       run: msbuild
 
     - name: package
-      uses: TheDoctor0/zip-release@0.7.1
-      with:
-        filename: "AnEngine-dbg.zip"
-        path: "bin/Debug-windows-x86_64/"
-        directory: "bin/Debug-windows-x86_64/"
+      run: |
+        cd bin/Debug-windows-x86_64/
+        zip -r AnEngine-dbg.windows.zip .
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
