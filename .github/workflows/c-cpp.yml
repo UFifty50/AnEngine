@@ -26,7 +26,7 @@ jobs:
     - name: package
       run: |
         cd bin/Debug-linux-x86_64/
-        zip -r AnEngine-dbg.linux.zip .
+        tar -a -c -f AnEngine-dbg.linux.zip .
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
@@ -54,7 +54,7 @@ jobs:
     - name: package
       run: |
         cd bin/Debug-windows-x86_64/
-        zip -r AnEngine-dbg.windows.zip .
+        tar.exe -a -c -f AnEngine-dbg.windows.zip .
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
