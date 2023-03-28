@@ -19,14 +19,17 @@ jobs:
 
     - name: configure
       run: vendor/premake/premake5 gmake2
+
     - name: make
       run: make config=debug all
+
     - name: package
       uses: TheDoctor0/zip-release@0.7.1
       with:
         filename: "AnEngine-dbg.zip"
         path: "bin/Debug-linux-x86_64/"
         directory: "bin/Debug-linux-x86_64/"
+
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
@@ -46,14 +49,17 @@ jobs:
 
     - name: configure
       run: vendor/premake/premake5.exe vs2022
-    - name: make
-      run: make config=debug all
+
+    - name: build
+      run: msbuild
+
     - name: package
       uses: TheDoctor0/zip-release@0.7.1
       with:
         filename: "AnEngine-dbg.zip"
         path: "bin/Debug-windows-x86_64/"
         directory: "bin/Debug-windows-x86_64/"
+
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
