@@ -1,0 +1,31 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: configure
+      run: vendor/premake/premake5 gmake2
+    - name: make
+      run: make config=debug all
+    - name: package
+      uses: TheDoctor0/zip-release@0.7.1
+      with:
+        filename: "AnEngine-dbg.zip"
+        path: "bin/Debug-linux-x86_64/"
+        directory: "bin/Debug-linux-x86_64/"
+    - name: upload
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: "AnEngine-dbg.zip"
+        path: "bin/Debug-linux-x86_64/"
