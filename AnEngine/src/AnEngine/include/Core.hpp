@@ -4,17 +4,24 @@
 
 #if defined(AE_WIN)
     #define DEBUG_BREAK() __debugbreak()
-    
-    #ifdef AE_DLL
-        #define AE_API __declspec(dllexport)
+    #if defined(AE_DYN_LINK)
+        #if defined(AE_DLL)
+            #define AE_API __declspec(dllexport)
+        #else
+            #define AE_API __declspec(dllimport)
+        #endif
     #else
-        #define AE_API __declspec(dllimport)
+        #define AE_API
     #endif
 #elif defined(AE_LINUX)
     #include <signal.h>
     #define DEBUG_BREAK() raise(SIGTRAP)
-    #ifdef AE_DLL
-        #define AE_API __attribute__((visibility("default")))
+    #if defined(AE_DYN_LINK)
+        #if defined(AE_DLL)
+            #define AE_API __attribute__((visibility("default")))
+        #else
+            #define AE_API
+        #endif
     #else
         #define AE_API
     #endif
@@ -26,7 +33,7 @@
     #define AE_ENABLE_ASSERTS
 #endif
 
-#ifdef AE_ENABLE_ASSERTS
+#if defined(AE_ENABLE_ASSERTS)
     #define AE_ASSERT(x, ...) { if(!(x)) { AE_ERROR("Assertion Failed: {0}", __VA_ARGS__); DEBUG_BREAK(); } }
     #define AE_CORE_ASSERT(x, ...) { if(!(x)) { AE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); DEBUG_BREAK(); } }
 #else

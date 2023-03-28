@@ -3,9 +3,7 @@
 
 
 namespace AnEngine {
-    LayerStack::LayerStack() {
-        layerInsert = layers.begin();
-    }
+    LayerStack::LayerStack() {}
 
     LayerStack::~LayerStack() {
         for (Layer* layer : layers) {
@@ -15,7 +13,8 @@ namespace AnEngine {
     }
 
     void LayerStack::pushLayer(Layer* layer) {
-        layerInsert = layers.emplace(layerInsert, layer);
+       layers.emplace(layers.begin() + layerInsertIndex, layer);
+       layerInsertIndex++;
     }
 
     void LayerStack::pushOverlay(Layer* overlay) {
@@ -26,7 +25,7 @@ namespace AnEngine {
         auto it = std::ranges::find(layers, layer);
         if (it != layers.end()) {
             layers.erase(it);
-            layerInsert--;
+            layerInsertIndex--;
         }
     }
 

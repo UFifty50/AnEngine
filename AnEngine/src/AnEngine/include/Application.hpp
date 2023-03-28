@@ -5,12 +5,14 @@
 #include "LayerStack.hpp"
 #include "Events/Event.hpp"
 #include "Events/ApplicationEvent.hpp"
+#include "ImGui/ImGuiLayer.hpp"
 
 namespace AnEngine {
     class AE_API Application {
     private:
         static Application* instance;
         std::unique_ptr<Window> window;
+        ImGuiLayer* imGuiLayer;
         bool running = true;
         LayerStack layerStack;
 

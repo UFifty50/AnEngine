@@ -17,6 +17,7 @@ namespace AnEngine {
            virtual void onAttach() {}
            virtual void onDetach() {}
            virtual void onUpdate() {}
+           virtual void onImGuiRender() {}
            virtual void onEvent(Event& e) {}
     
            inline const std::string& getName() const { return debugName; }

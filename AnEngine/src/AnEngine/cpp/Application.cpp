@@ -17,6 +17,9 @@ namespace AnEngine {
 
         window = std::unique_ptr<Window>(Window::create());
         window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
+
+        imGuiLayer = new ImGuiLayer();
+        pushOverlay(imGuiLayer);
     }
 
     Application::~Application() {}
@@ -57,8 +60,11 @@ namespace AnEngine {
                 layer->onUpdate();
             }
 
-            auto[x, y] = Input::getMousePosition();
-            AE_CORE_DEBUG("{0}, {1}", x, y);
+            imGuiLayer->begin();
+            for (Layer* layer : layerStack) {
+                layer->onImGuiRender();
+            }
+            imGuiLayer->end();
 
             window->onUpdate();
         }

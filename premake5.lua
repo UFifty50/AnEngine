@@ -19,9 +19,10 @@ group "Dependencies"
 group ""
 project "AnEngine"
     location "AnEngine"
-    kind "SharedLib"
-    staticruntime "off"
+    kind "StaticLib"
+    staticruntime "on"
     language "C++"
+    cppdialect "C++20"
 
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
     objdir ("bin/intermediate/" .. outputDir .. "/%{prj.name}")
@@ -39,6 +40,10 @@ project "AnEngine"
     files {
         "%{prj.name}/src/Platform/OpenGL/**.hpp",
         "%{prj.name}/src/Platform/OpenGL/**.cpp",
+    }
+
+    defines { 
+        "_CRT_SECURE_NO_WARNINGS",
     }
 
     includedirs { 
@@ -59,8 +64,7 @@ project "AnEngine"
     }
 
     filter "system:linux"
-        pic "On"
-        cppdialect "C++20"
+        pic "on"
         systemversion "latest"
 
         files {
@@ -84,17 +88,16 @@ project "AnEngine"
             "AE_DLL",
         }
 
-        prebuildcommands {
-                "{RMDIR} ../bin/" .. outputDir
-        }
+    --    prebuildcommands {
+    --            "{RMDIR} ../bin/" .. outputDir
+    --    }
 
-        postbuildcommands {
-                "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
-                "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox"
-        }
+    --    postbuildcommands {
+    --            "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
+    --            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox"
+   --     }
 
     filter "system:windows"
-        cppdialect "C++20"
         systemversion "latest"
         buildoptions { "/external:W0" }
 
@@ -113,36 +116,37 @@ project "AnEngine"
             "GLFW_INCLUDE_NONE"
         }
 
-        prebuildcommands {
-                "{RMDIR} ../bin/" .. outputDir
-        }
+    --    prebuildcommands {
+    --            "{RMDIR} ../bin/" .. outputDir
+    --    }
 
-        postbuildcommands {
-                "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
-                "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox"
-        }
+      --  postbuildcommands {
+     --           "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
+    --            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox"
+   --     }
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG" }
         runtime "Debug"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
         defines { "AE_RELEASE" }
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
     filter "configurations:Dist"
         defines { "AE_DIST" }
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
 
 project "Sandbox"
     location "Sandbox"
     kind "ConsoleApp"
-    staticruntime "off"
+    staticruntime "on"
     language "C++"
+    cppdialect "C++20"
 
     links { "AnEngine" }
 
@@ -157,12 +161,12 @@ project "Sandbox"
         "AnEngine/src/AnEngine/include/",
         "%{prj.name}/src/Platform/",
         "AnEngine/vendor/spdlog/include/",
+        "%{includeDir.ImGui}",
         "%{includeDir.glm}"
     }
 
     filter "system:Linux"
         pic "On"
-        cppdialect "C++20"
         systemversion "latest"
 
         defines { 
@@ -170,7 +174,6 @@ project "Sandbox"
         }
 
     filter "system:windows"
-        cppdialect "C++20"
         systemversion "latest"
         buildoptions { "/external:W0" }
 
@@ -181,14 +184,14 @@ project "Sandbox"
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG" }
         runtime "Debug"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
         defines { "AE_RELEASE" }
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
     filter "configurations:Dist"
         defines { "AE_DIST" }
         runtime "Release"
-        optimize "On"
+        optimize "on"

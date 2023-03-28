@@ -1,5 +1,6 @@
 #include <AnEngine.hpp>
-
+#include "imgui.h"
+#include "imgui_internal.h"
 
 class ExampleLayer : public AnEngine::Layer {
 public:
@@ -13,6 +14,12 @@ public:
         }
     }
 
+    virtual void onImGuiRender() override {
+        ImGui::Begin("Test");
+        ImGui::Text("Hello World!");
+        ImGui::End();
+    }
+
     void onEvent(AnEngine::Event& event) override {
      //   AE_TRACE("{0}", event);
     }
@@ -22,7 +29,6 @@ class Sandbox : public AnEngine::Application {
 public:
     Sandbox() {
         pushLayer(new ExampleLayer());
-        pushOverlay(new AnEngine::ImGuiLayer());
     }
 
     ~Sandbox() {}
