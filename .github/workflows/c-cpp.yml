@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-ubuntu:
 
     runs-on: ubuntu-latest
 
@@ -35,14 +35,14 @@ jobs:
 
 
 
-  build:
+  build-windows:
     runs-on: windows-latest
 
     steps:
+    - uses: microsoft/setup-msbuild@v1.0.2
     - uses: actions/checkout@v3
       with:
         submodules: recursive
-
 
     - name: configure
       run: vendor/premake/premake5.exe vs2022
