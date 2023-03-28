@@ -95,7 +95,6 @@ project "AnEngine"
         defines { 
             "AE_LINUX",
             "AE_DLL",
-            "AE_DYN_LINK"
         }
 
     filter "system:windows"
@@ -151,13 +150,10 @@ project "Sandbox"
         "%{prj.name}/src/include/",
         "AnEngine/src",
         "AnEngine/src/AnEngine/include/",
-        "AnEngine/src/Platform/",
         "AnEngine/vendor/spdlog/include/",
         "%{includeDir.ImGui}",
         "%{includeDir.glm}"
     }
-    --    "%{includeDir.GLFW}",
- --       "%{includeDir.Glad}",
 
     filter "system:Linux"
         pic "on"
