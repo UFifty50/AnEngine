@@ -24,9 +24,7 @@ jobs:
       run: make config=debug all
 
     - name: package
-      run: |
-        cd bin/Debug-linux-x86_64/
-        tar -a -c -f AnEngine-dbg.linux.zip .
+      run: tar -a -c -f AnEngine-dbg.linux.zip bin/Debug-linux-x86_64/Sandbox
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
@@ -52,9 +50,7 @@ jobs:
       run: msbuild
 
     - name: package
-      run: |
-        cd bin/Debug-windows-x86_64/
-        tar.exe -a -c -f AnEngine-dbg.windows.zip .
+      run: tar.exe -a -c -f AnEngine-dbg.windows.zip bin/Debug-windows-x86_64/Sandbox
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
