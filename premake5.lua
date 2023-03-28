@@ -86,6 +86,7 @@ project "AnEngine"
         defines { 
             "AE_LINUX",
             "AE_DLL",
+            "AE_DYN_LINK"
         }
 
     --    prebuildcommands {

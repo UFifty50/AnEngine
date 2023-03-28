@@ -16,15 +16,15 @@
 #elif defined(AE_LINUX)
     #include <signal.h>
     #define DEBUG_BREAK() raise(SIGTRAP)
-  //  #if defined(AE_DYN_LINK)
+    #if defined(AE_DYN_LINK)
         #if defined(AE_DLL)
             #define AE_API __attribute__((visibility("default")))
         #else
             #define AE_API
         #endif
- //   #else
-  //      #define AE_API
- //   #endif
+    #else
+        #define AE_API
+    #endif
 #else 
     #error AnEngine only supports Windows and Linux!
 #endif
