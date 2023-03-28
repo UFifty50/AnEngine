@@ -151,11 +151,13 @@ project "Sandbox"
         "%{prj.name}/src/include/",
         "AnEngine/src",
         "AnEngine/src/AnEngine/include/",
-        "%{prj.name}/src/Platform/",
+        "AnEngine/src/Platform/",
         "AnEngine/vendor/spdlog/include/",
         "%{includeDir.ImGui}",
         "%{includeDir.glm}"
     }
+    --    "%{includeDir.GLFW}",
+ --       "%{includeDir.Glad}",
 
     filter "system:Linux"
         pic "on"
