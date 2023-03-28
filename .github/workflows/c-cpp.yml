@@ -14,6 +14,9 @@ jobs:
       with:
         submodules: recursive
 
+    - name: install stuff
+      run: sudo apt install -y libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglew-dev
+
     - name: configure
       run: vendor/premake/premake5 gmake2
     - name: make
@@ -27,5 +30,31 @@ jobs:
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: "AnEngine-dbg.zip"
+        name: "AnEngine-dbg.linux.zip"
         path: "bin/Debug-linux-x86_64/"
+
+
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+
+    - name: configure
+      run: vendor/premake/premake5.exe vs2022
+    - name: make
+      run: make config=debug all
+    - name: package
+      uses: TheDoctor0/zip-release@0.7.1
+      with:
+        filename: "AnEngine-dbg.zip"
+        path: "bin/Debug-windows-x86_64/"
+        directory: "bin/Debug-windows-x86_64/"
+    - name: upload
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: "AnEngine-dbg.windows.zip"
+        path: "bin/Debug-windows-x86_64/"
