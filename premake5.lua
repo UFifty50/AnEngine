@@ -63,6 +63,15 @@ project "AnEngine"
         "ImGui",
     }
 
+--    prebuildcommands {
+--            "{RMDIR} ../bin/" .. outputDir
+--    }
+
+--    postbuildcommands {
+--            "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
+--            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox"
+--    }
+
     filter "system:linux"
         pic "on"
         systemversion "latest"
@@ -89,15 +98,6 @@ project "AnEngine"
             "AE_DYN_LINK"
         }
 
-    --    prebuildcommands {
-    --            "{RMDIR} ../bin/" .. outputDir
-    --    }
-
-    --    postbuildcommands {
-    --            "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
-    --            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox"
-   --     }
-
     filter "system:windows"
         systemversion "latest"
         buildoptions { "/external:W0" }
@@ -116,15 +116,6 @@ project "AnEngine"
             "AE_DLL",
             "GLFW_INCLUDE_NONE"
         }
-
-    --    prebuildcommands {
-    --            "{RMDIR} ../bin/" .. outputDir
-    --    }
-
-      --  postbuildcommands {
-     --           "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
-    --            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox"
-   --     }
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG" }
@@ -167,11 +158,25 @@ project "Sandbox"
     }
 
     filter "system:Linux"
-        pic "On"
+        pic "on"
         systemversion "latest"
 
         defines { 
             "AE_LINUX",
+        }
+
+        links {
+            "Xrandr",
+            "Xi",
+            "GLEW",
+            "GLU",
+            "GL",
+            "X11",
+            "dl",
+            "pthread",
+            "GLFW",
+            "Glad",
+            "ImGui",
         }
 
     filter "system:windows"
