@@ -24,7 +24,7 @@
         #endif
  //   #else
   //      #define AE_API
-    #endif
+ //   #endif
 #else 
     #error AnEngine only supports Windows and Linux!
 #endif
