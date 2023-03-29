@@ -24,6 +24,8 @@ project "AnEngine"
     language "C++"
     cppdialect "C++20"
 
+    externalwarnings "off"
+
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
     objdir ("bin/intermediate/" .. outputDir .. "/%{prj.name}")
 
@@ -40,10 +42,6 @@ project "AnEngine"
     files {
         "%{prj.name}/src/Platform/OpenGL/**.hpp",
         "%{prj.name}/src/Platform/OpenGL/**.cpp",
-    }
-
-    defines { 
-        "_CRT_SECURE_NO_WARNINGS",
     }
 
     includedirs { 
