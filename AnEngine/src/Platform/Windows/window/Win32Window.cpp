@@ -1,10 +1,11 @@
 #include "aepch.hpp"
-#include <glad/glad.h>
 
 #include "Windows/window/Win32Window.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
+
+#include "Platform/OpenGL/OpenGLContext.hpp"
 
 
 namespace AnEngine {
@@ -33,6 +34,7 @@ namespace AnEngine {
 
         AE_CORE_INFO("Creating window {0} (width {1}; height {2})", props.title, props.width, props.height);
 
+
         if (!GLFWinitialised) {
             int success = glfwInit();
             AE_CORE_ASSERT(success, "Could not initialise GLFW!");
@@ -47,9 +49,10 @@ namespace AnEngine {
             nullptr,
             nullptr
         );
-        glfwMakeContextCurrent(window);
-        int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        AE_CORE_ASSERT(status, "Failed to initialise Glad!");
+
+        graphicsContext = new OpenGLContext(window);
+        graphicsContext->init();
+
         glfwSetWindowUserPointer(window, &data);
         setVSync(true);
 
@@ -159,7 +162,7 @@ namespace AnEngine {
 
     void Win32Window::onUpdate() {
         glfwPollEvents();
-        glfwSwapBuffers(window);
+        graphicsContext->swapBuffers();
     }
 
     void Win32Window::setVSync(bool enabled) {
