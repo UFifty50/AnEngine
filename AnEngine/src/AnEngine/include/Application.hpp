@@ -15,6 +15,7 @@ namespace AnEngine {
         ImGuiLayer* imGuiLayer;
         bool running = true;
         LayerStack layerStack;
+        unsigned int vertexArray, vertexBuffer, indexBuffer;
 
         bool onWindowClose(WindowCloseEvent& e);
 
