@@ -2,6 +2,7 @@
 #define AEPCH_HPP
 
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <functional>
 #include <memory>
