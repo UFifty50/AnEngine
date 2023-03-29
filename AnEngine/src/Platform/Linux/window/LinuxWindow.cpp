@@ -1,10 +1,11 @@
 #include "aepch.hpp"
-#include <glad/glad.h>
 
-#include "LinuxWindow.hpp"
+#include "Platform/Linux/window/LinuxWindow.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
+
+#include "Platform/OpenGL/OpenGLContext.hpp"
 
 
 namespace AnEngine {
@@ -47,9 +48,9 @@ namespace AnEngine {
             nullptr,
             nullptr
         );
-        glfwMakeContextCurrent(window);
-        int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        AE_CORE_ASSERT(status, "Failed to initialise Glad!");
+        graphicsContext = new OpenGLContext(window);
+        graphicsContext->init();
+
         glfwSetWindowUserPointer(window, &data);
         setVSync(true);
 
@@ -159,7 +160,7 @@ namespace AnEngine {
 
     void LinuxWindow::onUpdate() {
         glfwPollEvents();
-        glfwSwapBuffers(window);
+        graphicsContext->swapBuffers();
     }
 
     void LinuxWindow::setVSync(bool enabled) {

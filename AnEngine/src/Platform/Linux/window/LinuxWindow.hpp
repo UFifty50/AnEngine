@@ -2,6 +2,7 @@
 #define LINUXWINDOW_HPP
 
 #include "Window.hpp"
+#include "Renderer/RenderContext.hpp"
 #include <GLFW/glfw3.h>
 
 
@@ -18,6 +19,7 @@ namespace AnEngine {
 
         GLFWwindow* window;
         WindowData data;
+        RenderContext* graphicsContext;
 
         virtual void init(const WindowProperties& props);
         virtual void shutdown();
