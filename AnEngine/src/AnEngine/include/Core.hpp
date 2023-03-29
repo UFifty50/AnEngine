@@ -2,6 +2,10 @@
 #define CORE_HPP
 
 
+#if defined(AE_WIN) and defined(AE_LINUX)
+    #error Only one platform can be defined
+#endif
+
 #if defined(AE_WIN)
     #define DEBUG_BREAK() __debugbreak()
     #if defined(AE_DYN_LINK)
@@ -25,8 +29,8 @@
     #else
         #define AE_API
     #endif
-#else 
-    #error AnEngine only supports Windows and Linux!
+#else
+    #error No platform defined, or platform not supported
 #endif
 
 #if defined(AE_DEBUG_FLAG) and not defined(AE_ENABLE_ASSERTS)

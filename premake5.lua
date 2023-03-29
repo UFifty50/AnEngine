@@ -99,7 +99,6 @@ project "AnEngine"
 
     filter "system:windows"
         systemversion "latest"
-        buildoptions { "/external:W0" }
 
         files {
             "%{prj.name}/src/Platform/Windows/**.hpp",
@@ -139,7 +138,12 @@ project "Sandbox"
     language "C++"
     cppdialect "C++20"
 
-    links { "AnEngine" }
+    links {
+        "AnEngine",
+        "GLFW",
+        "Glad",
+        "ImGui",
+    }
 
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
     objdir ("bin/intermediate/" .. outputDir .. "/%{prj.name}")
@@ -163,23 +167,8 @@ project "Sandbox"
             "AE_LINUX",
         }
 
-        links {
-            "Xrandr",
-            "Xi",
-            "GLEW",
-            "GLU",
-            "GL",
-            "X11",
-            "dl",
-            "pthread",
-            "GLFW",
-            "Glad",
-            "ImGui",
-        }
-
     filter "system:windows"
         systemversion "latest"
-        buildoptions { "/external:W0" }
 
         defines { 
             "AE_WIN",
