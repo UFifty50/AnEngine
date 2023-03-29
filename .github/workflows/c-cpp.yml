@@ -20,7 +20,7 @@ jobs:
     - name: configure
       run: vendor/premake/premake5 gmake2
 
-    - name: make
+    - name: build
       run: make config=debug all
 
     - name: package
@@ -50,10 +50,10 @@ jobs:
       run: msbuild
 
     - name: package
-      run: tar.exe -a -c -f AnEngine-dbg.windows.zip bin\Debug-windows-x86_64\Sandbox
+      run: tar.exe -a -c -f AnEngine-dbg.windows.zip bin/Debug-windows-x86_64/Sandbox
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
         name: "AnEngine-dbg.windows"
-        path: ".\AnEngine-dbg.windows.zip"
+        path: "./AnEngine-dbg.windows.zip"
