@@ -29,8 +29,8 @@ jobs:
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: "AnEngine-dbg.linux.zip"
-        path: "bin/Debug-linux-x86_64/"
+        name: "AnEngine-dbg.linux"
+        path: "bin/Debug-linux-x86_64/AnEngine-dbg.linux.zip"
 
 
 
@@ -55,5 +55,5 @@ jobs:
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: "AnEngine-dbg.windows.zip"
-        path: "bin/Debug-windows-x86_64/"
+        name: "AnEngine-dbg.windows"
+        path: "bin/Debug-windows-x86_64/AnEngine-dbg.windows.zip"
