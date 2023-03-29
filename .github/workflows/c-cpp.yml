@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v3.1.2
       with:
         name: "AnEngine-dbg.linux"
-        path: "bin/Debug-linux-x86_64/AnEngine-dbg.linux.zip"
+        path: "./AnEngine-dbg.linux.zip"
 
 
 
@@ -50,10 +50,10 @@ jobs:
       run: msbuild
 
     - name: package
-      run: tar.exe -a -c -f AnEngine-dbg.windows.zip bin/Debug-windows-x86_64/Sandbox
+      run: tar.exe -a -c -f AnEngine-dbg.windows.zip bin\Debug-windows-x86_64\Sandbox
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
         name: "AnEngine-dbg.windows"
-        path: "bin/Debug-windows-x86_64/AnEngine-dbg.windows.zip"
+        path: ".\AnEngine-dbg.windows.zip"
