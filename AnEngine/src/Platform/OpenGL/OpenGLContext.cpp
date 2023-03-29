@@ -14,6 +14,11 @@ namespace AnEngine {
 
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
         AE_CORE_ASSERT(status, "Failed to initialise Glad!");
+
+        AE_CORE_DEBUG("OpenGL Info:");
+        AE_CORE_DEBUG("  Vendor: {0}", (char*)glGetString(GL_VENDOR));
+        AE_CORE_DEBUG("  Renderer: {0}", (char*)glGetString(GL_RENDERER));
+        AE_CORE_DEBUG("  Version: {0}", (char*)glGetString(GL_VERSION));
     }
     
     void OpenGLContext::swapBuffers() {
