@@ -23,7 +23,8 @@ project "AnEngine"
     staticruntime "on"
     language "C++"
     cppdialect "C++20"
-
+    
+    externalanglebrackets "on"
     externalwarnings "off"
 
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
@@ -44,11 +45,14 @@ project "AnEngine"
         "%{prj.name}/src/Platform/OpenGL/**.cpp",
     }
 
+    externalincludedirs {
+        "%{prj.name}/vendor/spdlog/include/"
+    }
+
     includedirs { 
         "%{prj.name}/src/AnEngine/include/",
         "%{prj.name}/src/Platform/",
         "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include/",
         "%{includeDir.GLFW}",
         "%{includeDir.Glad}",
         "%{includeDir.ImGui}",
