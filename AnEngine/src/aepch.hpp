@@ -13,13 +13,19 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <unordered_map>
 #include <unordered_set>
 
-#ifdef AE_WIN
+#if defined(AE_WIN)
     #include <Windows.h>
+    #include <Shlwapi.h>
+    #include <io.h> 
+#elif defined(AE_LINUX)
+    #include <limits.h>
+    #include <libgen.h>
+    #include <unistd.h>
 #endif
-
 
 #include "Log.hpp"
 #include "Core.hpp"

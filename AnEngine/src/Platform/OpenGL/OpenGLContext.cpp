@@ -19,6 +19,7 @@ namespace AnEngine {
         AE_CORE_DEBUG("  Vendor: {0}", (char*)glGetString(GL_VENDOR));
         AE_CORE_DEBUG("  Renderer: {0}", (char*)glGetString(GL_RENDERER));
         AE_CORE_DEBUG("  Version: {0}", (char*)glGetString(GL_VERSION));
+        AE_CORE_DEBUG("  GLSL Version: {0}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
     }
     
     void OpenGLContext::swapBuffers() {

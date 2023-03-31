@@ -2,6 +2,7 @@ workspace "AnEngine"
     architecture "x64"
     configurations { "Debug", "Release", "Dist" }
     startproject "Sandbox"
+    debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Sandbox"
 
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -45,10 +46,6 @@ project "AnEngine"
         "%{prj.name}/src/Platform/OpenGL/**.cpp",
     }
 
-    externalincludedirs {
-        "%{prj.name}/vendor/spdlog/include/"
-    }
-
     includedirs { 
         "%{prj.name}/src/AnEngine/include/",
         "%{prj.name}/src/Platform/",
@@ -59,20 +56,25 @@ project "AnEngine"
         "%{includeDir.glm}"
     }
 
+    externalincludedirs {
+        "%{prj.name}/vendor/spdlog/include/"
+    }
+
     links {
         "GLFW",
         "Glad",
         "ImGui",
     }
 
---    prebuildcommands {
---            "{RMDIR} ../bin/" .. outputDir
---    }
+    prebuildcommands {
+            "{RMDIR} ../bin/" .. outputDir
+    }
 
---    postbuildcommands {
---            "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
---            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox"
---    }
+    postbuildcommands {
+            "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
+            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox",
+            "{COPYDIR} ../AnEngine/src/res ../bin/" .. outputDir .. "/Sandbox/res"
+    }
 
     filter "system:linux"
         pic "on"
@@ -108,7 +110,8 @@ project "AnEngine"
         }
 
         links {
-            "opengl32.lib"
+            "opengl32.lib",
+            "shlwapi.lib"
         }
 
         defines { 
@@ -116,6 +119,9 @@ project "AnEngine"
             "AE_DLL",
             "GLFW_INCLUDE_NONE"
         }
+
+    filter "toolset:msc*"
+        buildoptions "/analyze:external-"
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG" }
@@ -156,9 +162,13 @@ project "Sandbox"
         "%{prj.name}/src/include/",
         "AnEngine/src",
         "AnEngine/src/AnEngine/include/",
-        "AnEngine/vendor/spdlog/include/",
+        "AnEngine/src/Platform/",
         "%{includeDir.ImGui}",
         "%{includeDir.glm}"
+    }
+
+    externalincludedirs {
+        "AnEngine/vendor/spdlog/include/"
     }
 
     filter "system:Linux"
@@ -175,6 +185,9 @@ project "Sandbox"
         defines { 
             "AE_WIN",
         }
+
+    filter "toolset:msc*"
+        buildoptions "/analyze:external-"
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG" }

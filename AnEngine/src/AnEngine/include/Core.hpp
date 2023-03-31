@@ -38,8 +38,8 @@
 #endif
 
 #if defined(AE_ENABLE_ASSERTS)
-    #define AE_ASSERT(x, ...) { if(!(x)) { AE_ERROR("Assertion Failed: {0}", __VA_ARGS__); DEBUG_BREAK(); } }
-    #define AE_CORE_ASSERT(x, ...) { if(!(x)) { AE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); DEBUG_BREAK(); } }
+    #define AE_ASSERT(x, ...) { if(!(x)) { AE_CRITICAL("Assertion Failed: {0}", __VA_ARGS__); DEBUG_BREAK(); } }
+    #define AE_CORE_ASSERT(x, ...) { if(!(x)) { AE_CORE_CRITICAL("Assertion Failed: {0}", __VA_ARGS__); DEBUG_BREAK(); } }
 #else
     #define AE_ASSERT(x, ...)
     #define AE_CORE_ASSERT(x, ...)

@@ -7,6 +7,10 @@
 #include "Events/ApplicationEvent.hpp"
 #include "ImGui/ImGuiLayer.hpp"
 
+#include "OpenGL/OpenGLShaderCompiler.hpp"
+#include "File/InputFileStream.hpp"
+
+
 namespace AnEngine {
     class AE_API Application {
     private:
@@ -15,7 +19,9 @@ namespace AnEngine {
         ImGuiLayer* imGuiLayer;
         bool running = true;
         LayerStack layerStack;
+
         unsigned int vertexArray, vertexBuffer, indexBuffer;
+        std::unique_ptr<Shader> shader;
 
         bool onWindowClose(WindowCloseEvent& e);
 
