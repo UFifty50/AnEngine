@@ -20,7 +20,7 @@ namespace AnEngine {
         PathCombineA(combined, directory.c_str(), path.c_str());
 
         this->path = std::string(combined);
-#elif defined(AE_LINUX
+#elif defined(AE_LINUX)
         char exePathName[PATH_MAX];
         realpath("/proc/self/exe", exePathName);
 
