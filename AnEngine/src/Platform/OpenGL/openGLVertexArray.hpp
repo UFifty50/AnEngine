@@ -11,7 +11,7 @@ namespace AnEngine {
     class OpenGLVertexArray : public VertexArray {
     public:
         OpenGLVertexArray();
-        virtual ~OpenGLVertexArray() = default;
+        virtual ~OpenGLVertexArray();
 
         inline virtual void bind() const override { glBindVertexArray(this->rendererID); }
         inline virtual void unBind() const override { glBindVertexArray(0); }

@@ -84,6 +84,9 @@ namespace AnEngine {
 
                 case ShaderDataType::Bool:    return 1;
             }
+
+            AE_CORE_ASSERT(false, "Unknown ShaderDataType");
+            return 0;
         }
     };
 

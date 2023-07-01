@@ -5,11 +5,11 @@
 
 
 namespace AnEngine {
-    class NotImplementedException : private std::exception {
+    class NotImplementedException : public std::exception {
     public:
-        NotImplementedException() : std::exception("Not implemented yet") {}
-        NotImplementedException(const char* msg) : std::exception(msg) {}
-        NotImplementedException(const std::string& msg) : std::exception(msg.c_str()) {}
+        const char* what() {
+            return "Not implemented yet";
+        }
     };
 };
 

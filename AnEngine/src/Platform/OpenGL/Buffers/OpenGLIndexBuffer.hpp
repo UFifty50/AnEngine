@@ -14,10 +14,10 @@ namespace AnEngine {
         OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
         virtual ~OpenGLIndexBuffer();
 
-        virtual uint32_t getCount() const;
+        virtual uint32_t getCount() const override;
 
-        virtual void bind() const;
-        virtual void unBind() const;
+        virtual void bind() const override;
+        virtual void unBind() const override;
     };
 }
 
