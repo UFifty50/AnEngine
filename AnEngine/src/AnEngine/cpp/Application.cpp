@@ -36,34 +36,6 @@ namespace AnEngine {
 
         imGuiLayer = new ImGuiLayer();
         pushOverlay(imGuiLayer);
-
-
-        squareVA.reset(VertexArray::create());
-
-        float vertices[3 * 4] = {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-        };
-        squareVB.reset(VertexBuffer::create(vertices, sizeof(vertices)));
-
-        BufferLayout layout = {
-            { ShaderDataType::Vec3, "position" },
-        };
-        squareVB->setLayout(layout);
-
-        squareVA->addVertexBuffer(squareVB);
-
-        uint32_t indices[6] = { 0, 1, 2, 2, 3, 0 };
-        squareIB.reset(IndexBuffer::create(indices, 6));
-
-        squareVA->setIndexBuffer(squareIB);
-
-
-        InputFileStream vertShaderStream("res/shaders/basic.vert");
-        InputFileStream fragShaderStream("res/shaders/basic.frag");
-        shader.reset(Shader::create(vertShaderStream, fragShaderStream));
     }
 
     Application::~Application() = default;
@@ -95,17 +67,6 @@ namespace AnEngine {
 
     void Application::Run() {
         while (running) {
-            RenderCommandQueue::clearColour({ 0.1f, 0.1f, 0.1f, 1 });
-            RenderCommandQueue::clear();
-
-            Renderer::beginScene();
-
-            shader->bind();
-            Renderer::submit(squareVA);
-
-            Renderer::endScene();
-
-
             for (Layer* layer : layerStack) {
                 layer->onUpdate();
             }

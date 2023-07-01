@@ -171,6 +171,10 @@ project "Sandbox"
         "AnEngine/vendor/spdlog/include/"
     }
 
+    postbuildcommands {
+            "{COPYDIR} ../AnEngine/src/res ../bin/" .. outputDir .. "/Sandbox/res"
+    }
+
     filter "system:Linux"
         pic "on"
         systemversion "latest"
