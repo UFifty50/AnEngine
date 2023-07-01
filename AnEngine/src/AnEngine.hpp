@@ -8,6 +8,15 @@
 
 // ---Rendering---
 #include "AnEngine/include/Renderer/Renderer.hpp"
+#include "AnEngine/include/Renderer/RenderCommandQueue.hpp"
+#include "AnEngine/include/Renderer/RenderAPI.hpp"
+
+#include "AnEngine/include/Renderer/Shader.hpp"
+#include "AnEngine/include/Renderer/VertexArray.hpp"
+
+#include "AnEngine/include/Renderer/Buffers/VertexBuffer.hpp"
+#include "AnEngine/include/Renderer/Buffers/IndexBuffer.hpp"
+#include "AnEngine/include/Renderer/Buffers/BufferLayout.hpp"
 
 // ---Layers---
 #include "AnEngine/include/Layer.hpp"

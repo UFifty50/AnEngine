@@ -1,7 +1,7 @@
 #include "aepch.hpp"
 
 #include "Renderer/Buffers/IndexBuffer.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Renderer/RenderAPI.hpp"
 #include "Exceptions/NotImplementedException.hpp"
 
 #include "Platform/OpenGL/Buffers/OpenGLIndexBuffer.hpp"
@@ -9,7 +9,7 @@
 
 namespace AnEngine {
     IndexBuffer* IndexBuffer::create(uint32_t* indices, uint32_t count) {
-        switch (Renderer::getAPI()) {
+        switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
                 return new OpenGLIndexBuffer(indices, count);
 

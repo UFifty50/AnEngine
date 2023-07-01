@@ -37,11 +37,10 @@ namespace AnEngine {
         LayerStack layerStack;
 
         std::shared_ptr<Shader> shader;
-        std::shared_ptr<VertexArray> vertexArray;
-        std::shared_ptr<VertexBuffer> vertexBuffer;
-        std::shared_ptr<IndexBuffer> indexBuffer;
-
         std::shared_ptr<VertexArray> squareVA;
+        std::shared_ptr<VertexBuffer> squareVB;
+        std::shared_ptr<IndexBuffer> squareIB;
+
 
         bool onWindowClose(WindowCloseEvent& e);
     };

@@ -2,13 +2,13 @@
 
 #include <Exceptions/NotImplementedException.hpp>
 #include "Renderer/VertexArray.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Renderer/RenderAPI.hpp"
 #include "Platform/OpenGL/openGLVertexArray.hpp"
 
 
 namespace AnEngine {
     VertexArray* VertexArray::create() {
-        switch (Renderer::getAPI()) {
+        switch (RenderAPI::getAPI()) {
         case RenderAPI::OpenGL:
             return new OpenGLVertexArray();
 

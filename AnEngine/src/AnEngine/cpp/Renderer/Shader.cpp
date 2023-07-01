@@ -1,7 +1,7 @@
 #include "aepch.hpp"
 
 #include "Renderer/Shader.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Renderer/RenderAPI.hpp"
 #include "Exceptions/NotImplementedException.hpp"
 
 #include "Platform/OpenGL/OpenGLShader.hpp"
@@ -9,7 +9,7 @@
 
 namespace AnEngine {
     Shader* Shader::create(InputFileStream& vertShaderStream, InputFileStream& fragShaderStream) {
-        switch (Renderer::getAPI()) {
+        switch (RenderAPI::getAPI()) {
         case RenderAPI::OpenGL:
             return new OpenGLShader(vertShaderStream, fragShaderStream);
 
@@ -32,7 +32,7 @@ namespace AnEngine {
     }
 
     Shader* Shader::create(const std::string& vertShaderSrc, const std::string& fragShaderSrc) {
-        switch (Renderer::getAPI()) {
+        switch (RenderAPI::getAPI()) {
         case RenderAPI::OpenGL:
             return new OpenGLShader(vertShaderSrc, fragShaderSrc);
 

@@ -1,6 +1,6 @@
 #include "aepch.hpp"
 #include "OpenGLContext.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Renderer/RenderAPI.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -21,7 +21,7 @@ namespace AnEngine {
         AE_CORE_DEBUG("  Renderer: {0}", (char*)glGetString(GL_RENDERER));
         AE_CORE_DEBUG("  Version: {0}", (char*)glGetString(GL_VERSION));
         AE_CORE_DEBUG("  GLSL Version: {0}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-        AE_CORE_DEBUG("Current RenderAPI: {0}", Renderer::getAPI());
+        AE_CORE_DEBUG("Current RenderAPI: {0}", RenderAPI::getAPI());
     }
     
     void OpenGLContext::swapBuffers() {

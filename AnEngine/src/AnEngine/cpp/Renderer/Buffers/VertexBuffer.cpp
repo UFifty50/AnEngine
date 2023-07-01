@@ -1,7 +1,7 @@
 #include "aepch.hpp"
 
 #include "Renderer/Buffers/VertexBuffer.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Renderer/RenderAPI.hpp"
 #include "Exceptions/NotImplementedException.hpp"
 
 #include "Platform/OpenGL/Buffers/OpenGLVertexBuffer.hpp"
@@ -9,7 +9,7 @@
 
 namespace AnEngine {
     VertexBuffer* VertexBuffer::create(float* vertices, size_t size) {
-        switch (Renderer::getAPI()) {
+        switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
                 return new OpenGLVertexBuffer(vertices, size);
 

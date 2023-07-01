@@ -36,6 +36,6 @@ public:
 };
 
 AnEngine::Application* AnEngine::CreateApplication() {
-    Renderer::setAPI(RenderAPI::OpenGL);
+    RenderAPI::setAPI(RenderAPI::OpenGL);
     return new Sandbox();
 }
