@@ -1,5 +1,5 @@
-#ifndef OPENGLCONTEXT_HPP
-#define OPENGLCONTEXT_HPP
+#ifndef OGLCONTEXT_HPP
+#define OGLCONTEXT_HPP
 
 #include "Renderer/RenderContext.hpp"
 struct GLFWwindow;

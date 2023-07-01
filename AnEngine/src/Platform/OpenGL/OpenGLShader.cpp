@@ -1,13 +1,13 @@
 #include "aepch.hpp"
 
-#include "OpenGLShaderCompiler.hpp"
+#include "OpenGLShader.hpp"
 #include "File/InputFileStream.hpp"
 
 #include <glad/glad.h>
 
 
 namespace AnEngine {
-    Shader::Shader(AnEngine::InputFileStream& vertShaderStream, AnEngine::InputFileStream& fragShaderStream) {
+    OpenGLShader::OpenGLShader(AnEngine::InputFileStream& vertShaderStream, AnEngine::InputFileStream& fragShaderStream) {
         std::string vertShader;
         std::string fragShader;
         
@@ -24,15 +24,15 @@ namespace AnEngine {
         this->rendererID = this->compileAndCheckShaders(vertShader, fragShader);
     }
     
-    Shader::Shader(const std::string& vertShaderSrc, const std::string& fragShaderSrc) {
+    OpenGLShader::OpenGLShader(const std::string& vertShaderSrc, const std::string& fragShaderSrc) {
         this->rendererID = this->compileAndCheckShaders(vertShaderSrc, fragShaderSrc);
     }
 
-    Shader::~Shader() {
+    OpenGLShader::~OpenGLShader() {
         glDeleteProgram(this->rendererID);
     }
 
-    unsigned int Shader::compileAndCheckShaders(const std::string& vertShaderSrc, const std::string& fragShaderSrc) {
+    uint32_t OpenGLShader::compileAndCheckShaders(const std::string& vertShaderSrc, const std::string& fragShaderSrc) const {
         // Create the shaders
         GLuint vertShaderID = glCreateShader(GL_VERTEX_SHADER);
         GLuint fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -121,14 +121,14 @@ namespace AnEngine {
         glDeleteShader(vertShaderID);
         glDeleteShader(fragShaderID);
 
-        return programID;
+        return static_cast<uint32_t>(programID);
     }
     
-    void Shader::bind() const {
+    void OpenGLShader::bind() const {
         glUseProgram(this->rendererID);
     }
     
-    void Shader::unbind() const {
+    void OpenGLShader::unbind() const {
         glUseProgram(0);
     }
 }

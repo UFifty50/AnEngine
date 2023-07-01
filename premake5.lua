@@ -1,5 +1,5 @@
 workspace "AnEngine"
-    architecture "x64"
+    architecture "x86_64"
     configurations { "Debug", "Release", "Dist" }
     startproject "Sandbox"
     debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Sandbox"

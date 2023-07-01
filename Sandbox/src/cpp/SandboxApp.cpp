@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
+
 class ExampleLayer : public AnEngine::Layer {
 public:
     ExampleLayer() : Layer("Example") {}
@@ -35,5 +36,6 @@ public:
 };
 
 AnEngine::Application* AnEngine::CreateApplication() {
+    Renderer::setAPI(RenderAPI::OpenGL);
     return new Sandbox();
 }

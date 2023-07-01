@@ -24,7 +24,7 @@ namespace AnEngine {
     public:
         using EventCallbackFn = std::function<void(Event&)>;
 
-        virtual ~Window() {}
+        virtual ~Window() = default;
 
         virtual void onUpdate() = 0;
 
