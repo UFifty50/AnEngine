@@ -13,8 +13,8 @@ namespace AnEngine {
     }
 
     void LayerStack::pushLayer(Layer* layer) {
-       layers.emplace(layers.begin() + layerInsertIndex, layer);
-       layerInsertIndex++;
+        layers.emplace(layers.begin() + layerInsertIndex, layer);
+        layerInsertIndex++;
     }
 
     void LayerStack::pushOverlay(Layer* overlay) {
@@ -24,6 +24,7 @@ namespace AnEngine {
     void LayerStack::popLayer(Layer* layer) {
         auto it = std::ranges::find(layers, layer);
         if (it != layers.end()) {
+            layer->onDetach();
             layers.erase(it);
             layerInsertIndex--;
         }
@@ -32,6 +33,7 @@ namespace AnEngine {
     void LayerStack::popOverlay(Layer* overlay) {
         auto it = std::ranges::find(layers, overlay);
         if (it != layers.end()) {
+            overlay->onDetach();
             layers.erase(it);
         }
     }

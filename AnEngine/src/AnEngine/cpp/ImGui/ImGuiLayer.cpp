@@ -12,7 +12,7 @@
 namespace AnEngine {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
-    ImGuiLayer::~ImGuiLayer() {}
+    ImGuiLayer::~ImGuiLayer() = default;
 
     void ImGuiLayer::onAttach() {
         // setup context
@@ -38,7 +38,7 @@ namespace AnEngine {
 
         // platform/renderer bindings
         ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 410");
+        ImGui_ImplOpenGL3_Init("#version 460");
     }
 
     void ImGuiLayer::onDetach() {
@@ -72,6 +72,6 @@ namespace AnEngine {
 
     void ImGuiLayer::onImGuiRender() {
         static bool show = true;
-        ImGui::ShowDemoWindow(&show);
+     //   ImGui::ShowDemoWindow(&show);
     }
 }

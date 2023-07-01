@@ -33,7 +33,7 @@ namespace AnEngine {
 
         this->path = directory + "/" + path;
 #endif
-        // winows and linux paths
+        // split path
         if (this->path.find_last_of("\\") != std::string::npos) {
             this->name = this->path.substr(this->path.find_last_of("\\") + 1);
         } else {         

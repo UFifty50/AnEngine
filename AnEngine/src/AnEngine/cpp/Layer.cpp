@@ -5,5 +5,5 @@
 namespace AnEngine {
     Layer::Layer(const std::string& name) : debugName(name) {}
 
-    Layer::~Layer() {}
+    Layer::~Layer() = default;
 }

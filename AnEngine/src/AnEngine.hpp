@@ -6,6 +6,9 @@
 // ---virtual base application---
 #include "AnEngine/include/Application.hpp"
 
+// ---Rendering---
+#include "AnEngine/include/Renderer/Renderer.hpp"
+
 // ---Layers---
 #include "AnEngine/include/Layer.hpp"
 #include "AnEngine/include/ImGui/ImGuiLayer.hpp"
