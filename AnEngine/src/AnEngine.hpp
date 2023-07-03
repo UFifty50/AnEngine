@@ -12,11 +12,15 @@
 #include "AnEngine/include/Renderer/RenderAPI.hpp"
 
 #include "AnEngine/include/Renderer/Shader.hpp"
+#include "AnEngine/include/Renderer/ShaderUniform.hpp"
 #include "AnEngine/include/Renderer/VertexArray.hpp"
 
 #include "AnEngine/include/Renderer/Buffers/VertexBuffer.hpp"
 #include "AnEngine/include/Renderer/Buffers/IndexBuffer.hpp"
 #include "AnEngine/include/Renderer/Buffers/BufferLayout.hpp"
+
+// ---Cameras---
+#include "AnEngine/include/Renderer/Camera/OrthographicCamera.hpp"
 
 // ---Layers---
 #include "AnEngine/include/Layer.hpp"

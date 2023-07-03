@@ -4,6 +4,7 @@
 #include "File/InputFileStream.hpp"
 
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 
 namespace AnEngine {
@@ -130,5 +131,104 @@ namespace AnEngine {
     
     void OpenGLShader::unbind() const {
         glUseProgram(0);
+    }
+
+    void OpenGLShader::uploadUniform(const std::string& name, std::any uniform) {
+        GLint location = glGetUniformLocation(this->rendererID, name.c_str());
+        if (location == -1) {
+            AE_CORE_ERROR("Uniform {0} doesn't exist.", name);
+            return;
+        }
+
+        if (uniform.type() == typeid(int32_t)) {
+            glUniform1i(location, std::any_cast<int32_t>(uniform));
+        }
+        else if (uniform.type() == typeid(uint32_t)) {
+            glUniform1ui(location, std::any_cast<uint32_t>(uniform));
+        }
+        else if (uniform.type() == typeid(bool)) {
+            glUniform1i(location, std::any_cast<bool>(uniform));
+        }
+        else if (uniform.type() == typeid(float)) {
+            glUniform1f(location, std::any_cast<float>(uniform));
+        }
+        else if (uniform.type() == typeid(double)) {
+            glUniform1d(location, std::any_cast<double>(uniform));
+        }
+        
+
+        else if (uniform.type() == typeid(glm::vec2)) {
+            glm::vec2 vec = std::any_cast<glm::vec2>(uniform);
+            glUniform2f(location, vec.x, vec.y);
+        }
+        else if (uniform.type() == typeid(glm::ivec2)) {
+            glm::ivec2 vec = std::any_cast<glm::ivec2>(uniform);
+            glUniform2i(location, vec.x, vec.y);
+        }
+        else if (uniform.type() == typeid(glm::uvec2)) {
+            glm::uvec2 vec = std::any_cast<glm::uvec2>(uniform);
+            glUniform2ui(location, vec.x, vec.y);
+        }
+        else if (uniform.type() == typeid(glm::dvec2)) {
+            glm::dvec2 vec = std::any_cast<glm::dvec2>(uniform);
+            glUniform2d(location, vec.x, vec.y);
+        }
+        else if (uniform.type() == typeid(glm::bvec2)) {
+            glm::bvec2 vec = std::any_cast<glm::bvec2>(uniform);
+            glUniform2i(location, vec.x, vec.y);
+        }
+        
+        else if (uniform.type() == typeid(glm::vec3)) {
+            glm::vec3 vec = std::any_cast<glm::vec3>(uniform);
+            glUniform3f(location, vec.x, vec.y, vec.z);
+        }
+        else if (uniform.type() == typeid(glm::ivec3)) {
+            glm::ivec3 vec = std::any_cast<glm::ivec3>(uniform);
+            glUniform3i(location, vec.x, vec.y, vec.z);
+        }
+        else if (uniform.type() == typeid(glm::uvec3)) {
+            glm::uvec3 vec = std::any_cast<glm::uvec3>(uniform);
+            glUniform3ui(location, vec.x, vec.y, vec.z);
+        }
+        else if (uniform.type() == typeid(glm::dvec3)) {
+            glm::dvec3 vec = std::any_cast<glm::dvec3>(uniform);
+            glUniform3d(location, vec.x, vec.y, vec.z);
+        }
+        else if (uniform.type() == typeid(glm::bvec3)) {
+            glm::bvec3 vec = std::any_cast<glm::bvec3>(uniform);
+            glUniform3i(location, vec.x, vec.y, vec.z);
+        }
+
+        else if (uniform.type() == typeid(glm::vec4)) {
+            glm::vec4 vec = std::any_cast<glm::vec4>(uniform);
+            glUniform4f(location, vec.r, vec.b, vec.g, vec.a);
+        }
+        else if (uniform.type() == typeid(glm::ivec4)) {
+            glm::ivec4 vec = std::any_cast<glm::ivec4>(uniform);
+            glUniform4i(location, vec.r, vec.b, vec.g, vec.a);
+        }
+        else if (uniform.type() == typeid(glm::uvec4)) {
+            glm::uvec4 vec = std::any_cast<glm::uvec4>(uniform);
+            glUniform4ui(location, vec.r, vec.b, vec.g, vec.a);
+        }
+        else if (uniform.type() == typeid(glm::dvec4)) {
+            glm::dvec4 vec = std::any_cast<glm::dvec4>(uniform);
+            glUniform4d(location, vec.r, vec.b, vec.g, vec.a);
+        }
+        else if (uniform.type() == typeid(glm::bvec4)) {
+            glm::bvec4 vec = std::any_cast<glm::bvec4>(uniform);
+            glUniform4i(location, vec.r, vec.b, vec.g, vec.a);
+        }
+
+        
+        else if (uniform.type() == typeid(glm::mat3)) {
+            glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(std::any_cast<glm::mat3>(uniform)));
+        }
+        else if (uniform.type() == typeid(glm::mat4)) {
+            glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(std::any_cast<glm::mat4>(uniform)));
+        }
+        else {
+            AE_CORE_ASSERT(false, "Unknown uniform type.");
+        }
     }
 }
