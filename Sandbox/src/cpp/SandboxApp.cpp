@@ -8,7 +8,8 @@ std::initializer_list<AnEngine::ShaderUniformBase> varName = { __VA_ARGS__ }
 
 class ExampleLayer : public AnEngine::Layer {
 public:
-    ExampleLayer() : Layer("Example"), camera(-1.6f, 1.6f, -0.9f, 0.9f) {
+    ExampleLayer() : Layer("Example"), camera(-1.6f, 1.6f, -0.9f, 0.9f),
+                     cameraPosition(0.0f), cameraRotation(0.0f) {
         // rectangle
         {
             squareVA.reset(AnEngine::VertexArray::create());
@@ -70,7 +71,33 @@ public:
     }
 
     void onUpdate() override {
-        AE_INFO("ExampleLayer::Update");
+        if (AnEngine::Input::isKeyPressed(AE_KEY_A) ||
+            AnEngine::Input::isKeyPressed(AE_KEY_LEFT)) {
+            cameraPosition.x -= 0.03f;
+        }
+        else if (AnEngine::Input::isKeyPressed(AE_KEY_D) || 
+                 AnEngine::Input::isKeyPressed(AE_KEY_RIGHT)) {
+            cameraPosition.x += 0.03f;
+        }
+
+        if (AnEngine::Input::isKeyPressed(AE_KEY_W) ||
+                 AnEngine::Input::isKeyPressed(AE_KEY_UP)) {
+            cameraPosition.y += 0.03f;
+        }
+        else if (AnEngine::Input::isKeyPressed(AE_KEY_S) ||
+                AnEngine::Input::isKeyPressed(AE_KEY_DOWN)) {
+            cameraPosition.y -= 0.03f;
+        }
+
+        if (AnEngine::Input::isKeyPressed(AE_KEY_Q)) {
+            cameraRotation += 0.1f;
+        }
+        else if (AnEngine::Input::isKeyPressed(AE_KEY_E)) {
+            cameraRotation -= 0.1f;
+        }
+
+        camera.setPosition(cameraPosition);
+        camera.setRotation(cameraRotation);
 
         AnEngine::RenderCommandQueue::clearColour({ 0.1f, 0.1f, 0.1f, 1 });
         AnEngine::RenderCommandQueue::clear();
@@ -98,29 +125,7 @@ public:
         ImGui::End();
     }
 
-    void onEvent(AnEngine::Event& event) override {
-        switch (event.getEventType()) {
-            case (AnEngine::EventType::KeyPressed): {
-                AnEngine::KeyTypedEvent& e = (AnEngine::KeyTypedEvent&)event;
-                if (e.getKeyCode() == AE_KEY_A) {
-                    camera.setPosition(camera.getPosition() - glm::vec3(0.1f, 0.0f, 0.0f));
-                    AE_CORE_INFO("A is pressed (event)!");
-                }
-                else if (e.getKeyCode() == AE_KEY_D) {
-                    camera.setPosition(camera.getPosition() + glm::vec3(0.1f, 0.0f, 0.0f));
-                    AE_CORE_INFO("D is pressed (event)!");
-                }
-                else if (e.getKeyCode() == AE_KEY_W) {
-                    camera.setPosition(camera.getPosition() + glm::vec3(0.0f, 0.1f, 0.0f));
-                    AE_CORE_INFO("W is pressed (event)!");
-                }
-                else if (e.getKeyCode() == AE_KEY_S) {
-                    camera.setPosition(camera.getPosition() - glm::vec3(0.0f, 0.1f, 0.0f));
-                    AE_CORE_INFO("S is pressed (event)!");
-                }
-            }
-        };
-    }
+    void onEvent(AnEngine::Event& event) override {}
 
 private:
     std::shared_ptr<AnEngine::Shader> shader;
@@ -134,6 +139,8 @@ private:
     std::shared_ptr<AnEngine::IndexBuffer> triangleIB;
 
     AnEngine::OrthographicCamera camera;
+    glm::vec3 cameraPosition;
+    float cameraRotation;
 
 };
 
@@ -142,7 +149,6 @@ public:
     ExampleLayerTwo() : Layer("Example") {}
 
     void onUpdate() override {
-        AE_INFO("ExampleLayerTwo::Update");
 
         if (AnEngine::Input::isKeyPressed(AE_KEY_BACKSPACE)) {
             AE_ERROR("BACKSPACE is pressed (poll)!");
