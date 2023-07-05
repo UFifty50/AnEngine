@@ -1,9 +1,10 @@
 #ifndef LAYER_HPP
 #define LAYER_HPP
 
-
 #include "Core.hpp"
 #include "Events/Event.hpp"
+#include "Time/TimeStep.hpp"
+
 
 namespace AnEngine {
     class AE_API Layer {
@@ -11,17 +12,17 @@ namespace AnEngine {
         std::string debugName;
 
     public:
-           Layer(const std::string& name = "Layer");
-           virtual ~Layer();
-    
-           virtual void onAttach() {}
-           virtual void onDetach() {}
-           virtual void onUpdate() {}
-           virtual void onImGuiRender() {}
-           virtual void onEvent(Event& e) {}
-    
-           inline const std::string& getName() const { return debugName; }
+        Layer(const std::string& name = "Layer");
+        virtual ~Layer();
+
+        virtual void onAttach() {}
+        virtual void onDetach() {}
+        virtual void onUpdate(TimeStep deltaTime) {}
+        virtual void onImGuiRender() {}
+        virtual void onEvent(Event& e) {}
+
+        inline const std::string& getName() const { return debugName; }
     };
-}
+}  // namespace AnEngine
 
 #endif

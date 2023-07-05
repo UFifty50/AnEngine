@@ -7,28 +7,30 @@
 #include "AnEngine/include/Application.hpp"
 
 // ---Rendering---
-#include "AnEngine/include/Renderer/Renderer.hpp"
-#include "AnEngine/include/Renderer/RenderCommandQueue.hpp"
+#include "AnEngine/include/Renderer/Buffers/BufferLayout.hpp"
+#include "AnEngine/include/Renderer/Buffers/IndexBuffer.hpp"
+#include "AnEngine/include/Renderer/Buffers/VertexBuffer.hpp"
 #include "AnEngine/include/Renderer/RenderAPI.hpp"
-
+#include "AnEngine/include/Renderer/RenderCommandQueue.hpp"
+#include "AnEngine/include/Renderer/Renderer.hpp"
 #include "AnEngine/include/Renderer/Shader.hpp"
 #include "AnEngine/include/Renderer/ShaderUniform.hpp"
 #include "AnEngine/include/Renderer/VertexArray.hpp"
 
-#include "AnEngine/include/Renderer/Buffers/VertexBuffer.hpp"
-#include "AnEngine/include/Renderer/Buffers/IndexBuffer.hpp"
-#include "AnEngine/include/Renderer/Buffers/BufferLayout.hpp"
-
 // ---Cameras---
 #include "AnEngine/include/Renderer/Camera/OrthographicCamera.hpp"
 
+// ---Time---
+#include "AnEngine/include/Time/Time.hpp"
+#include "AnEngine/include/Time/TimeStep.hpp"
+
 // ---Layers---
-#include "AnEngine/include/Layer.hpp"
 #include "AnEngine/include/ImGui/ImGuiLayer.hpp"
+#include "AnEngine/include/Layer.hpp"
 
 // ---Events---
-#include "AnEngine/include/Events/Event.hpp"
 #include "AnEngine/include/Events/ApplicationEvent.hpp"
+#include "AnEngine/include/Events/Event.hpp"
 #include "AnEngine/include/Events/KeyEvent.hpp"
 #include "AnEngine/include/Events/MouseEvent.hpp"
 
@@ -36,10 +38,10 @@
 #include "AnEngine/include/Input.hpp"
 
 // ---KeyCodes---
+#include "AnEngine/include/GamepadCodes.hpp"
+#include "AnEngine/include/JoystickButtonCodes.hpp"
 #include "AnEngine/include/KeyCodes.hpp"
 #include "AnEngine/include/MouseButtonCodes.hpp"
-#include "AnEngine/include/JoystickButtonCodes.hpp"
-#include "AnEngine/include/GamepadCodes.hpp"
 
 // ---Log---
 #include "AnEngine/include/Log.hpp"

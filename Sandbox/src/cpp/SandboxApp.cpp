@@ -1,176 +1,216 @@
 #include <AnEngine.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <vector>
 
 #include "imgui.h"
 #include "imgui_internal.h"
 
+
 #define UNIFORMS(varName, ...) \
-  std::initializer_list<AnEngine::ShaderUniformBase> varName = {__VA_ARGS__}
+    AnEngine::ShaderUniformVector varName = {__VA_ARGS__}
 
 class ExampleLayer : public AnEngine::Layer {
- public:
-  ExampleLayer()
-      : Layer("Example"),
-        camera(-1.6f, 1.6f, -0.9f, 0.9f),
-        cameraPosition(0.0f),
-        cameraRotation(0.0f) {
-    // rectangle
-    {
-      squareVA.reset(AnEngine::VertexArray::create());
+public:
+    ExampleLayer()
+        : Layer("Example"),
+          camera(-1.6f, 1.6f, -0.9f, 0.9f),
+          cameraPosition(0.0f),
+          cameraRotation(0.0f),
+          objPosition(0.0f) {
+        // square
+        {
+            squareVA.reset(AnEngine::VertexArray::create());
 
-      float vertices[3 * 4] = {
-          -0.75f, -0.75f, 0.0f, 0.75f,  -0.75f, 0.0f,
-          0.75f,  0.75f,  0.0f, -0.75f, 0.75f,  0.0f,
-      };
-      squareVB.reset(
-          AnEngine::VertexBuffer::create(vertices, sizeof(vertices)));
+            // clang-format off
+            float vertices[3 * 4] = {
+                -0.5f, -0.5f, 0.0f,
+                 0.5f, -0.5f, 0.0f,
+                 0.5f,  0.5f, 0.0f,
+                -0.5f,  0.5f, 0.0f,
+            };
+            // clang-format on
 
-      AnEngine::BufferLayout layout = {
-          {AnEngine::ShaderDataType::Vec3, "position"},
-      };
-      squareVB->setLayout(layout);
+            squareVB.reset(
+                AnEngine::VertexBuffer::create(vertices, sizeof(vertices)));
 
-      squareVA->addVertexBuffer(squareVB);
+            AnEngine::BufferLayout layout = {
+                {AnEngine::ShaderDataType::Vec3, "position"},
+            };
+            squareVB->setLayout(layout);
 
-      uint32_t indices[6] = {0, 1, 2, 2, 3, 0};
-      squareIB.reset(AnEngine::IndexBuffer::create(indices, 6));
+            squareVA->addVertexBuffer(squareVB);
 
-      squareVA->setIndexBuffer(squareIB);
+            uint32_t indices[6] = {0, 1, 2, 2, 3, 0};
+            squareIB.reset(AnEngine::IndexBuffer::create(indices, 6));
 
-      AnEngine::InputFileStream vertShaderStream("res/shaders/basic.vert");
-      AnEngine::InputFileStream fragShaderStream("res/shaders/basic.frag");
-      shader.reset(
-          AnEngine::Shader::create(vertShaderStream, fragShaderStream));
+            squareVA->setIndexBuffer(squareIB);
+
+            AnEngine::InputFileStream vertShaderStream(
+                "res/shaders/basic.vert");
+            AnEngine::InputFileStream fragShaderStream(
+                "res/shaders/basic.frag");
+            shader.reset(
+                AnEngine::Shader::create(vertShaderStream, fragShaderStream));
+        }
+
+        // triangle
+        {
+            triangleVA.reset(AnEngine::VertexArray::create());
+
+            float vertices2[3 * 3] = {
+                -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f,
+            };
+            triangleVB.reset(
+                AnEngine::VertexBuffer::create(vertices2, sizeof(vertices2)));
+
+            AnEngine::BufferLayout layout2 = {
+                {AnEngine::ShaderDataType::Vec3, "position"},
+            };
+            triangleVB->setLayout(layout2);
+
+            triangleVA->addVertexBuffer(triangleVB);
+
+            uint32_t indices2[3] = {0, 1, 2};
+            triangleIB.reset(AnEngine::IndexBuffer::create(indices2, 3));
+
+            triangleVA->setIndexBuffer(triangleIB);
+
+            AnEngine::InputFileStream vertShaderStream2(
+                "res/shaders/basic.vert");
+            AnEngine::InputFileStream fragShaderStream2(
+                "res/shaders/basic2.frag");
+            shader2.reset(
+                AnEngine::Shader::create(vertShaderStream2, fragShaderStream2));
+        }
     }
 
-    // triangle
-    {
-      triangleVA.reset(AnEngine::VertexArray::create());
+    void onUpdate(AnEngine::TimeStep deltaTime) override {
+        if (AnEngine::Input::isKeyPressed(AE_KEY_A)) {
+            cameraPosition.x -= 1.0f * deltaTime;
+        } else if (AnEngine::Input::isKeyPressed(AE_KEY_D)) {
+            cameraPosition.x += 1.0f * deltaTime;
+        }
 
-      float vertices2[3 * 3] = {
-          -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f,
-      };
-      triangleVB.reset(
-          AnEngine::VertexBuffer::create(vertices2, sizeof(vertices2)));
+        if (AnEngine::Input::isKeyPressed(AE_KEY_W)) {
+            cameraPosition.y += 1.0f * deltaTime;
+        } else if (AnEngine::Input::isKeyPressed(AE_KEY_S)) {
+            cameraPosition.y -= 1.0f * deltaTime;
+        }
 
-      AnEngine::BufferLayout layout2 = {
-          {AnEngine::ShaderDataType::Vec3, "position"},
-      };
-      triangleVB->setLayout(layout2);
+        if (AnEngine::Input::isKeyPressed(AE_KEY_Q)) {
+            cameraRotation += 10.0f * deltaTime;
+        } else if (AnEngine::Input::isKeyPressed(AE_KEY_E)) {
+            cameraRotation -= 10.0f * deltaTime;
+        }
 
-      triangleVA->addVertexBuffer(triangleVB);
+        camera.setPosition(cameraPosition);
+        camera.setRotation(cameraRotation);
 
-      uint32_t indices2[3] = {0, 1, 2};
-      triangleIB.reset(AnEngine::IndexBuffer::create(indices2, 3));
+        AnEngine::RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1});
+        AnEngine::RenderCommandQueue::clear();
 
-      triangleVA->setIndexBuffer(triangleIB);
+        AnEngine::Renderer::beginScene(camera);
 
-      AnEngine::InputFileStream vertShaderStream2("res/shaders/basic.vert");
-      AnEngine::InputFileStream fragShaderStream2("res/shaders/basic2.frag");
-      shader2.reset(
-          AnEngine::Shader::create(vertShaderStream2, fragShaderStream2));
+
+        static const glm::mat4 scale =
+            glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+        glm::vec4 red(0.8f, 0.2f, 0.3f, 1.0f);
+        glm::vec4 green(0.3f, 0.8f, 0.2f, 1.0f);
+        glm::vec4 blue(0.2f, 0.3f, 0.8f, 0.0f);
+
+        UNIFORMS(uniforms, AnEngine::ShaderUniform(
+                               "Ucolour", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+
+        for (int x = 0; x < 20; x++) {
+            for (int y = 0; y < 20; y++) {
+                float nx = x * 0.05f;
+                float ny = y * 0.125f;
+
+                uniforms["Ucolour"] =
+                    (x + y) % 2 == 0
+                        ? red * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f)
+                        : blue * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f);
+                glm::vec3 pos =
+                    glm::vec3(x * 0.11f + 0.3f, y * 0.11f + 0.2f, 0.0f);
+                glm::mat4 transform =
+                    glm::translate(glm::mat4(1.0f), pos) * scale;
+                AnEngine::Renderer::submit(shader, squareVA, transform,
+                                           uniforms);
+            }
+        }
+
+        UNIFORMS(triangleUniforms, AnEngine::ShaderUniform("Ucolour", red));
+
+        AnEngine::Renderer::submit(shader2, triangleVA, glm::mat4(1.0f),
+                                   triangleUniforms);
+
+        AnEngine::Renderer::endScene();
+
+        if (AnEngine::Input::isKeyPressed(AE_KEY_ENTER)) {
+            AE_ERROR("ENTER is pressed (poll)!");
+        }
     }
-  }
 
-  void onUpdate() override {
-    if (AnEngine::Input::isKeyPressed(AE_KEY_A) ||
-        AnEngine::Input::isKeyPressed(AE_KEY_LEFT)) {
-      cameraPosition.x -= 0.03f;
-    } else if (AnEngine::Input::isKeyPressed(AE_KEY_D) ||
-               AnEngine::Input::isKeyPressed(AE_KEY_RIGHT)) {
-      cameraPosition.x += 0.03f;
+    virtual void onImGuiRender() override {
+        ImGui::Begin("Test");
+        ImGui::Text("Hello World!");
+        ImGui::End();
     }
 
-    if (AnEngine::Input::isKeyPressed(AE_KEY_W) ||
-        AnEngine::Input::isKeyPressed(AE_KEY_UP)) {
-      cameraPosition.y += 0.03f;
-    } else if (AnEngine::Input::isKeyPressed(AE_KEY_S) ||
-               AnEngine::Input::isKeyPressed(AE_KEY_DOWN)) {
-      cameraPosition.y -= 0.03f;
-    }
+    void onEvent(AnEngine::Event& event) override {}
 
-    if (AnEngine::Input::isKeyPressed(AE_KEY_Q)) {
-      cameraRotation += 0.1f;
-    } else if (AnEngine::Input::isKeyPressed(AE_KEY_E)) {
-      cameraRotation -= 0.1f;
-    }
+private:
+    std::shared_ptr<AnEngine::Shader> shader;
+    std::shared_ptr<AnEngine::VertexArray> squareVA;
+    std::shared_ptr<AnEngine::VertexBuffer> squareVB;
+    std::shared_ptr<AnEngine::IndexBuffer> squareIB;
 
-    camera.setPosition(cameraPosition);
-    camera.setRotation(cameraRotation);
+    std::shared_ptr<AnEngine::Shader> shader2;
+    std::shared_ptr<AnEngine::VertexArray> triangleVA;
+    std::shared_ptr<AnEngine::VertexBuffer> triangleVB;
+    std::shared_ptr<AnEngine::IndexBuffer> triangleIB;
 
-    AnEngine::RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1});
-    AnEngine::RenderCommandQueue::clear();
+    AnEngine::OrthographicCamera camera;
+    glm::vec3 cameraPosition;
+    float cameraRotation;
 
-    AnEngine::Renderer::beginScene(camera);
-
-    UNIFORMS(uniforms, AnEngine::ShaderUniform(
-                           "Ucolour", glm::vec4(0.8f, 0.2f, 0.5f, 1.0f)));
-
-    AnEngine::Renderer::submit(shader, squareVA, uniforms);
-    AnEngine::Renderer::submit(shader2, triangleVA);
-
-    AnEngine::Renderer::endScene();
-
-    if (AnEngine::Input::isKeyPressed(AE_KEY_ENTER)) {
-      AE_ERROR("ENTER is pressed (poll)!");
-    }
-  }
-
-  virtual void onImGuiRender() override {
-    ImGui::Begin("Test");
-    ImGui::Text("Hello World!");
-    ImGui::End();
-  }
-
-  void onEvent(AnEngine::Event& event) override {}
-
- private:
-  std::shared_ptr<AnEngine::Shader> shader;
-  std::shared_ptr<AnEngine::VertexArray> squareVA;
-  std::shared_ptr<AnEngine::VertexBuffer> squareVB;
-  std::shared_ptr<AnEngine::IndexBuffer> squareIB;
-
-  std::shared_ptr<AnEngine::Shader> shader2;
-  std::shared_ptr<AnEngine::VertexArray> triangleVA;
-  std::shared_ptr<AnEngine::VertexBuffer> triangleVB;
-  std::shared_ptr<AnEngine::IndexBuffer> triangleIB;
-
-  AnEngine::OrthographicCamera camera;
-  glm::vec3 cameraPosition;
-  float cameraRotation;
+    glm::vec3 objPosition;
 };
 
 class ExampleLayerTwo : public AnEngine::Layer {
- public:
-  ExampleLayerTwo() : Layer("Example") {}
+public:
+    ExampleLayerTwo() : Layer("Example") {}
 
-  void onUpdate() override {
-    if (AnEngine::Input::isKeyPressed(AE_KEY_BACKSPACE)) {
-      AE_ERROR("BACKSPACE is pressed (poll)!");
+    void onUpdate(AnEngine::TimeStep deltaTime) override {
+        if (AnEngine::Input::isKeyPressed(AE_KEY_BACKSPACE)) {
+            AE_ERROR("BACKSPACE is pressed (poll)!");
+        }
     }
-  }
 
-  virtual void onImGuiRender() override {
-    ImGui::Begin("Test2");
-    ImGui::Text("Hello World!2");
-    ImGui::End();
-  }
+    virtual void onImGuiRender() override {
+        ImGui::Begin("Test2");
+        ImGui::Text("Hello World!2");
+        ImGui::End();
+    }
 
-  void onEvent(AnEngine::Event& event) override {
-    //   AE_TRACE("{0}", event);
-  }
+    void onEvent(AnEngine::Event& event) override {
+        //   AE_TRACE("{0}", event);
+    }
 };
 
 class Sandbox : public AnEngine::Application {
- public:
-  Sandbox() {
-    pushLayer(new ExampleLayer());
-    pushLayer(new ExampleLayerTwo());
-  }
+public:
+    Sandbox() {
+        pushLayer(new ExampleLayer());
+        pushLayer(new ExampleLayerTwo());
+    }
 
-  ~Sandbox() {}
+    ~Sandbox() {}
 };
 
 AnEngine::Application* AnEngine::CreateApplication() {
-  RenderAPI::setAPI(RenderAPI::OpenGL);
-  return new Sandbox();
+    RenderAPI::setAPI(RenderAPI::OpenGL);
+    return new Sandbox();
 }

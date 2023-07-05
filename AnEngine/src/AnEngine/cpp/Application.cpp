@@ -1,17 +1,14 @@
 #include "aepch.hpp"
+
 #include "Application.hpp"
-#include "Renderer/RenderAPI.hpp"
-#include "Renderer/Renderer.hpp"
-#include "Renderer/RenderCommandQueue.hpp"
 
 #include "Events/ApplicationEvent.hpp"
-#include "Renderer/Buffers/VertexBuffer.hpp"
-#include "Renderer/Buffers/IndexBuffer.hpp"
-#include "Renderer/Buffers/BufferLayout.hpp"
-#include "Renderer/VertexArray.hpp"
-#include "Renderer/Shader.hpp"
 #include "Input.hpp"
 #include "Log.hpp"
+#include "Renderer/RenderAPI.hpp"
+#include "Time/Time.hpp"
+#include "Time/TimeStep.hpp"
+#include "Window.hpp"
 
 
 namespace AnEngine {
@@ -23,7 +20,9 @@ namespace AnEngine {
 
         if (RenderAPI::getAPI() == RenderAPI::NoAPI) {
             std::stringstream msg;
-            msg << "AnEngine::Renderer::setAPI() needs to be called in CreateApplication with one of" << std::endl;
+            msg << "AnEngine::Renderer::setAPI() needs to be called in CreateApplication with one "
+                   "of"
+                << std::endl;
             msg << "| RenderAPI::OpenGL" << std::endl;
             msg << "| RenderAPI::DirectX11" << std::endl;
             msg << "| RenderAPI::DirectX12" << std::endl;
@@ -67,8 +66,12 @@ namespace AnEngine {
 
     void Application::Run() {
         while (running) {
+            float time = Time::getTime();
+            TimeStep timeStep = time - lastFrameTime;
+            lastFrameTime = time;
+
             for (Layer* layer : layerStack) {
-                layer->onUpdate();
+                layer->onUpdate(timeStep);
             }
 
             imGuiLayer->begin();
@@ -79,5 +82,5 @@ namespace AnEngine {
 
             window->onUpdate();
         }
-     }
-}
+    }
+}  // namespace AnEngine
