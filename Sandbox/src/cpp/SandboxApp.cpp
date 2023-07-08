@@ -1,5 +1,6 @@
 #include <AnEngine.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
 
@@ -16,8 +17,7 @@ public:
         : Layer("Example"),
           camera(-1.6f, 1.6f, -0.9f, 0.9f),
           cameraPosition(0.0f),
-          cameraRotation(0.0f),
-          objPosition(0.0f) {
+          cameraRotation(0.0f) {
         // square
         {
             squareVA.reset(AnEngine::VertexArray::create());
@@ -120,18 +120,17 @@ public:
         glm::vec4 green(0.3f, 0.8f, 0.2f, 1.0f);
         glm::vec4 blue(0.2f, 0.3f, 0.8f, 0.0f);
 
-        UNIFORMS(uniforms, AnEngine::ShaderUniform(
-                               "Ucolour", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+        UNIFORMS(uniforms, AnEngine::ShaderUniform("Ucolour", squareColour));
 
         for (int x = 0; x < 20; x++) {
             for (int y = 0; y < 20; y++) {
-                float nx = x * 0.05f;
-                float ny = y * 0.125f;
+                // float nx = x * 0.05f;
+                // float ny = y * 0.125f;
 
-                uniforms["Ucolour"] =
-                    (x + y) % 2 == 0
-                        ? red * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f)
-                        : blue * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f);
+                // uniforms["Ucolour"] =
+                //     (x + y) % 2 == 0
+                //         ? red * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f)
+                //         : blue * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f);
                 glm::vec3 pos =
                     glm::vec3(x * 0.11f + 0.3f, y * 0.11f + 0.2f, 0.0f);
                 glm::mat4 transform =
@@ -154,8 +153,8 @@ public:
     }
 
     virtual void onImGuiRender() override {
-        ImGui::Begin("Test");
-        ImGui::Text("Hello World!");
+        ImGui::Begin("Settings");
+        ImGui::ColorEdit3("Colour Picker", glm::value_ptr(squareColour));
         ImGui::End();
     }
 
@@ -176,36 +175,12 @@ private:
     glm::vec3 cameraPosition;
     float cameraRotation;
 
-    glm::vec3 objPosition;
-};
-
-class ExampleLayerTwo : public AnEngine::Layer {
-public:
-    ExampleLayerTwo() : Layer("Example") {}
-
-    void onUpdate(AnEngine::TimeStep deltaTime) override {
-        if (AnEngine::Input::isKeyPressed(AE_KEY_BACKSPACE)) {
-            AE_ERROR("BACKSPACE is pressed (poll)!");
-        }
-    }
-
-    virtual void onImGuiRender() override {
-        ImGui::Begin("Test2");
-        ImGui::Text("Hello World!2");
-        ImGui::End();
-    }
-
-    void onEvent(AnEngine::Event& event) override {
-        //   AE_TRACE("{0}", event);
-    }
+    glm::vec3 squareColour = {0.2f, 0.3f, 0.8f};
 };
 
 class Sandbox : public AnEngine::Application {
 public:
-    Sandbox() {
-        pushLayer(new ExampleLayer());
-        pushLayer(new ExampleLayerTwo());
-    }
+    Sandbox() { pushLayer(new ExampleLayer()); }
 
     ~Sandbox() {}
 };
