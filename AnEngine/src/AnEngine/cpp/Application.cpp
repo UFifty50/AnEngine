@@ -20,7 +20,8 @@ namespace AnEngine {
 
         if (RenderAPI::getAPI() == RenderAPI::NoAPI) {
             std::stringstream msg;
-            msg << "AnEngine::Renderer::setAPI() needs to be called in CreateApplication with one "
+            msg << "AnEngine::Renderer::setAPI() needs to be called in "
+                   "CreateApplication with one "
                    "of"
                 << std::endl;
             msg << "| RenderAPI::OpenGL" << std::endl;
@@ -30,7 +31,7 @@ namespace AnEngine {
             AE_CORE_ASSERT(false, msg.str());
         }
 
-        window = std::unique_ptr<Window>(Window::create());
+        window = Scope<Window>(Window::create());
         window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
         imGuiLayer = new ImGuiLayer();
@@ -51,7 +52,8 @@ namespace AnEngine {
 
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.dispatch<WindowCloseEvent>(
+            BIND_EVENT_FN(Application::onWindowClose));
 
         for (auto it = layerStack.end(); it != layerStack.begin();) {
             (*--it)->onEvent(e);

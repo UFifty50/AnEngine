@@ -26,7 +26,7 @@ namespace AnEngine {
 
     private:
         static Application* instance;
-        std::unique_ptr<Window> window;
+        Scope<Window> window;
         ImGuiLayer* imGuiLayer;
         bool running = true;
         LayerStack layerStack;

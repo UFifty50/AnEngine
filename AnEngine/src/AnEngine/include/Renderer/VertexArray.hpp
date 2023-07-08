@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "Renderer/Buffers/VertexBuffer.hpp"
 #include "Renderer/Buffers/IndexBuffer.hpp"
+#include "Renderer/Buffers/VertexBuffer.hpp"
 
 
 namespace AnEngine {
@@ -15,14 +15,15 @@ namespace AnEngine {
         virtual void bind() const = 0;
         virtual void unBind() const = 0;
 
-        virtual void addVertexBuffer(const std::shared_ptr<VertexBuffer>& layout) = 0;
-        virtual void setIndexBuffer(const std::shared_ptr<IndexBuffer>& layout) = 0;
+        virtual void addVertexBuffer(const Ref<VertexBuffer>& layout) = 0;
+        virtual void setIndexBuffer(const Ref<IndexBuffer>& layout) = 0;
 
-        virtual const std::vector<std::shared_ptr<VertexBuffer>>& getVertexBuffers() const = 0;
-        virtual const std::shared_ptr<IndexBuffer>& getIndexBuffer() const = 0;
+        virtual const std::vector<Ref<VertexBuffer>>& getVertexBuffers()
+            const = 0;
+        virtual const Ref<IndexBuffer>& getIndexBuffer() const = 0;
 
         static VertexArray* create();
     };
-};
+};  // namespace AnEngine
 
 #endif

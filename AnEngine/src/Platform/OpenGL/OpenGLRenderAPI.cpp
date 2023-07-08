@@ -1,7 +1,8 @@
 #include "aepch.hpp"
 
-#include <glad/glad.h>
 #include "Platform/OpenGL/OpenGLRenderAPI.hpp"
+
+#include <glad/glad.h>
 
 
 namespace AnEngine {
@@ -9,15 +10,14 @@ namespace AnEngine {
         glClearColor(colour.r, colour.g, colour.b, colour.a);
     }
 
-    void OpenGLRenderAPI::clear() {
-        glClear(GL_COLOR_BUFFER_BIT);
-    }
+    void OpenGLRenderAPI::clear() { glClear(GL_COLOR_BUFFER_BIT); }
 
     void OpenGLRenderAPI::clearDepth() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void OpenGLRenderAPI::drawIndexed(const std::shared_ptr<VertexArray>& vertexArray) {
-        glDrawElements(GL_TRIANGLES, vertexArray->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    void OpenGLRenderAPI::drawIndexed(const Ref<VertexArray>& vertexArray) {
+        glDrawElements(GL_TRIANGLES, vertexArray->getIndexBuffer()->getCount(),
+                       GL_UNSIGNED_INT, nullptr);
     }
-};
+};  // namespace AnEngine

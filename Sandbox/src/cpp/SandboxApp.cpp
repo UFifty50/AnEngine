@@ -162,15 +162,15 @@ public:
     void onEvent(AnEngine::Event& event) override {}
 
 private:
-    std::shared_ptr<AnEngine::Shader> shader;
-    std::shared_ptr<AnEngine::VertexArray> squareVA;
-    std::shared_ptr<AnEngine::VertexBuffer> squareVB;
-    std::shared_ptr<AnEngine::IndexBuffer> squareIB;
+    AnEngine::Ref<AnEngine::Shader> shader;
+    AnEngine::Ref<AnEngine::VertexArray> squareVA;
+    AnEngine::Ref<AnEngine::VertexBuffer> squareVB;
+    AnEngine::Ref<AnEngine::IndexBuffer> squareIB;
 
-    std::shared_ptr<AnEngine::Shader> shader2;
-    std::shared_ptr<AnEngine::VertexArray> triangleVA;
-    std::shared_ptr<AnEngine::VertexBuffer> triangleVB;
-    std::shared_ptr<AnEngine::IndexBuffer> triangleIB;
+    AnEngine::Ref<AnEngine::Shader> shader2;
+    AnEngine::Ref<AnEngine::VertexArray> triangleVA;
+    AnEngine::Ref<AnEngine::VertexBuffer> triangleVB;
+    AnEngine::Ref<AnEngine::IndexBuffer> triangleIB;
 
     AnEngine::OrthographicCamera camera;
     glm::vec3 cameraPosition;
