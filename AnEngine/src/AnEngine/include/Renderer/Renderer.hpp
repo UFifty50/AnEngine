@@ -16,8 +16,8 @@ namespace AnEngine {
         static void beginScene(OrthographicCamera& camera);
         static void endScene();
 
-        static void submit(const std::shared_ptr<Shader>& shader,
-                           const std::shared_ptr<VertexArray>& vertexArray,
+        static void submit(const Ref<Shader>& shader,
+                           const Ref<VertexArray>& vertexArray,
                            const glm::mat4& transform,
                            const AnEngine::ShaderUniformVector& uniforms = {});
 
@@ -26,7 +26,7 @@ namespace AnEngine {
             glm::mat4 viewProjectionMatrix;
         };
 
-        static SceneData* sceneData;
+        static Ref<SceneData> sceneData;
     };
 };  // namespace AnEngine
 

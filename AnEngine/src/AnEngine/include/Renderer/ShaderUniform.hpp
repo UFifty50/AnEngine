@@ -64,7 +64,7 @@ namespace AnEngine {
                 if (item.name == name) return item.uniform;
             }
             throw std::out_of_range(
-                "indexableVector::operator[] unable to find" + name);
+                "ShaderUniformVector::operator[] unable to find" + name);
         }
     };
 

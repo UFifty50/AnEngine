@@ -12,7 +12,8 @@
 
 
 namespace AnEngine {
-    Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
+    Ref<Renderer::SceneData> Renderer::sceneData =
+        std::make_shared<Renderer::SceneData>();
 
     void Renderer::beginScene(OrthographicCamera& camera) {
         sceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
@@ -20,8 +21,8 @@ namespace AnEngine {
 
     void Renderer::endScene() {}
 
-    void Renderer::submit(const std::shared_ptr<Shader>& shader,
-                          const std::shared_ptr<VertexArray>& vertexArray,
+    void Renderer::submit(const Ref<Shader>& shader,
+                          const Ref<VertexArray>& vertexArray,
                           const glm::mat4& transform,
                           const AnEngine::ShaderUniformVector& uniforms) {
         shader->bind();

@@ -2,6 +2,8 @@
 
 #include "Platform/Windows/window/Win32Window.hpp"
 
+#include <GLFW/glfw3.h>
+
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
@@ -42,7 +44,7 @@ namespace AnEngine {
         window = glfwCreateWindow((int)props.width, (int)props.height,
                                   props.title.c_str(), nullptr, nullptr);
 
-        graphicsContext = new OpenGLContext(window);
+        graphicsContext = std::make_shared<OpenGLContext>(window);
         graphicsContext->init();
 
         glfwSetWindowUserPointer(window, &data);

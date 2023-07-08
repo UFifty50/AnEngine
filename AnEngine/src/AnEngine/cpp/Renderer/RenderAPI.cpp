@@ -1,63 +1,56 @@
 #include "aepch.hpp"
 
-#include "Exceptions/NotImplementedException.hpp"
 #include "Renderer/RenderAPI.hpp"
 
+#include "Exceptions/NotImplementedException.hpp"
 #include "Platform/OpenGL/OpenGLRenderAPI.hpp"
 
 
 namespace AnEngine {
     RenderAPI::API RenderAPI::currAPI = RenderAPI::NoAPI;
 
-    RenderAPI* RenderAPI::create() {
+    Ref<RenderAPI> RenderAPI::create() {
         switch (currAPI) {
             case RenderAPI::OpenGL:
-                return new OpenGLRenderAPI();
-            
+                return std::make_shared<OpenGLRenderAPI>();
+
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
-                // return new DX11RenderAPI();
-            
+                // return std::make_shared<DX11RenderAPI>();
+
             case RenderAPI::DirectX12:
                 throw NotImplementedException();
-                // return new DX12RenderAPI();
-            
+                // return std::make_shared<DX12RenderAPI>();
+
             case RenderAPI::Vulkan:
                 throw NotImplementedException();
-                // return new VulkanRenderAPI();
-            
+                // return std::make_shared<VulkanRenderAPI>();
+
             default:
                 AE_CORE_ASSERT(false, "Unknown RendererAPI!");
                 throw NotImplementedException();
-        }   
+        }
     }
-    
+
     std::ostream& operator<<(std::ostream& os, const RenderAPI::API& api) {
         switch (api) {
             case RenderAPI::NoAPI:
-                os << "NoAPI";
-                break;
+                return os << "NoAPI";
 
             case RenderAPI::OpenGL:
-                os << "OpenGL";
-                break;
+                return os << "OpenGL";
 
             case RenderAPI::DirectX11:
-                os << "DirectX11";
-                break;
+                return os << "DirectX11";
 
             case RenderAPI::DirectX12:
-                os << "DirectX12";
-                break;
+                return os << "DirectX12";
 
             case RenderAPI::Vulkan:
-                os << "Vulkan";
-                break;
-
-            default:
-                break;
+                return os << "Vulkan";
         }
 
+        AE_CORE_ASSERT(false, "Unknown RendererAPI!");
         return os;
     }
-}
+}  // namespace AnEngine

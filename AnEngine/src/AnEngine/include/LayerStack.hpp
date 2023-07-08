@@ -10,21 +10,21 @@
 namespace AnEngine {
     class AE_API LayerStack {
     private:
-        std::vector<Layer*> layers;
+        std::vector<Ref<Layer>> layers;
         unsigned int layerInsertIndex = 0;
 
     public:
         LayerStack();
         ~LayerStack();
 
-        void pushLayer(Layer* layer);
-        void pushOverlay(Layer* overlay);
-        void popLayer(Layer* layer);
-        void popOverlay(Layer* overlay);
+        void pushLayer(Ref<Layer> layer);
+        void pushOverlay(Ref<Layer> overlay);
+        void popLayer(Ref<Layer> layer);
+        void popOverlay(Ref<Layer> overlay);
 
-        std::vector<Layer*>::iterator begin() { return layers.begin(); }
-        std::vector<Layer*>::iterator end() { return layers.end(); }
+        std::vector<Ref<Layer>>::iterator begin() { return layers.begin(); }
+        std::vector<Ref<Layer>>::iterator end() { return layers.end(); }
     };
-}
+}  // namespace AnEngine
 
 #endif

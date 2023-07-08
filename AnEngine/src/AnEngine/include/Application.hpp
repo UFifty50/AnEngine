@@ -16,8 +16,8 @@ namespace AnEngine {
         ~Application();
 
         void onEvent(Event& e);
-        void pushLayer(Layer* layer);
-        void pushOverlay(Layer* overlay);
+        void pushLayer(Ref<Layer> layer);
+        void pushOverlay(Ref<Layer> overlay);
 
         static inline Application& get() { return *instance; }
         inline Window& getWindow() { return *window; }
@@ -26,8 +26,8 @@ namespace AnEngine {
 
     private:
         static Application* instance;
-        std::unique_ptr<Window> window;
-        ImGuiLayer* imGuiLayer;
+        Scope<Window> window;
+        Ref<ImGuiLayer> imGuiLayer;
         bool running = true;
         LayerStack layerStack;
         float lastFrameTime = 0;

@@ -20,7 +20,8 @@ namespace AnEngine {
 
         if (RenderAPI::getAPI() == RenderAPI::NoAPI) {
             std::stringstream msg;
-            msg << "AnEngine::Renderer::setAPI() needs to be called in CreateApplication with one "
+            msg << "AnEngine::Renderer::setAPI() needs to be called in "
+                   "CreateApplication with one "
                    "of"
                 << std::endl;
             msg << "| RenderAPI::OpenGL" << std::endl;
@@ -30,28 +31,29 @@ namespace AnEngine {
             AE_CORE_ASSERT(false, msg.str());
         }
 
-        window = std::unique_ptr<Window>(Window::create());
+        window = Scope<Window>(Window::create());
         window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
-        imGuiLayer = new ImGuiLayer();
+        imGuiLayer = std::make_shared<ImGuiLayer>();
         pushOverlay(imGuiLayer);
     }
 
     Application::~Application() = default;
 
-    void Application::pushLayer(Layer* layer) {
+    void Application::pushLayer(Ref<Layer> layer) {
         layerStack.pushLayer(layer);
         layer->onAttach();
     }
 
-    void Application::pushOverlay(Layer* overlay) {
+    void Application::pushOverlay(Ref<Layer> overlay) {
         layerStack.pushOverlay(overlay);
         overlay->onAttach();
     }
 
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.dispatch<WindowCloseEvent>(
+            BIND_EVENT_FN(Application::onWindowClose));
 
         for (auto it = layerStack.end(); it != layerStack.begin();) {
             (*--it)->onEvent(e);
@@ -70,12 +72,12 @@ namespace AnEngine {
             TimeStep timeStep = time - lastFrameTime;
             lastFrameTime = time;
 
-            for (Layer* layer : layerStack) {
+            for (Ref<Layer> layer : layerStack) {
                 layer->onUpdate(timeStep);
             }
 
             imGuiLayer->begin();
-            for (Layer* layer : layerStack) {
+            for (Ref<Layer> layer : layerStack) {
                 layer->onImGuiRender();
             }
             imGuiLayer->end();
