@@ -10,8 +10,8 @@
 
 
 namespace AnEngine {
-    OpenGLShader::OpenGLShader(AnEngine::InputFileStream& vertShaderStream,
-                               AnEngine::InputFileStream& fragShaderStream) {
+    OpenGLShader::OpenGLShader(InputFileStream& vertShaderStream,
+                               InputFileStream& fragShaderStream) {
         std::string vertShader;
         std::string fragShader;
 

@@ -12,19 +12,19 @@ namespace AnEngine {
     Ref<RenderAPI> RenderAPI::create() {
         switch (currAPI) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLRenderAPI>(OpenGLRenderAPI());
+                return std::make_shared<OpenGLRenderAPI>();
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
-                // return std::make_shared<DX11RenderAPI>(DX11RenderAPI());
+                // return std::make_shared<DX11RenderAPI>();
 
             case RenderAPI::DirectX12:
                 throw NotImplementedException();
-                // return std::make_shared<DX12RenderAPI>(DX12RenderAPI());
+                // return std::make_shared<DX12RenderAPI>();
 
             case RenderAPI::Vulkan:
                 throw NotImplementedException();
-                // return std::make_shared<VulkanRenderAPI>(VulkanRenderAPI());
+                // return std::make_shared<VulkanRenderAPI>();
 
             default:
                 AE_CORE_ASSERT(false, "Unknown RendererAPI!");
