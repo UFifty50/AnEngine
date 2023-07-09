@@ -20,29 +20,30 @@ public:
           cameraRotation(0.0f) {
         // square
         {
-            squareVA.reset(AnEngine::VertexArray::create());
+            squareVA = AnEngine::VertexArray::create();
 
             // clang-format off
-            float vertices[3 * 4] = {
-                -0.5f, -0.5f, 0.0f,
-                 0.5f, -0.5f, 0.0f,
-                 0.5f,  0.5f, 0.0f,
-                -0.5f,  0.5f, 0.0f,
+            float vertices[5 * 4] = {
+                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+                 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+                 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+                -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
             };
             // clang-format on
 
-            squareVB.reset(
-                AnEngine::VertexBuffer::create(vertices, sizeof(vertices)));
+            squareVB =
+                AnEngine::VertexBuffer::create(vertices, sizeof(vertices));
 
             AnEngine::BufferLayout layout = {
                 {AnEngine::ShaderDataType::Vec3, "position"},
+                {AnEngine::ShaderDataType::Float2, "texCoord"},
             };
             squareVB->setLayout(layout);
 
             squareVA->addVertexBuffer(squareVB);
 
             uint32_t indices[6] = {0, 1, 2, 2, 3, 0};
-            squareIB.reset(AnEngine::IndexBuffer::create(indices, 6));
+            squareIB = AnEngine::IndexBuffer::create(indices, 6);
 
             squareVA->setIndexBuffer(squareIB);
 
@@ -50,19 +51,26 @@ public:
                 "res/shaders/basic.vert");
             AnEngine::InputFileStream fragShaderStream(
                 "res/shaders/basic.frag");
-            shader.reset(
-                AnEngine::Shader::create(vertShaderStream, fragShaderStream));
+            shader =
+                AnEngine::Shader::create(vertShaderStream, fragShaderStream);
+
+            AnEngine::InputFileStream textureVertShaderStream(
+                "res/shaders/textureShader.vert");
+            AnEngine::InputFileStream textureFragShaderStream(
+                "res/shaders/textureShader.frag");
+            textureShader = AnEngine::Shader::create(textureVertShaderStream,
+                                                     textureFragShaderStream);
         }
 
         // triangle
-        {
-            triangleVA.reset(AnEngine::VertexArray::create());
+        /*{
+            triangleVA = AnEngine::VertexArray::create();
 
             float vertices2[3 * 3] = {
                 -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f,
             };
-            triangleVB.reset(
-                AnEngine::VertexBuffer::create(vertices2, sizeof(vertices2)));
+            triangleVB =
+                AnEngine::VertexBuffer::create(vertices2, sizeof(vertices2));
 
             AnEngine::BufferLayout layout2 = {
                 {AnEngine::ShaderDataType::Vec3, "position"},
@@ -72,7 +80,7 @@ public:
             triangleVA->addVertexBuffer(triangleVB);
 
             uint32_t indices2[3] = {0, 1, 2};
-            triangleIB.reset(AnEngine::IndexBuffer::create(indices2, 3));
+            triangleIB = AnEngine::IndexBuffer::create(indices2, 3);
 
             triangleVA->setIndexBuffer(triangleIB);
 
@@ -80,9 +88,9 @@ public:
                 "res/shaders/basic.vert");
             AnEngine::InputFileStream fragShaderStream2(
                 "res/shaders/basic2.frag");
-            shader2.reset(
-                AnEngine::Shader::create(vertShaderStream2, fragShaderStream2));
-        }
+            shader2 =
+                AnEngine::Shader::create(vertShaderStream2, fragShaderStream2);
+        }*/
     }
 
     void onUpdate(AnEngine::TimeStep deltaTime) override {
@@ -140,10 +148,13 @@ public:
             }
         }
 
-        UNIFORMS(triangleUniforms, AnEngine::ShaderUniform("Ucolour", red));
+        AnEngine::Renderer::submit(
+            textureShader, squareVA,
+            glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
-        AnEngine::Renderer::submit(shader2, triangleVA, glm::mat4(1.0f),
-                                   triangleUniforms);
+        // UNIFORMS(triangleUniforms, AnEngine::ShaderUniform("Ucolour", red));
+        // AnEngine::Renderer::submit(shader2, triangleVA, glm::mat4(1.0f),
+        //                             triangleUniforms);
 
         AnEngine::Renderer::endScene();
 
@@ -161,7 +172,7 @@ public:
     void onEvent(AnEngine::Event& event) override {}
 
 private:
-    AnEngine::Ref<AnEngine::Shader> shader;
+    AnEngine::Ref<AnEngine::Shader> shader, textureShader;
     AnEngine::Ref<AnEngine::VertexArray> squareVA;
     AnEngine::Ref<AnEngine::VertexBuffer> squareVB;
     AnEngine::Ref<AnEngine::IndexBuffer> squareIB;
@@ -180,7 +191,7 @@ private:
 
 class Sandbox : public AnEngine::Application {
 public:
-    Sandbox() { pushLayer(new ExampleLayer()); }
+    Sandbox() { pushLayer(std::make_shared<ExampleLayer>()); }
 
     ~Sandbox() {}
 };

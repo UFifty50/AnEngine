@@ -1,11 +1,12 @@
 #include "aepch.hpp"
 
 #include "Renderer/RenderCommandQueue.hpp"
-#include "Renderer/RenderAPI.hpp"
 
 #include "Platform/OpenGL/OpenGLRenderAPI.hpp"
+#include "Renderer/RenderAPI.hpp"
 
 
 namespace AnEngine {
-    RenderAPI* RenderCommandQueue::api = new OpenGLRenderAPI; // RenderAPI::create();
+    Scope<RenderAPI> RenderCommandQueue::api =
+        std::make_unique<OpenGLRenderAPI>();  // RenderAPI::create();
 }

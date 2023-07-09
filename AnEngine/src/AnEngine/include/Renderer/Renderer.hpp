@@ -26,7 +26,7 @@ namespace AnEngine {
             glm::mat4 viewProjectionMatrix;
         };
 
-        static SceneData* sceneData;
+        static Ref<SceneData> sceneData;
     };
 };  // namespace AnEngine
 

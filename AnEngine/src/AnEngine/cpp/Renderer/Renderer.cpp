@@ -12,7 +12,8 @@
 
 
 namespace AnEngine {
-    Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
+    Ref<Renderer::SceneData> Renderer::sceneData =
+        std::make_shared<Renderer::SceneData>();
 
     void Renderer::beginScene(OrthographicCamera& camera) {
         sceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();

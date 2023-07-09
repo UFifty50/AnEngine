@@ -2,6 +2,7 @@
 #define VERTEXBUFFER_HPP
 
 #include <vector>
+
 #include "Renderer/Buffers/BufferLayout.hpp"
 
 
@@ -19,10 +20,12 @@ namespace AnEngine {
         virtual const BufferLayout& getLayout() const = 0;
 
 
-        static VertexBuffer* create(float* vertices, size_t size);
-        static VertexBuffer* create(std::vector<float> vertices);
-        template<size_t _Size> static VertexBuffer* create(std::array<float, _Size> vertices);
+        static Ref<VertexBuffer> create(float* vertices, size_t size);
+        static Ref<VertexBuffer> create(std::vector<float> vertices);
+
+        template <size_t _Size>
+        static Ref<VertexBuffer> create(std::array<float, _Size> vertices);
     };
-}
+}  // namespace AnEngine
 
 #endif

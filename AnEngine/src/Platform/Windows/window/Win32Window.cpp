@@ -2,6 +2,8 @@
 
 #include "Platform/Windows/window/Win32Window.hpp"
 
+#include <GLFW/glfw3.h>
+
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
@@ -15,8 +17,8 @@ namespace AnEngine {
         AE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
     }
 
-    Window* Window::create(const WindowProperties& props) {
-        return new Win32Window(props);
+    Ref<Window> Window::create(const WindowProperties& props) {
+        return std::make_shared<Win32Window>(props);
     }
 
     Win32Window::Win32Window(const WindowProperties& props) { init(props); }
@@ -42,7 +44,7 @@ namespace AnEngine {
         window = glfwCreateWindow((int)props.width, (int)props.height,
                                   props.title.c_str(), nullptr, nullptr);
 
-        graphicsContext = new OpenGLContext(window);
+        graphicsContext = std::make_shared<OpenGLContext>(window);
         graphicsContext->init();
 
         glfwSetWindowUserPointer(window, &data);

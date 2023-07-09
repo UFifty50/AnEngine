@@ -1,15 +1,18 @@
 #include "aepch.hpp"
+
 #include "OpenGLContext.hpp"
-#include "Renderer/RenderAPI.hpp"
-#include <glad/glad.h>
+
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
+
+#include "Renderer/RenderAPI.hpp"
 
 
 namespace AnEngine {
     OpenGLContext::OpenGLContext(GLFWwindow* winPtr) : winPtr(winPtr) {
         AE_CORE_ASSERT(winPtr, "Window pointer is null!");
     }
-    
+
     void OpenGLContext::init() {
         glfwMakeContextCurrent(winPtr);
 
@@ -20,11 +23,10 @@ namespace AnEngine {
         AE_CORE_DEBUG("  Vendor: {0}", (char*)glGetString(GL_VENDOR));
         AE_CORE_DEBUG("  Renderer: {0}", (char*)glGetString(GL_RENDERER));
         AE_CORE_DEBUG("  Version: {0}", (char*)glGetString(GL_VERSION));
-        AE_CORE_DEBUG("  GLSL Version: {0}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+        AE_CORE_DEBUG("  GLSL Version: {0}",
+                      (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
         AE_CORE_DEBUG("Current RenderAPI: {0}", RenderAPI::getAPI());
     }
-    
-    void OpenGLContext::swapBuffers() {
-        glfwSwapBuffers(winPtr);
-    }
-}
+
+    void OpenGLContext::swapBuffers() { glfwSwapBuffers(winPtr); }
+}  // namespace AnEngine

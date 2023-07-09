@@ -8,7 +8,7 @@ namespace AnEngine {
         char exePathName[MAX_PATH];
         GetModuleFileNameA(NULL, exePathName, sizeof(exePathName));
 
-        char* exePath = new char[std::string(exePathName).length()+1];
+        char* exePath = new char[std::string(exePathName).length() + 1];
         strcpy(exePath, exePathName);
 
         PathRemoveFileSpecA(exePath);
@@ -36,10 +36,10 @@ namespace AnEngine {
         // split path
         if (this->path.find_last_of("\\") != std::string::npos) {
             this->name = this->path.substr(this->path.find_last_of("\\") + 1);
-        } else {         
+        } else {
             this->name = this->path.substr(this->path.find_last_of("/") + 1);
         }
-        
+
         this->extension = this->path.substr(this->path.find_last_of(".") + 1);
 
         this->open(this->path);
@@ -48,13 +48,11 @@ namespace AnEngine {
         }
     }
 
-    InputFileStream::~InputFileStream() {
-        this->close();
-    }
+    InputFileStream::~InputFileStream() { this->close(); }
 
     const std::string InputFileStream::readAll() const {
         std::stringstream ss;
         ss << this->rdbuf();
         return ss.str();
     }
-};
+};  // namespace AnEngine

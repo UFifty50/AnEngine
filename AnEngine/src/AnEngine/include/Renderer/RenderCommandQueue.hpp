@@ -22,7 +22,7 @@ namespace AnEngine {
         };
 
     private:
-        static RenderAPI* api;
+        static Scope<RenderAPI> api;
     };
 }  // namespace AnEngine
 

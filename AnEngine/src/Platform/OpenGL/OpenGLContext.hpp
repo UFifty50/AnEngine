@@ -16,6 +16,6 @@ namespace AnEngine {
         virtual void init() override;
         virtual void swapBuffers() override;
     };
-}
+}  // namespace AnEngine
 
 #endif

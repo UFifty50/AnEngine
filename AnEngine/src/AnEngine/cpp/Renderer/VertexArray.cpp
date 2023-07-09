@@ -1,32 +1,37 @@
 #include "aepch.hpp"
 
 #include <Exceptions/NotImplementedException.hpp>
+
 #include "Renderer/VertexArray.hpp"
-#include "Renderer/RenderAPI.hpp"
+
 #include "Platform/OpenGL/openGLVertexArray.hpp"
+#include "Renderer/RenderAPI.hpp"
 
 
 namespace AnEngine {
-    VertexArray* VertexArray::create() {
+    Ref<VertexArray> VertexArray::create() {
         switch (RenderAPI::getAPI()) {
-        case RenderAPI::OpenGL:
-            return new OpenGLVertexArray();
+            case RenderAPI::OpenGL:
+                return std::make_shared<OpenGLVertexArray>(OpenGLVertexArray());
 
-        case RenderAPI::DirectX11:
-            throw NotImplementedException();
-            //     return new DX11VertexArray();
+            case RenderAPI::DirectX11:
+                throw NotImplementedException();
+                //     return
+                //     std::make_shared<DX11VertexArray>(DX11VertexArray());
 
-        case RenderAPI::DirectX12:
-            throw NotImplementedException();
-            //      return new DX12VertexArray();
+            case RenderAPI::DirectX12:
+                throw NotImplementedException();
+                //      return
+                //      std::make_shared<DX12VertexArray>(DX12VertexArray());
 
-        case RenderAPI::Vulkan:
-            throw NotImplementedException();
-            //     return new VulkanVertexArray();
+            case RenderAPI::Vulkan:
+                throw NotImplementedException();
+                //     return
+                //     std::make_shared<VulkanVertexArray>(VulkanVertexArray());
 
-        default:
-            AE_CORE_ASSERT(false, "Unknown RendererAPI!");
-            throw NotImplementedException();
+            default:
+                AE_CORE_ASSERT(false, "Unknown RendererAPI!");
+                throw NotImplementedException();
         }
     }
-};
+};  // namespace AnEngine
