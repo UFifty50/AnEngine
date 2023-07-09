@@ -17,8 +17,8 @@ namespace AnEngine {
         AE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
     }
 
-    Ref<Window> Window::create(const WindowProperties& props) {
-        return std::make_shared<Win32Window>(props);
+    Window* Window::create(const WindowProperties& props) {
+        return new Win32Window(props);
     }
 
     Win32Window::Win32Window(const WindowProperties& props) { init(props); }

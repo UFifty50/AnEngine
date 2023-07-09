@@ -31,7 +31,7 @@ namespace AnEngine {
             AE_CORE_ASSERT(false, msg.str());
         }
 
-        window = Window::create();
+        window = Scope<Window>(Window::create());
         window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
         imGuiLayer = std::make_shared<ImGuiLayer>();

@@ -37,7 +37,7 @@ namespace AnEngine {
         virtual void* getNativeWindow() const = 0;
 
         // platform specific
-        static Ref<Window> create(
+        static Window* create(
             const WindowProperties& props = WindowProperties());
     };
 }  // namespace AnEngine

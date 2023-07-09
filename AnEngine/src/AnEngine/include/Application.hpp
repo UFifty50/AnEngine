@@ -26,7 +26,7 @@ namespace AnEngine {
 
     private:
         static Application* instance;
-        Ref<Window> window;
+        Scope<Window> window;
         Ref<ImGuiLayer> imGuiLayer;
         bool running = true;
         LayerStack layerStack;
