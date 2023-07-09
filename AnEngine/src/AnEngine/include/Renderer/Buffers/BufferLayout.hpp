@@ -1,10 +1,10 @@
 #ifndef BUFFERLAYOUT_HPP
 #define BUFFERLAYOUT_HPP
 
-#include <vector>
 #include <string>
+#include <vector>
 
-
+// clang-format off
 namespace AnEngine {
     class ShaderDataType {
     public:
