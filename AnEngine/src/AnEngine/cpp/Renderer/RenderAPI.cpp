@@ -9,7 +9,7 @@
 namespace AnEngine {
     RenderAPI::API RenderAPI::currAPI = RenderAPI::NoAPI;
 
-    Ref<RenderAPI> RenderAPI::create() {
+    /*Ref<RenderAPI> RenderAPI::create() {
         switch (currAPI) {
             case RenderAPI::OpenGL:
                 return std::make_shared<OpenGLRenderAPI>();
@@ -30,7 +30,7 @@ namespace AnEngine {
                 AE_CORE_ASSERT(false, "Unknown RendererAPI!");
                 throw NotImplementedException();
         }
-    }
+    } */
 
     std::ostream& operator<<(std::ostream& os, const RenderAPI::API& api) {
         switch (api) {

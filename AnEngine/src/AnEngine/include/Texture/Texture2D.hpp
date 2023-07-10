@@ -4,14 +4,13 @@
 #include <string>
 
 #include "Core.hpp"
-#include "File/InputFileStream.hpp"
 #include "Texture/Texture.hpp"
 
 
 namespace AnEngine {
     class Texture2D : public Texture {
     public:
-        static Ref<Texture2D> create(const InputFileStream& path);
+        static Ref<Texture2D> create(const std::string& path);
     };
 }  // namespace AnEngine
 

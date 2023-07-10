@@ -8,11 +8,15 @@
 
 
 namespace AnEngine {
+    struct Sampler2D {
+        uint32_t slot;
+    };
+
+
     template <typename S>
-    concept ScalarGLSLDataType =
-        std::is_same_v<S, bool> || std::is_same_v<S, int32_t> ||
-        std::is_same_v<S, uint32_t> || std::is_same_v<S, float> ||
-        std::is_same_v<S, double>;
+    concept ScalarGLSLDataType = std::is_same_v<S, bool> || std::is_same_v<S, int32_t> ||
+                                 std::is_same_v<S, uint32_t> ||
+                                 std::is_same_v<S, float> || std::is_same_v<S, double>;
 
     template <typename V>
     concept VectorGLSLDataType =
@@ -39,8 +43,12 @@ namespace AnEngine {
 
 
     template <typename T>
-    concept GLSLDataType =
-        ScalarGLSLDataType<T> || VectorGLSLDataType<T> || MatrixGLSLDataType<T>;
+    concept TextureGLSLDataType = std::is_same_v<T, Sampler2D>;
+
+    template <typename T>
+    concept GLSLDataType = ScalarGLSLDataType<T> || VectorGLSLDataType<T> ||
+                           MatrixGLSLDataType<T> || TextureGLSLDataType<T>;
+
 
     struct ShaderUniformBase {
         std::string name;
@@ -63,8 +71,8 @@ namespace AnEngine {
             for (auto& item : *this) {
                 if (item.name == name) return item.uniform;
             }
-            throw std::out_of_range(
-                "ShaderUniformVector::operator[] unable to find" + name);
+            throw std::out_of_range("ShaderUniformVector::operator[] unable to find" +
+                                    name);
         }
     };
 

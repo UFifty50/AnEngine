@@ -48,6 +48,14 @@ namespace AnEngine {
         }
     }
 
+    InputFileStream::InputFileStream(InputFileStream&& other)
+        : std::ifstream(std::move(other)) {
+        this->path = std::move(other.path);
+        this->name = std::move(other.name);
+        this->extension = std::move(other.extension);
+    }
+
+
     InputFileStream::~InputFileStream() { this->close(); }
 
     const std::string InputFileStream::readAll() const {

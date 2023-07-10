@@ -14,6 +14,8 @@ namespace AnEngine {
     public:
         OpenGLRenderAPI() = default;
 
+        virtual void init() override;
+
         virtual void clearColour(const glm::vec4& colour) override;
         virtual void clear() override;
         virtual void clearDepth() override;

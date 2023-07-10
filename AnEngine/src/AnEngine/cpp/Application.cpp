@@ -6,6 +6,7 @@
 #include "Input.hpp"
 #include "Log.hpp"
 #include "Renderer/RenderAPI.hpp"
+#include "Renderer/Renderer.hpp"
 #include "Time/Time.hpp"
 #include "Time/TimeStep.hpp"
 #include "Window.hpp"
@@ -34,6 +35,8 @@ namespace AnEngine {
         window = Scope<Window>(Window::create());
         window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
+        Renderer::init();
+
         imGuiLayer = std::make_shared<ImGuiLayer>();
         pushOverlay(imGuiLayer);
     }
@@ -52,8 +55,7 @@ namespace AnEngine {
 
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.dispatch<WindowCloseEvent>(
-            BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
 
         for (auto it = layerStack.end(); it != layerStack.begin();) {
             (*--it)->onEvent(e);

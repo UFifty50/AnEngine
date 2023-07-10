@@ -8,8 +8,7 @@
 #include "imgui_internal.h"
 
 
-#define UNIFORMS(varName, ...) \
-    AnEngine::ShaderUniformVector varName = {__VA_ARGS__}
+#define UNIFORMS(varName, ...) AnEngine::ShaderUniformVector varName = {__VA_ARGS__}
 
 class ExampleLayer : public AnEngine::Layer {
 public:
@@ -31,8 +30,7 @@ public:
             };
             // clang-format on
 
-            squareVB =
-                AnEngine::VertexBuffer::create(vertices, sizeof(vertices));
+            squareVB = AnEngine::VertexBuffer::create(vertices, sizeof(vertices));
 
             AnEngine::BufferLayout layout = {
                 {AnEngine::ShaderDataType::Vec3, "position"},
@@ -47,50 +45,22 @@ public:
 
             squareVA->setIndexBuffer(squareIB);
 
-            AnEngine::InputFileStream vertShaderStream(
-                "res/shaders/basic.vert");
-            AnEngine::InputFileStream fragShaderStream(
-                "res/shaders/basic.frag");
-            shader =
-                AnEngine::Shader::create(vertShaderStream, fragShaderStream);
+            AnEngine::InputFileStream vertShaderStream("assets/shaders/basic.vert");
+            AnEngine::InputFileStream fragShaderStream("assets/shaders/basic.frag");
+            shader = AnEngine::Shader::create(vertShaderStream, fragShaderStream);
 
             AnEngine::InputFileStream textureVertShaderStream(
-                "res/shaders/textureShader.vert");
+                "assets/shaders/textureShader.vert");
             AnEngine::InputFileStream textureFragShaderStream(
-                "res/shaders/textureShader.frag");
+                "assets/shaders/textureShader.frag");
             textureShader = AnEngine::Shader::create(textureVertShaderStream,
                                                      textureFragShaderStream);
+
+            texture = AnEngine::Texture2D::create("assets/textures/Checkerboard.png");
+            logoTexture = AnEngine::Texture2D::create("assets/textures/ChernoLogo.png");
+
+            textureShader->uploadUniform("Utexture", AnEngine::Sampler2D{0});
         }
-
-        // triangle
-        /*{
-            triangleVA = AnEngine::VertexArray::create();
-
-            float vertices2[3 * 3] = {
-                -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f,
-            };
-            triangleVB =
-                AnEngine::VertexBuffer::create(vertices2, sizeof(vertices2));
-
-            AnEngine::BufferLayout layout2 = {
-                {AnEngine::ShaderDataType::Vec3, "position"},
-            };
-            triangleVB->setLayout(layout2);
-
-            triangleVA->addVertexBuffer(triangleVB);
-
-            uint32_t indices2[3] = {0, 1, 2};
-            triangleIB = AnEngine::IndexBuffer::create(indices2, 3);
-
-            triangleVA->setIndexBuffer(triangleIB);
-
-            AnEngine::InputFileStream vertShaderStream2(
-                "res/shaders/basic.vert");
-            AnEngine::InputFileStream fragShaderStream2(
-                "res/shaders/basic2.frag");
-            shader2 =
-                AnEngine::Shader::create(vertShaderStream2, fragShaderStream2);
-        }*/
     }
 
     void onUpdate(AnEngine::TimeStep deltaTime) override {
@@ -121,8 +91,7 @@ public:
         AnEngine::Renderer::beginScene(camera);
 
 
-        static const glm::mat4 scale =
-            glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+        static const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
         glm::vec4 red(0.8f, 0.2f, 0.3f, 1.0f);
         glm::vec4 green(0.3f, 0.8f, 0.2f, 1.0f);
@@ -139,22 +108,18 @@ public:
                 //     (x + y) % 2 == 0
                 //         ? red * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f)
                 //         : blue * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f);
-                glm::vec3 pos =
-                    glm::vec3(x * 0.11f + 0.3f, y * 0.11f + 0.2f, 0.0f);
-                glm::mat4 transform =
-                    glm::translate(glm::mat4(1.0f), pos) * scale;
-                AnEngine::Renderer::submit(shader, squareVA, transform,
-                                           uniforms);
+                glm::vec3 pos = glm::vec3(x * 0.11f + 0.3f, y * 0.11f + 0.2f, 0.0f);
+                glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+                AnEngine::Renderer::submit(shader, squareVA, transform, uniforms);
             }
         }
 
-        AnEngine::Renderer::submit(
-            textureShader, squareVA,
-            glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-
-        // UNIFORMS(triangleUniforms, AnEngine::ShaderUniform("Ucolour", red));
-        // AnEngine::Renderer::submit(shader2, triangleVA, glm::mat4(1.0f),
-        //                             triangleUniforms);
+        texture->bind();
+        AnEngine::Renderer::submit(textureShader, squareVA,
+                                   glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+        logoTexture->bind();
+        AnEngine::Renderer::submit(textureShader, squareVA,
+                                   glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
         AnEngine::Renderer::endScene();
 
@@ -177,10 +142,7 @@ private:
     AnEngine::Ref<AnEngine::VertexBuffer> squareVB;
     AnEngine::Ref<AnEngine::IndexBuffer> squareIB;
 
-    AnEngine::Ref<AnEngine::Shader> shader2;
-    AnEngine::Ref<AnEngine::VertexArray> triangleVA;
-    AnEngine::Ref<AnEngine::VertexBuffer> triangleVB;
-    AnEngine::Ref<AnEngine::IndexBuffer> triangleIB;
+    AnEngine::Ref<AnEngine::Texture2D> texture, logoTexture;
 
     AnEngine::OrthographicCamera camera;
     glm::vec3 cameraPosition;

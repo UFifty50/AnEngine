@@ -17,6 +17,9 @@
 #include "AnEngine/include/Renderer/ShaderUniform.hpp"
 #include "AnEngine/include/Renderer/VertexArray.hpp"
 
+// ---Textures---
+#include "AnEngine/include/Texture/Texture2D.hpp"
+
 // ---Cameras---
 #include "AnEngine/include/Renderer/Camera/OrthographicCamera.hpp"
 

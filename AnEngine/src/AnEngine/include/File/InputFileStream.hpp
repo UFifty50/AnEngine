@@ -7,25 +7,24 @@
 
 namespace AnEngine {
     class InputFileStream : private std::ifstream {
-    private:
-        std::string path;
-        std::string name;
-        std::string extension;
-
     public:
         InputFileStream(const std::string& path);
+        InputFileStream(InputFileStream&& other);
         ~InputFileStream();
 
         const std::string readAll() const;
 
         inline const std::string& getFilePath() const { return this->path; }
         inline const std::string& getFileName() const { return this->name; }
-        inline const std::string& getFileExtension() const {
-            return this->extension;
-        }
+        inline const std::string& getFileExtension() const { return this->extension; }
 
         using std::ifstream::close;
         using std::ifstream::is_open;
+
+    private:
+        std::string path;
+        std::string name;
+        std::string extension;
     };
 }  // namespace AnEngine
 

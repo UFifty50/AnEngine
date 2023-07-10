@@ -6,6 +6,11 @@
 
 
 namespace AnEngine {
+    void OpenGLRenderAPI::init() {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
     void OpenGLRenderAPI::clearColour(const glm::vec4& colour) {
         glClearColor(colour.r, colour.g, colour.b, colour.a);
     }

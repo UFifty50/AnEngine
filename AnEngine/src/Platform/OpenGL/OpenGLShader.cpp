@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 
 #include "File/InputFileStream.hpp"
+#include "Renderer/ShaderUniform.hpp"
 
 
 namespace AnEngine {
@@ -32,15 +33,13 @@ namespace AnEngine {
 
     OpenGLShader::OpenGLShader(const std::string& vertShaderSrc,
                                const std::string& fragShaderSrc) {
-        this->rendererID =
-            this->compileAndCheckShaders(vertShaderSrc, fragShaderSrc);
+        this->rendererID = this->compileAndCheckShaders(vertShaderSrc, fragShaderSrc);
     }
 
     OpenGLShader::~OpenGLShader() { glDeleteProgram(this->rendererID); }
 
     uint32_t OpenGLShader::compileAndCheckShaders(
-        const std::string& vertShaderSrc,
-        const std::string& fragShaderSrc) const {
+        const std::string& vertShaderSrc, const std::string& fragShaderSrc) const {
         // Create the shaders
         GLuint vertShaderID = glCreateShader(GL_VERTEX_SHADER);
         GLuint fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -139,14 +138,13 @@ namespace AnEngine {
 
     void OpenGLShader::unbind() const { glUseProgram(0); }
 
-    void OpenGLShader::uploadUniform(const std::string& name,
-                                     std::any uniform) {
+    void OpenGLShader::uploadUniform(const std::string& name, std::any uniform) {
         GLint location = glGetUniformLocation(this->rendererID, name.c_str());
         if (location == -1) {
             AE_CORE_ERROR("Uniform {0} doesn't exist.", name);
             return;
         }
-
+        // integral types
         if (uniform.type() == typeid(int32_t)) {
             glUniform1i(location, std::any_cast<int32_t>(uniform));
         } else if (uniform.type() == typeid(uint32_t)) {
@@ -159,7 +157,7 @@ namespace AnEngine {
             glUniform1d(location, std::any_cast<double>(uniform));
         }
 
-
+        // 2D vectors
         else if (uniform.type() == typeid(glm::vec2)) {
             glm::vec2 vec = std::any_cast<glm::vec2>(uniform);
             glUniform2f(location, vec.x, vec.y);
@@ -177,6 +175,7 @@ namespace AnEngine {
             glUniform2i(location, vec.x, vec.y);
         }
 
+        // 3D vectors
         else if (uniform.type() == typeid(glm::vec3)) {
             glm::vec3 vec = std::any_cast<glm::vec3>(uniform);
             glUniform3f(location, vec.x, vec.y, vec.z);
@@ -194,6 +193,7 @@ namespace AnEngine {
             glUniform3i(location, vec.x, vec.y, vec.z);
         }
 
+        // 4D vectors
         else if (uniform.type() == typeid(glm::vec4)) {
             glm::vec4 vec = std::any_cast<glm::vec4>(uniform);
             glUniform4f(location, vec.r, vec.b, vec.g, vec.a);
@@ -212,15 +212,22 @@ namespace AnEngine {
         }
 
 
+        // Matrices
         else if (uniform.type() == typeid(glm::mat3)) {
-            glUniformMatrix3fv(
-                location, 1, GL_FALSE,
-                glm::value_ptr(std::any_cast<glm::mat3>(uniform)));
+            glUniformMatrix3fv(location, 1, GL_FALSE,
+                               glm::value_ptr(std::any_cast<glm::mat3>(uniform)));
         } else if (uniform.type() == typeid(glm::mat4)) {
-            glUniformMatrix4fv(
-                location, 1, GL_FALSE,
-                glm::value_ptr(std::any_cast<glm::mat4>(uniform)));
-        } else {
+            glUniformMatrix4fv(location, 1, GL_FALSE,
+                               glm::value_ptr(std::any_cast<glm::mat4>(uniform)));
+        }
+
+        // Textures
+        else if (uniform.type() == typeid(Sampler2D)) {
+            uint32_t slot = std::any_cast<Sampler2D>(uniform).slot;
+            glUniform1i(location, slot);
+        }
+
+        else {
             AE_CORE_ASSERT(false, "Unknown uniform type.");
         }
     }

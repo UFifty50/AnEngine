@@ -9,6 +9,8 @@
 namespace AnEngine {
     class RenderCommandQueue {
     public:
+        static void init() { api->init(); }
+
         inline static void clearColour(const glm::vec4& colour) {
             api->clearColour(colour);
         }

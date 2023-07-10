@@ -18,7 +18,8 @@ namespace AnEngine {
         inline static API getAPI() { return currAPI; }
         inline static void setAPI(RenderAPI::API api) { currAPI = api; }
 
-        static Ref<RenderAPI> create();
+        //    static Ref<RenderAPI> create();
+        virtual void init() = 0;
 
         virtual void clearColour(const glm::vec4& colour) = 0;
         virtual void clear() = 0;

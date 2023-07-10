@@ -11,6 +11,7 @@ includeDir['GLFW'] = "AnEngine/vendor/GLFW/include"
 includeDir['Glad'] = "AnEngine/vendor/Glad/include"
 includeDir['ImGui'] = "AnEngine/vendor/ImGui/"
 includeDir['glm'] = "AnEngine/vendor/glm/"
+includeDir['stb'] = "AnEngine/vendor/stb/"
 
 group "Dependencies"
     include "AnEngine/vendor/GLFW"
@@ -37,6 +38,8 @@ project "AnEngine"
     files {
         "%{prj.name}/src/**.hpp",
         "%{prj.name}/src/**.cpp",
+        "%{prj.name}/vendor/stb/**.cpp",
+        "%{prj.name}/vendor/stb/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.inl"
     }
@@ -53,7 +56,8 @@ project "AnEngine"
         "%{includeDir.GLFW}",
         "%{includeDir.Glad}",
         "%{includeDir.ImGui}",
-        "%{includeDir.glm}"
+        "%{includeDir.glm}",
+        "%{includeDir.stb}"
     }
 
     externalincludedirs {
@@ -73,7 +77,7 @@ project "AnEngine"
     postbuildcommands {
             "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
             "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox",
-            "{COPYDIR} ../AnEngine/src/res ../bin/" .. outputDir .. "/Sandbox/res"
+            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets"
     }
 
     filter "system:linux"
@@ -172,7 +176,7 @@ project "Sandbox"
     }
 
     postbuildcommands {
-            "{COPYDIR} ../AnEngine/src/res ../bin/" .. outputDir .. "/Sandbox/res"
+            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets"
     }
 
     filter "system:Linux"

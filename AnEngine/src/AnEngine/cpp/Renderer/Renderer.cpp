@@ -15,19 +15,19 @@ namespace AnEngine {
     Ref<Renderer::SceneData> Renderer::sceneData =
         std::make_shared<Renderer::SceneData>();
 
+    void Renderer::init() { RenderCommandQueue::init(); }
+
     void Renderer::beginScene(OrthographicCamera& camera) {
         sceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
     }
 
     void Renderer::endScene() {}
 
-    void Renderer::submit(const Ref<Shader>& shader,
-                          const Ref<VertexArray>& vertexArray,
+    void Renderer::submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray,
                           const glm::mat4& transform,
                           const AnEngine::ShaderUniformVector& uniforms) {
         shader->bind();
-        shader->uploadUniform("viewProjectionMatrix",
-                              sceneData->viewProjectionMatrix);
+        shader->uploadUniform("viewProjectionMatrix", sceneData->viewProjectionMatrix);
         shader->uploadUniform("modelMatrix", transform);
 
         for (const auto& item : uniforms) {

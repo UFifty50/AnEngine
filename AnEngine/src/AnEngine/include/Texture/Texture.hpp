@@ -69,7 +69,7 @@ namespace AnEngine {
         virtual ImageFormat::FileFormat getFileFormat() const = 0;
         virtual ImageFormat::PixelFormat getPixelFormat() const = 0;
 
-        virtual void bind() const = 0;
+        virtual void bind(uint32_t slot = 0) const = 0;
     };
     ;
 };  // namespace AnEngine

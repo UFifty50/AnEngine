@@ -13,11 +13,11 @@
 namespace AnEngine {
     class Renderer {
     public:
+        static void init();
         static void beginScene(OrthographicCamera& camera);
         static void endScene();
 
-        static void submit(const Ref<Shader>& shader,
-                           const Ref<VertexArray>& vertexArray,
+        static void submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray,
                            const glm::mat4& transform,
                            const AnEngine::ShaderUniformVector& uniforms = {});
 
