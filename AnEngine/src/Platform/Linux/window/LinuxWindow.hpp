@@ -1,9 +1,10 @@
 #ifndef LINUXWINDOW_HPP
 #define LINUXWINDOW_HPP
 
-#include "Window.hpp"
-#include "Renderer/RenderContext.hpp"
 #include <GLFW/glfw3.h>
+
+#include "Renderer/RenderContext.hpp"
+#include "Window.hpp"
 
 
 namespace AnEngine {
@@ -19,7 +20,7 @@ namespace AnEngine {
 
         GLFWwindow* window;
         WindowData data;
-        RenderContext* graphicsContext;
+        Ref<RenderContext> graphicsContext;
 
         virtual void init(const WindowProperties& props);
         virtual void shutdown();
@@ -33,12 +34,14 @@ namespace AnEngine {
         inline unsigned int getWidth() const override { return data.width; }
         inline unsigned int getHeight() const override { return data.height; }
 
-        inline void setEventCallback(const EventCallbackFn& callback) override { data.eventCallback = callback; }
+        inline void setEventCallback(const EventCallbackFn& callback) override {
+            data.eventCallback = callback;
+        }
         void setVSync(bool enabled) override;
         bool VSyncEnabled() const override;
 
         inline virtual void* getNativeWindow() const override { return window; }
     };
-}
+}  // namespace AnEngine
 
 #endif
