@@ -3,17 +3,20 @@
 #include "Renderer/Shader.hpp"
 
 #include "Exceptions/NotImplementedException.hpp"
+#include "File/InputFileStream.hpp"
 #include "Platform/OpenGL/OpenGLShader.hpp"
 #include "Renderer/RenderAPI.hpp"
 
 
 namespace AnEngine {
-    Ref<Shader> Shader::create(InputFileStream& vertShaderStream,
-                               InputFileStream& fragShaderStream) {
+    Ref<Shader> Shader::create(const std::string& vertShaderPath,
+                               const std::string& fragShaderPath) {
+        InputFileStream vertShaderStream(vertShaderPath, std::ios::binary);
+        InputFileStream fragShaderStream(fragShaderPath, std::ios::binary);
+
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLShader>(vertShaderStream,
-                                                      fragShaderStream);
+                return std::make_shared<OpenGLShader>(vertShaderStream, fragShaderStream);
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
@@ -36,12 +39,12 @@ namespace AnEngine {
         }
     }
 
-    Ref<Shader> Shader::create(const std::string& vertShaderSrc,
-                               const std::string& fragShaderSrc) {
+    Ref<Shader> Shader::create(const std::string& mixedShaderPath) {
+        InputFileStream mixedShaderStream(mixedShaderPath, std::ios::binary);
+
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLShader>(vertShaderSrc,
-                                                      fragShaderSrc);
+                return std::make_shared<OpenGLShader>(mixedShaderStream);
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();

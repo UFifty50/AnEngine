@@ -11,3 +11,6 @@
 [submodule "AnEngine/vendor/glm"]
 	path = AnEngine/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "AnEngine/vendor/fmt"]
+	path = AnEngine/vendor/fmt
+	url = https://github.com/UFifty50/fmt-premake

@@ -25,7 +25,7 @@ namespace AnEngine {
         AE_CORE_DEBUG("  Version: {0}", (char*)glGetString(GL_VERSION));
         AE_CORE_DEBUG("  GLSL Version: {0}",
                       (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-        AE_CORE_DEBUG("Current RenderAPI: {0}", RenderAPI::getAPI());
+        AE_CORE_DEBUG("Current RenderAPI: {0}", RenderAPI::getAPIName());
     }
 
     void OpenGLContext::swapBuffers() { glfwSwapBuffers(winPtr); }

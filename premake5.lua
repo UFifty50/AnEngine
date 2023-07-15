@@ -11,12 +11,14 @@ includeDir['GLFW'] = "AnEngine/vendor/GLFW/include"
 includeDir['Glad'] = "AnEngine/vendor/Glad/include"
 includeDir['ImGui'] = "AnEngine/vendor/ImGui/"
 includeDir['glm'] = "AnEngine/vendor/glm/"
+-- includeDir['fmt'] = "AnEngine/vendor/fmt/include/"
 includeDir['stb'] = "AnEngine/vendor/stb/"
 
 group "Dependencies"
     include "AnEngine/vendor/GLFW"
     include "AnEngine/vendor/Glad"
     include "AnEngine/vendor/ImGui"
+--    include "AnEngine/vendor/fmt"
 
 group ""
 project "AnEngine"
@@ -57,6 +59,7 @@ project "AnEngine"
         "%{includeDir.Glad}",
         "%{includeDir.ImGui}",
         "%{includeDir.glm}",
+  --      "%{includeDir.fmt}",
         "%{includeDir.stb}"
     }
 
@@ -68,6 +71,7 @@ project "AnEngine"
         "GLFW",
         "Glad",
         "ImGui",
+     --   "fmt",
     }
 
     prebuildcommands {
@@ -155,6 +159,7 @@ project "Sandbox"
         "GLFW",
         "Glad",
         "ImGui",
+   --     "fmt"
     }
 
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")

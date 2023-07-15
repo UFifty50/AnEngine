@@ -29,7 +29,7 @@ namespace AnEngine {
             msg << "| RenderAPI::DirectX11" << std::endl;
             msg << "| RenderAPI::DirectX12" << std::endl;
             msg << "| RenderAPI::Vulkan" << std::endl;
-            AE_CORE_ASSERT(false, msg.str());
+            AE_CORE_ASSERT(false, msg.str().c_str());
         }
 
         window = Scope<Window>(Window::create());

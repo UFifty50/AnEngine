@@ -45,16 +45,11 @@ public:
 
             squareVA->setIndexBuffer(squareIB);
 
-            AnEngine::InputFileStream vertShaderStream("assets/shaders/basic.vert");
-            AnEngine::InputFileStream fragShaderStream("assets/shaders/basic.frag");
-            shader = AnEngine::Shader::create(vertShaderStream, fragShaderStream);
+            shader = AnEngine::Shader::create("assets/shaders/basic.vert",
+                                              "assets/shaders/basic.frag");
 
-            AnEngine::InputFileStream textureVertShaderStream(
-                "assets/shaders/textureShader.vert");
-            AnEngine::InputFileStream textureFragShaderStream(
-                "assets/shaders/textureShader.frag");
-            textureShader = AnEngine::Shader::create(textureVertShaderStream,
-                                                     textureFragShaderStream);
+            textureShader =
+                AnEngine::Shader::create("assets/shaders/mixedTextureShader.glsl");
 
             texture = AnEngine::Texture2D::create("assets/textures/Checkerboard.png");
             logoTexture = AnEngine::Texture2D::create("assets/textures/ChernoLogo.png");

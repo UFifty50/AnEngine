@@ -11,7 +11,7 @@
 
 namespace AnEngine {
     OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
-        : file(InputFileStream(path)) {
+        : file(InputFileStream(path, std::ios::binary)) {
         // TODO: asset build pipeline - custom file format
         int width, height, channels, internalFormat, dataFormat;
         stbi_set_flip_vertically_on_load(1);

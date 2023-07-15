@@ -3,7 +3,7 @@
 #include "File/InputFileStream.hpp"
 
 namespace AnEngine {
-    InputFileStream::InputFileStream(const std::string& path) {
+    InputFileStream::InputFileStream(const std::string& path, int type) {
 #if defined(AE_WIN)
         char exePathName[MAX_PATH];
         GetModuleFileNameA(NULL, exePathName, sizeof(exePathName));
@@ -42,13 +42,13 @@ namespace AnEngine {
 
         this->extension = this->path.substr(this->path.find_last_of(".") + 1);
 
-        this->open(this->path);
+        this->open(this->path, std::ios::in, type);
         if (!this->is_open()) {
             perror(("Error opening file " + this->path).c_str());
         }
     }
 
-    InputFileStream::InputFileStream(InputFileStream&& other)
+    InputFileStream::InputFileStream(InputFileStream&& other) noexcept
         : std::ifstream(std::move(other)) {
         this->path = std::move(other.path);
         this->name = std::move(other.name);

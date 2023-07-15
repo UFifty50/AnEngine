@@ -10,129 +10,134 @@
 #include "Renderer/ShaderUniform.hpp"
 
 
+// using namespace fmt::literals;
+
 namespace AnEngine {
     OpenGLShader::OpenGLShader(InputFileStream& vertShaderStream,
                                InputFileStream& fragShaderStream) {
-        std::string vertShader;
-        std::string fragShader;
+        std::unordered_map<GLenum, std::string> shaderSources;
 
-        // Read the Vertex Shader code from the file
-        AE_CORE_ASSERT(vertShaderStream.is_open(),
-                       "Couldn't open " + vertShaderStream.getFilePath() + ".");
-        vertShader = vertShaderStream.readAll();
+        if (vertShaderStream.is_open() && !fragShaderStream.is_open()) {
+            AE_CORE_CRITICAL(
+                "Opened {0}, but cannot compile as {1} is not open for reading.",
+                vertShaderStream.getFilePath(), fragShaderStream.getFilePath());
+            return;
+        }
+
+        if (!vertShaderStream.is_open() && fragShaderStream.is_open()) {
+            AE_CORE_CRITICAL(
+                "Opened {1}, but cannot compile as {0} is not open for reading.",
+                vertShaderStream.getFilePath(), fragShaderStream.getFilePath());
+            return;
+        }
+
+        if (!vertShaderStream.is_open() && !fragShaderStream.is_open()) {
+            AE_CORE_CRITICAL(
+                "Cannot compile as neither {0} nor {1} can be opened to read.",
+                vertShaderStream.getFilePath(), fragShaderStream.getFilePath());
+            return;
+        }
+
+        shaderSources[GL_VERTEX_SHADER] = vertShaderStream.readAll();
+        shaderSources[GL_FRAGMENT_SHADER] = fragShaderStream.readAll();
+
         vertShaderStream.close();
-
-        // Read the Fragment Shader code from the file
-        AE_CORE_ASSERT(fragShaderStream.is_open(),
-                       "Couldn't open " + fragShaderStream.getFilePath() + ".");
-        fragShader = fragShaderStream.readAll();
         fragShaderStream.close();
 
-        this->rendererID = this->compileAndCheckShaders(vertShader, fragShader);
+        this->rendererID = this->compile(shaderSources);
     }
 
-    OpenGLShader::OpenGLShader(const std::string& vertShaderSrc,
-                               const std::string& fragShaderSrc) {
-        this->rendererID = this->compileAndCheckShaders(vertShaderSrc, fragShaderSrc);
+    OpenGLShader::OpenGLShader(InputFileStream& mixedShaderStream) {
+        if (!mixedShaderStream.is_open()) {
+            AE_CORE_CRITICAL("Cannot compile as {0} is not open.",
+                             mixedShaderStream.getFilePath());
+            return;
+        }
+
+
+        std::unordered_map<GLenum, std::string> shaderSources =
+            this->preProcess(mixedShaderStream.readAll());
+        mixedShaderStream.close();
+
+        this->rendererID = this->compile(shaderSources);
+    }
+
+    std::unordered_map<GLenum, std::string> OpenGLShader::preProcess(
+        const std::string& mixedShaderSrc) {
+        std::unordered_map<GLenum, std::string> shaderSources;
+
+        ShaderParser parser(mixedShaderSrc);
+        parser.parse();
+        for (auto& [shaderType, shaderSrc] : parser.getShaders()) {
+            shaderSources[shaderType] = shaderSrc;
+        }
+
+        return shaderSources;
+    }
+
+    uint32_t OpenGLShader::compile(
+        const std::unordered_map<uint32_t, std::string>& shaderSources) const {
+        std::vector<GLuint> shaderIDs;
+        shaderIDs.resize(shaderSources.size());
+
+        GLuint program = glCreateProgram();
+
+        AE_CORE_DEBUG("Compiling shader {0}", program);
+
+        for (auto& [shaderType, shaderSrc] : shaderSources) {
+            GLuint shader = glCreateShader(shaderType);
+
+            const GLchar* source = shaderSrc.c_str();
+            glShaderSource(shader, 1, &source, 0);
+            glCompileShader(shader);
+
+            GLint compileResult;
+            glGetShaderiv(shader, GL_COMPILE_STATUS, &compileResult);
+            if (compileResult == GL_FALSE) {
+                GLint InfoLogLength = 0;
+                glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &InfoLogLength);
+                std::vector<GLchar> infoLog(InfoLogLength);
+                glGetShaderInfoLog(shader, InfoLogLength, &InfoLogLength, &infoLog[0]);
+                AE_CORE_CRITICAL("Shader compilation failed: {0}", infoLog.data());
+                glDeleteShader(shader);
+                return -1;
+            }
+
+            glAttachShader(program, shader);
+            shaderIDs.push_back(shader);
+        }
+
+        glLinkProgram(program);
+
+        GLint linkResult = 0;
+        glGetProgramiv(program, GL_LINK_STATUS, (int*)&linkResult);
+        if (linkResult == GL_FALSE) {
+            GLint InfoLogLength = 0;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &InfoLogLength);
+            std::vector<GLchar> infoLog(InfoLogLength);
+            glGetProgramInfoLog(program, InfoLogLength, &InfoLogLength, &infoLog[0]);
+
+            glDeleteProgram(program);
+            for (auto& shader : shaderIDs) {
+                glDeleteShader(shader);
+            }
+
+            AE_CORE_CRITICAL("Shader linking failed: {0}", infoLog.data());
+            return -1;
+        }
+
+
+        for (auto& shader : shaderIDs) {
+            glDetachShader(program, shader);
+            glDeleteShader(shader);
+        }
+
+        AE_CORE_DEBUG("Shader {0} compiled", program);
+
+        return program;
     }
 
     OpenGLShader::~OpenGLShader() { glDeleteProgram(this->rendererID); }
-
-    uint32_t OpenGLShader::compileAndCheckShaders(
-        const std::string& vertShaderSrc, const std::string& fragShaderSrc) const {
-        // Create the shaders
-        GLuint vertShaderID = glCreateShader(GL_VERTEX_SHADER);
-        GLuint fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-
-        // Compile Vertex Shader
-        AE_CORE_DEBUG("Compiling vertex shader : {0}", vertShaderID);
-        char const* VertexSourcePointer = vertShaderSrc.c_str();
-        glShaderSource(vertShaderID, 1, &VertexSourcePointer, NULL);
-        glCompileShader(vertShaderID);
-
-
-        // Check Vertex Shader
-        GLint compileResult;
-        glGetShaderiv(vertShaderID, GL_COMPILE_STATUS, &compileResult);
-        if (compileResult == GL_FALSE) {
-            GLint InfoLogLength = 0;
-            glGetShaderiv(vertShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-
-            std::vector<GLchar> VertexShaderErrorMessage(InfoLogLength);
-            glGetShaderInfoLog(vertShaderID, InfoLogLength, &InfoLogLength,
-                               &VertexShaderErrorMessage[0]);
-
-            glDeleteShader(vertShaderID);
-
-            AE_CORE_CRITICAL("{0}", VertexShaderErrorMessage.data());
-            AE_CORE_ASSERT(false, "Vertex shader compilation failed.");
-            return 0;
-        }
-
-
-        // Compile Fragment Shader
-        AE_CORE_DEBUG("Compiling fragment shader : {0}", fragShaderID);
-        char const* FragmentSourcePointer = fragShaderSrc.c_str();
-        glShaderSource(fragShaderID, 1, &FragmentSourcePointer, NULL);
-        glCompileShader(fragShaderID);
-
-
-        // Check Fragment Shader
-        glGetShaderiv(fragShaderID, GL_COMPILE_STATUS, &compileResult);
-        if (compileResult == GL_FALSE) {
-            GLint InfoLogLength = 0;
-            glGetShaderiv(fragShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-
-            std::vector<GLchar> FragmentShaderErrorMessage(InfoLogLength);
-            glGetShaderInfoLog(fragShaderID, InfoLogLength, &InfoLogLength,
-                               &FragmentShaderErrorMessage[0]);
-
-            glDeleteShader(fragShaderID);
-            glDeleteShader(vertShaderID);
-
-            AE_CORE_CRITICAL("{0}", FragmentShaderErrorMessage.data());
-            AE_CORE_ASSERT(false, "Fragment shader compilation failed.");
-            return 0;
-        }
-
-
-        // Link the program
-        AE_CORE_DEBUG("Linking program");
-        GLuint programID = glCreateProgram();
-        glAttachShader(programID, vertShaderID);
-        glAttachShader(programID, fragShaderID);
-        glLinkProgram(programID);
-
-
-        // Check the program
-        GLint linkResult = 0;
-        glGetProgramiv(programID, GL_LINK_STATUS, (int*)&linkResult);
-        if (linkResult == GL_FALSE) {
-            GLint InfoLogLength = 0;
-            glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-            std::vector<GLchar> ProgramErrorMessage(InfoLogLength);
-            glGetProgramInfoLog(programID, InfoLogLength, &InfoLogLength,
-                                &ProgramErrorMessage.front());
-
-            glDeleteProgram(programID);
-            glDeleteShader(vertShaderID);
-            glDeleteShader(fragShaderID);
-
-            AE_CORE_CRITICAL("{0}", ProgramErrorMessage.data());
-            AE_CORE_ASSERT(false, "Shader linking failed.");
-            return programID;
-        }
-
-
-        glDetachShader(programID, vertShaderID);
-        glDetachShader(programID, fragShaderID);
-
-        glDeleteShader(vertShaderID);
-        glDeleteShader(fragShaderID);
-
-        return static_cast<uint32_t>(programID);
-    }
 
     void OpenGLShader::bind() const { glUseProgram(this->rendererID); }
 
@@ -230,5 +235,58 @@ namespace AnEngine {
         else {
             AE_CORE_ASSERT(false, "Unknown uniform type.");
         }
+    }
+
+
+    ShaderParser::ShaderParser(const std::string& mixedShaderSrc)
+        : mixedShaderSrc(mixedShaderSrc) {}
+
+    void ShaderParser::parse() {
+        std::string line;
+        std::stringstream ss(mixedShaderSrc);
+
+        std::string shaderToken = "#shader";
+
+        while (std::getline(ss, line)) {
+            if (line.starts_with(shaderToken)) {
+                std::string shaderTypeStr = line.substr(shaderToken.length());
+
+                if (shaderTypeStr.empty()) {
+                    AE_CORE_ASSERT(false, "Shader type must be specified.");
+                }
+
+                shaderTypeStr.erase(0, shaderTypeStr.find_first_not_of(' '));
+
+                switch (hashedType(shaderTypeStr)) {
+                    case VERTEX:
+                        shaderType = GL_VERTEX_SHADER;
+                        break;
+                    case FRAGMENT:
+                        shaderType = GL_FRAGMENT_SHADER;
+                        break;
+                    case GEOMETRY:
+                        shaderType = GL_GEOMETRY_SHADER;
+                        break;
+                    case COMPUTE:
+                        shaderType = GL_COMPUTE_SHADER;
+                        break;
+                    default:
+                        AE_CORE_ASSERT(false, "Unknown shader type: \"{0}\"",
+                                       shaderTypeStr);
+                        break;
+                }
+
+                if (shaders.find(shaderType) != shaders.end()) {
+                    AE_CORE_ASSERT(false, "{0} Shader already defined.", shaderTypeStr);
+                }
+
+            } else {
+                shaders[shaderType] += line + "\n";
+            }
+        }
+    }
+
+    std::unordered_map<GLenum, std::string> ShaderParser::getShaders() const {
+        return shaders;
     }
 }  // namespace AnEngine

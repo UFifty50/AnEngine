@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+#include <glad/glad.h>
+
 #include <any>
 #include <string>
 
@@ -16,22 +18,49 @@ namespace AnEngine {
         OpenGLShader(InputFileStream& vertShaderStream,
                      InputFileStream& fragShaderStream);
 
-        OpenGLShader(const std::string& vertShaderSrc,
-                     const std::string& fragShaderSrc);
+        OpenGLShader(InputFileStream& mixedShaderStream);
         ~OpenGLShader();
 
         virtual void bind() const override;
         virtual void unbind() const override;
 
-        virtual void uploadUniform(const std::string& name,
-                                   std::any uniform) override;
+        virtual void uploadUniform(const std::string& name, std::any uniform) override;
 
     private:
         uint32_t rendererID = NULL;
 
-        uint32_t compileAndCheckShaders(
-            const std::string& vertShaderSrc,
-            const std::string& fragShaderSrc) const override;
+        std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
+        uint32_t compile(const std::unordered_map<uint32_t, std::string>& shaderSources)
+            const override;
+    };
+
+    class ShaderParser {
+    public:
+        ShaderParser(const std::string& mixedShaderSrc);
+
+        void parse();
+        std::unordered_map<GLenum, std::string> getShaders() const;
+
+    private:
+        std::string mixedShaderSrc;
+        GLenum shaderType;
+        std::unordered_map<GLenum, std::string> shaders;
+
+        enum StrCode : uint8_t {
+            VERTEX = 0,
+            FRAGMENT = 1,
+            GEOMETRY = 2,
+            COMPUTE = 5,
+            UNKNOWN = 255
+        };
+
+        StrCode hashedType(const std::string& type) {
+            if (type == "vertex") return VERTEX;
+            if (type == "fragment" || type == "pixel") return FRAGMENT;
+            if (type == "geometry") return GEOMETRY;
+            if (type == "compute") return COMPUTE;
+            return UNKNOWN;
+        }
     };
 }  // namespace AnEngine
 
