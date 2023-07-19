@@ -6,48 +6,16 @@
 
 #include <glad/glad.h>
 
+#include <algorithm>
+#include <cctype>
+
 #include "File/InputFileStream.hpp"
 #include "Renderer/ShaderUniform.hpp"
 
 
-// using namespace fmt::literals;
-
 namespace AnEngine {
-    OpenGLShader::OpenGLShader(InputFileStream& vertShaderStream,
-                               InputFileStream& fragShaderStream) {
-        std::unordered_map<GLenum, std::string> shaderSources;
-
-        if (vertShaderStream.is_open() && !fragShaderStream.is_open()) {
-            AE_CORE_CRITICAL(
-                "Opened {0}, but cannot compile as {1} is not open for reading.",
-                vertShaderStream.getFilePath(), fragShaderStream.getFilePath());
-            return;
-        }
-
-        if (!vertShaderStream.is_open() && fragShaderStream.is_open()) {
-            AE_CORE_CRITICAL(
-                "Opened {1}, but cannot compile as {0} is not open for reading.",
-                vertShaderStream.getFilePath(), fragShaderStream.getFilePath());
-            return;
-        }
-
-        if (!vertShaderStream.is_open() && !fragShaderStream.is_open()) {
-            AE_CORE_CRITICAL(
-                "Cannot compile as neither {0} nor {1} can be opened to read.",
-                vertShaderStream.getFilePath(), fragShaderStream.getFilePath());
-            return;
-        }
-
-        shaderSources[GL_VERTEX_SHADER] = vertShaderStream.readAll();
-        shaderSources[GL_FRAGMENT_SHADER] = fragShaderStream.readAll();
-
-        vertShaderStream.close();
-        fragShaderStream.close();
-
-        this->rendererID = this->compile(shaderSources);
-    }
-
-    OpenGLShader::OpenGLShader(InputFileStream& mixedShaderStream) {
+    OpenGLShader::OpenGLShader(InputFileStream& mixedShaderStream,
+                               const std::string& name) {
         if (!mixedShaderStream.is_open()) {
             AE_CORE_CRITICAL("Cannot compile as {0} is not open.",
                              mixedShaderStream.getFilePath());
@@ -58,6 +26,8 @@ namespace AnEngine {
         std::unordered_map<GLenum, std::string> shaderSources =
             this->preProcess(mixedShaderStream.readAll());
         mixedShaderStream.close();
+
+        name != "" ? this->name = name : this->name = mixedShaderStream.getFileName();
 
         this->rendererID = this->compile(shaderSources);
     }
@@ -115,7 +85,8 @@ namespace AnEngine {
             GLint InfoLogLength = 0;
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &InfoLogLength);
             std::vector<GLchar> infoLog(InfoLogLength);
-            glGetProgramInfoLog(program, InfoLogLength, &InfoLogLength, &infoLog[0]);
+            glGetProgramInfoLog(program, InfoLogLength, &InfoLogLength,
+                                &infoLog.front());  // .front called on empty vector
 
             glDeleteProgram(program);
             for (auto& shader : shaderIDs) {
@@ -245,17 +216,23 @@ namespace AnEngine {
         std::string line;
         std::stringstream ss(mixedShaderSrc);
 
-        std::string shaderToken = "#shader";
+        std::string shaderTokenA = "#shader";
+        std::string shaderTokenB = "#type";
 
         while (std::getline(ss, line)) {
-            if (line.starts_with(shaderToken)) {
-                std::string shaderTypeStr = line.substr(shaderToken.length());
+            if (line.starts_with(shaderTokenA) || line.starts_with(shaderTokenB)) {
+                std::string shaderTypeStr = line.find_first_of(' ') != std::string::npos
+                                                ? line.substr(line.find_first_of(' '))
+                                                : "";
+
+                auto trim = std::ranges::remove_if(shaderTypeStr, [](unsigned char c) {
+                                return std::isspace(c);
+                            }).begin();
+                shaderTypeStr.erase(trim, shaderTypeStr.end());
 
                 if (shaderTypeStr.empty()) {
                     AE_CORE_ASSERT(false, "Shader type must be specified.");
                 }
-
-                shaderTypeStr.erase(0, shaderTypeStr.find_first_not_of(' '));
 
                 switch (hashedType(shaderTypeStr)) {
                     case VERTEX:
@@ -279,7 +256,6 @@ namespace AnEngine {
                 if (shaders.find(shaderType) != shaders.end()) {
                     AE_CORE_ASSERT(false, "{0} Shader already defined.", shaderTypeStr);
                 }
-
             } else {
                 shaders[shaderType] += line + "\n";
             }

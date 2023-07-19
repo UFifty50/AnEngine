@@ -45,11 +45,11 @@ public:
 
             squareVA->setIndexBuffer(squareIB);
 
-            shader = AnEngine::Shader::create("assets/shaders/basic.vert",
-                                              "assets/shaders/basic.frag");
 
-            textureShader =
-                AnEngine::Shader::create("assets/shaders/mixedTextureShader.glsl");
+            auto shader = shaderLibrary.load("SmallSquares", "assets/shaders/basic.glsl");
+
+            auto textureShader = shaderLibrary.load(
+                "RGBATextureShader", "assets/shaders/mixedTextureShader.glsl");
 
             texture = AnEngine::Texture2D::create("assets/textures/Checkerboard.png");
             logoTexture = AnEngine::Texture2D::create("assets/textures/ChernoLogo.png");
@@ -94,6 +94,9 @@ public:
 
         UNIFORMS(uniforms, AnEngine::ShaderUniform("Ucolour", squareColour));
 
+        auto textureShader = shaderLibrary.get("RGBATextureShader");
+        auto squareShader = shaderLibrary.get("SmallSquares");
+
         for (int x = 0; x < 20; x++) {
             for (int y = 0; y < 20; y++) {
                 // float nx = x * 0.05f;
@@ -105,9 +108,10 @@ public:
                 //         : blue * glm::vec4(nx, ny, nx / 2 + ny / 2, 1.0f);
                 glm::vec3 pos = glm::vec3(x * 0.11f + 0.3f, y * 0.11f + 0.2f, 0.0f);
                 glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-                AnEngine::Renderer::submit(shader, squareVA, transform, uniforms);
+                AnEngine::Renderer::submit(squareShader, squareVA, transform, uniforms);
             }
         }
+
 
         texture->bind();
         AnEngine::Renderer::submit(textureShader, squareVA,
@@ -132,7 +136,8 @@ public:
     void onEvent(AnEngine::Event& event) override {}
 
 private:
-    AnEngine::Ref<AnEngine::Shader> shader, textureShader;
+    AnEngine::ShaderLibrary shaderLibrary;
+
     AnEngine::Ref<AnEngine::VertexArray> squareVA;
     AnEngine::Ref<AnEngine::VertexBuffer> squareVB;
     AnEngine::Ref<AnEngine::IndexBuffer> squareIB;

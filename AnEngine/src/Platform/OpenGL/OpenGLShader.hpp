@@ -15,10 +15,7 @@
 namespace AnEngine {
     class OpenGLShader : public Shader {
     public:
-        OpenGLShader(InputFileStream& vertShaderStream,
-                     InputFileStream& fragShaderStream);
-
-        OpenGLShader(InputFileStream& mixedShaderStream);
+        OpenGLShader(InputFileStream& mixedShaderStream, const std::string& name = "");
         ~OpenGLShader();
 
         virtual void bind() const override;
@@ -26,8 +23,11 @@ namespace AnEngine {
 
         virtual void uploadUniform(const std::string& name, std::any uniform) override;
 
+        virtual const std::string& getName() const override { return name; }
+
     private:
         uint32_t rendererID = NULL;
+        std::string name;
 
         std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
         uint32_t compile(const std::unordered_map<uint32_t, std::string>& shaderSources)
@@ -42,10 +42,6 @@ namespace AnEngine {
         std::unordered_map<GLenum, std::string> getShaders() const;
 
     private:
-        std::string mixedShaderSrc;
-        GLenum shaderType;
-        std::unordered_map<GLenum, std::string> shaders;
-
         enum StrCode : uint8_t {
             VERTEX = 0,
             FRAGMENT = 1,
@@ -53,6 +49,10 @@ namespace AnEngine {
             COMPUTE = 5,
             UNKNOWN = 255
         };
+
+        std::string mixedShaderSrc;
+        GLenum shaderType;
+        std::unordered_map<GLenum, std::string> shaders;
 
         StrCode hashedType(const std::string& type) {
             if (type == "vertex") return VERTEX;

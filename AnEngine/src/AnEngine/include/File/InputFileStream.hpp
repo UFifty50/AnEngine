@@ -9,9 +9,8 @@ namespace AnEngine {
     class InputFileStream : private std::ifstream {
     public:
         InputFileStream(const std::string& path,
-                        int type = std::ios_base::_Default_open_prot);
+                        ios_base::openmode type = std::ios::binary);
 
-        InputFileStream(InputFileStream&& other) noexcept;
         ~InputFileStream();
 
         const std::string readAll() const;

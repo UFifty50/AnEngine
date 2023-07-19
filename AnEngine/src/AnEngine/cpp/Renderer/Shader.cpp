@@ -9,14 +9,13 @@
 
 
 namespace AnEngine {
-    Ref<Shader> Shader::create(const std::string& vertShaderPath,
-                               const std::string& fragShaderPath) {
-        InputFileStream vertShaderStream(vertShaderPath, std::ios::binary);
-        InputFileStream fragShaderStream(fragShaderPath, std::ios::binary);
+    Ref<Shader> Shader::create(const std::string& mixedShaderPath,
+                               const std::string& name) {
+        InputFileStream mixedShaderStream(mixedShaderPath, std::ios::binary);
 
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLShader>(vertShaderStream, fragShaderStream);
+                return std::make_shared<OpenGLShader>(mixedShaderStream, name);
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
@@ -39,31 +38,32 @@ namespace AnEngine {
         }
     }
 
-    Ref<Shader> Shader::create(const std::string& mixedShaderPath) {
-        InputFileStream mixedShaderStream(mixedShaderPath, std::ios::binary);
 
-        switch (RenderAPI::getAPI()) {
-            case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLShader>(mixedShaderStream);
+    void ShaderLibrary::add(const Ref<Shader>& shader) {
+        auto& name = shader->getName();
+        add(name, shader);
+    }
 
-            case RenderAPI::DirectX11:
-                throw NotImplementedException();
-                // return std::make_shared<DX11Shader>(vertShaderStream,
-                // fragShaderStream);
+    void ShaderLibrary::add(const std::string& name, const Ref<Shader>& shader) {
+        AE_CORE_ASSERT(shaders.find(name) == shaders.end(), "Shader already exists!");
+        shaders[name] = shader;
+    }
 
-            case RenderAPI::DirectX12:
-                throw NotImplementedException();
-                // return std::make_shared<DX12Shader>(vertShaderStream,
-                // fragShaderStream);
+    Ref<Shader> ShaderLibrary::load(const std::string& mixedShaderPath) {
+        auto shader = Shader::create(mixedShaderPath);
+        add(shader);
+        return shader;
+    }
 
-            case RenderAPI::Vulkan:
-                throw NotImplementedException();
-                // return std::make_shared<VulkanShader>(vertShaderStream,
-                // fragShaderStream);
+    Ref<Shader> ShaderLibrary::load(const std::string& name,
+                                    const std::string& mixedShaderPath) {
+        auto shader = Shader::create(mixedShaderPath);
+        add(name, shader);
+        return shader;
+    }
 
-            default:
-                AE_CORE_ASSERT(false, "Unknown RendererAPI!");
-                throw NotImplementedException();
-        }
+    Ref<Shader> ShaderLibrary::get(const std::string& name) {
+        AE_CORE_ASSERT(shaders.find(name) != shaders.end(), "Shader not found!");
+        return shaders[name];
     }
 }  // namespace AnEngine
