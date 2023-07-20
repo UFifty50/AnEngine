@@ -17,8 +17,8 @@ namespace AnEngine {
 
     void Renderer::init() { RenderCommandQueue::init(); }
 
-    void Renderer::beginScene(OrthographicCamera& camera) {
-        sceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
+    void Renderer::beginScene(Ref<Camera> camera) {
+        sceneData->viewProjectionMatrix = camera->getViewProjectionMatrix();
     }
 
     void Renderer::endScene() {}

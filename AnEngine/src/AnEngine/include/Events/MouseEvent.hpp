@@ -3,6 +3,7 @@
 
 
 #include "aepch.hpp"
+
 #include "Event.hpp"
 
 namespace AnEngine {
@@ -28,10 +29,12 @@ namespace AnEngine {
 
     class AE_API MouseScrolledEvent : public Event {
     private:
-        float Yoffset, Xoffset;
+        float Xoffset;
+        float Yoffset;
 
     public:
-        MouseScrolledEvent(float  Yoffset, float Xoffset) : Xoffset(Xoffset), Yoffset(Yoffset) {}
+        MouseScrolledEvent(float Xoffset, float Yoffset)
+            : Xoffset(Xoffset), Yoffset(Yoffset) {}
 
         inline float getXOffset() const { return Xoffset; }
         inline float getYOffset() const { return Yoffset; }
@@ -82,6 +85,6 @@ namespace AnEngine {
 
         EVENT_CLASS_TYPE(MouseButtonReleased)
     };
-}
+}  // namespace AnEngine
 
 #endif

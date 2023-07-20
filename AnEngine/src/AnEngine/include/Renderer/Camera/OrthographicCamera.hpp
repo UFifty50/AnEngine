@@ -2,22 +2,43 @@
 #define ORTHOGRAPHICCAMERA_H
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
+#include "Renderer/Camera/Camera.hpp"
 
 namespace AnEngine {
-    class OrthographicCamera {
+    class OrthographicCamera : public Camera {
     public:
         OrthographicCamera(float left, float right, float bottom, float top);
 
-        inline void setPosition(const glm::vec3& position) { this->position = position; recalculateViewMatrix(); }
-        inline const glm::vec3& getPosition() const { return this->position; }
 
-        inline void setRotation(float rotation) { this->rotation = rotation; recalculateViewMatrix(); }
-        inline float getRotation() const { return this->rotation; }
+        virtual void setProjection(float left, float right, float bottom,
+                                   float top) override {
+            projectionMaxtrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+            viewProjectionMatrix = projectionMaxtrix * viewMatrix;
+        }
 
-        inline const glm::mat4& getProjectionMatrix() const { return this->projectionMaxtrix; }
-        inline const glm::mat4& getViewMatrix() const { return this->viewMatrix; }
-        inline const glm::mat4& getViewProjectionMatrix() const { return this->viewProjectionMatrix; }
+        virtual void setPosition(const glm::vec3& position) override {
+            this->position = position;
+            recalculateViewMatrix();
+        }
+        virtual const glm::vec3& getPosition() const override { return this->position; }
+
+        virtual void setRotation(float rotation) override {
+            this->rotation = rotation;
+            recalculateViewMatrix();
+        }
+        virtual float getRotation() const override { return this->rotation; }
+
+        virtual const glm::mat4& getProjectionMatrix() const override {
+            return this->projectionMaxtrix;
+        }
+        virtual const glm::mat4& getViewMatrix() const override {
+            return this->viewMatrix;
+        }
+        virtual const glm::mat4& getViewProjectionMatrix() const override {
+            return this->viewProjectionMatrix;
+        }
 
     private:
         glm::mat4 projectionMaxtrix;
@@ -29,6 +50,6 @@ namespace AnEngine {
 
         void recalculateViewMatrix();
     };
-};
+};  // namespace AnEngine
 
 #endif

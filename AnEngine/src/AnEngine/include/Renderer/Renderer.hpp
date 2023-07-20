@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "Renderer/Camera/OrthographicCamera.hpp"
+#include "Renderer/Camera/Camera.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/ShaderUniform.hpp"
 #include "Renderer/VertexArray.hpp"
@@ -14,7 +14,7 @@ namespace AnEngine {
     class Renderer {
     public:
         static void init();
-        static void beginScene(OrthographicCamera& camera);
+        static void beginScene(Ref<Camera> camera);
         static void endScene();
 
         static void submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray,

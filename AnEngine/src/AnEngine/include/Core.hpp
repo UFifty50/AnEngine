@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#undef near
+#undef far
 
 #if defined(AE_WIN) and defined(AE_LINUX)
     #error Only one platform can be defined

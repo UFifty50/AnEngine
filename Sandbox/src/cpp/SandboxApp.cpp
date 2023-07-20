@@ -13,10 +13,7 @@
 class ExampleLayer : public AnEngine::Layer {
 public:
     ExampleLayer()
-        : Layer("Example"),
-          camera(-1.6f, 1.6f, -0.9f, 0.9f),
-          cameraPosition(0.0f),
-          cameraRotation(0.0f) {
+        : Layer("Example"), cameraController(1280.0f / 720.0f, 75, true, true) {
         // square
         {
             squareVA = AnEngine::VertexArray::create();
@@ -59,32 +56,12 @@ public:
     }
 
     void onUpdate(AnEngine::TimeStep deltaTime) override {
-        if (AnEngine::Input::isKeyPressed(AE_KEY_A)) {
-            cameraPosition.x -= 1.0f * deltaTime;
-        } else if (AnEngine::Input::isKeyPressed(AE_KEY_D)) {
-            cameraPosition.x += 1.0f * deltaTime;
-        }
-
-        if (AnEngine::Input::isKeyPressed(AE_KEY_W)) {
-            cameraPosition.y += 1.0f * deltaTime;
-        } else if (AnEngine::Input::isKeyPressed(AE_KEY_S)) {
-            cameraPosition.y -= 1.0f * deltaTime;
-        }
-
-        if (AnEngine::Input::isKeyPressed(AE_KEY_Q)) {
-            cameraRotation += 10.0f * deltaTime;
-        } else if (AnEngine::Input::isKeyPressed(AE_KEY_E)) {
-            cameraRotation -= 10.0f * deltaTime;
-        }
-
-        camera.setPosition(cameraPosition);
-        camera.setRotation(cameraRotation);
+        cameraController.onUpdate(deltaTime);
 
         AnEngine::RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1});
         AnEngine::RenderCommandQueue::clear();
 
-        AnEngine::Renderer::beginScene(camera);
-
+        AnEngine::Renderer::beginScene(cameraController.getCamera());
 
         static const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -133,7 +110,7 @@ public:
         ImGui::End();
     }
 
-    void onEvent(AnEngine::Event& event) override {}
+    void onEvent(AnEngine::Event& event) override { cameraController.onEvent(event); }
 
 private:
     AnEngine::ShaderLibrary shaderLibrary;
@@ -143,10 +120,7 @@ private:
     AnEngine::Ref<AnEngine::IndexBuffer> squareIB;
 
     AnEngine::Ref<AnEngine::Texture2D> texture, logoTexture;
-
-    AnEngine::OrthographicCamera camera;
-    glm::vec3 cameraPosition;
-    float cameraRotation;
+    AnEngine::CameraController cameraController;
 
     glm::vec3 squareColour = {0.2f, 0.3f, 0.8f};
 };

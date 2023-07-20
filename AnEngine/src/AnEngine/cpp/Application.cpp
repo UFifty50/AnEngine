@@ -71,11 +71,11 @@ namespace AnEngine {
     void Application::Run() {
         while (running) {
             float time = Time::getTime();
-            TimeStep timeStep = time - lastFrameTime;
+            TimeStep deltaTime = time - lastFrameTime;
             lastFrameTime = time;
 
             for (Ref<Layer> layer : layerStack) {
-                layer->onUpdate(timeStep);
+                layer->onUpdate(deltaTime);
             }
 
             imGuiLayer->begin();

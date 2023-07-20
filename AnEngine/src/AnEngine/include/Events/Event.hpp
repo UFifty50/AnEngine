@@ -2,6 +2,7 @@
 #define EVENT_HPP
 
 #include "aepch.hpp"
+
 #include "Core.hpp"
 
 namespace AnEngine {
@@ -46,7 +47,7 @@ namespace AnEngine {
 
 
     class AE_API Event {
-   //     friend class EventDispatcher;
+        //     friend class EventDispatcher;
     public:
         bool handled = false;
 
@@ -61,15 +62,16 @@ namespace AnEngine {
     };
 
     class EventDispatcher {
-        template<typename T>
+        template <typename T>
         using EventFn = std::function<bool(T&)>;
+
     private:
         Event& event;
 
     public:
-        EventDispatcher(Event& event) : event(event) { }
+        EventDispatcher(Event& event) : event(event) {}
 
-        template<typename T>
+        template <typename T>
         bool dispatch(EventFn<T> eventFunc) {
             if (event.getEventType() == T::getStaticType()) {
                 event.handled = eventFunc(*(T*)&event);
@@ -82,12 +84,14 @@ namespace AnEngine {
     inline std::ostream& operator<<(std::ostream& os, const Event& e) {
         return os << e.toString();
     }
-}
+}  // namespace AnEngine
 
-#define EVENT_CLASS_TYPE(type) static EventType getStaticType() { return EventType::type; }               \
-                               virtual EventType getEventType() const override { return getStaticType(); }  \
-                               virtual const char* getName() const override { return #type; }
+#define EVENT_CLASS_TYPE(type)                                                  \
+    static EventType getStaticType() { return EventType::type; }                \
+    virtual EventType getEventType() const override { return getStaticType(); } \
+    virtual const char* getName() const override { return #type; }
 
-#define EVENT_CLASS_CATEGORY(category) virtual int getCategoryFlags() const override { return category; }
+#define EVENT_CLASS_CATEGORY(category) \
+    virtual int getCategoryFlags() const override { return category; }
 
 #endif

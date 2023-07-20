@@ -51,15 +51,14 @@ namespace AnEngine {
         setVSync(true);
 
         // GLFW callbacks
-        glfwSetWindowSizeCallback(
-            window, [](GLFWwindow* win, int width, int height) {
-                WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
-                data.width = width;
-                data.height = height;
+        glfwSetWindowSizeCallback(window, [](GLFWwindow* win, int width, int height) {
+            WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
+            data.width = width;
+            data.height = height;
 
-                WindowResizeEvent event(width, height);
-                data.eventCallback(event);
-            });
+            WindowResizeEvent event(width, height);
+            data.eventCallback(event);
+        });
 
         glfwSetWindowCloseCallback(window, [](GLFWwindow* win) {
             WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
@@ -67,30 +66,30 @@ namespace AnEngine {
             data.eventCallback(event);
         });
 
-        glfwSetKeyCallback(window, [](GLFWwindow* win, int key, int scancode,
-                                      int action, int mods) {
-            WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
+        glfwSetKeyCallback(
+            window, [](GLFWwindow* win, int key, int scancode, int action, int mods) {
+                WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
 
-            switch (action) {
-                case GLFW_PRESS: {
-                    KeyPressedEvent event(key, 0);
-                    data.eventCallback(event);
-                    break;
-                }
+                switch (action) {
+                    case GLFW_PRESS: {
+                        KeyPressedEvent event(key, 0);
+                        data.eventCallback(event);
+                        break;
+                    }
 
-                case GLFW_RELEASE: {
-                    KeyReleasedEvent event(key);
-                    data.eventCallback(event);
-                    break;
-                }
+                    case GLFW_RELEASE: {
+                        KeyReleasedEvent event(key);
+                        data.eventCallback(event);
+                        break;
+                    }
 
-                case GLFW_REPEAT: {
-                    KeyPressedEvent event(key, 1);
-                    data.eventCallback(event);
-                    break;
+                    case GLFW_REPEAT: {
+                        KeyPressedEvent event(key, 1);
+                        data.eventCallback(event);
+                        break;
+                    }
                 }
-            }
-        });
+            });
 
         glfwSetCharCallback(window, [](GLFWwindow* win, unsigned int keycode) {
             WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
@@ -125,13 +124,12 @@ namespace AnEngine {
                 data.eventCallback(event);
             });
 
-        glfwSetCursorPosCallback(
-            window, [](GLFWwindow* win, double Xpos, double Ypos) {
-                WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
+        glfwSetCursorPosCallback(window, [](GLFWwindow* win, double Xpos, double Ypos) {
+            WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
 
-                MouseMovedEvent event((float)Xpos, (float)Ypos);
-                data.eventCallback(event);
-            });
+            MouseMovedEvent event((float)Xpos, (float)Ypos);
+            data.eventCallback(event);
+        });
     }
 
     void Win32Window::shutdown() { glfwDestroyWindow(window); }
