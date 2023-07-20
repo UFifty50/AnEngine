@@ -139,10 +139,10 @@ namespace AnEngine {
         graphicsContext->swapBuffers();
     }
 
-    void Win32Window::setVSync(bool enabled) {
-        enabled ? glfwSwapInterval(1) : glfwSwapInterval(0);
+    void Win32Window::setVSync(bool isEnabled) {
+        isEnabled ? glfwSwapInterval(1) : glfwSwapInterval(0);
 
-        data.vSync = enabled;
+        data.vSync = isEnabled;
     }
 
     bool Win32Window::VSyncEnabled() const { return data.vSync; }

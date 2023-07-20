@@ -2,7 +2,7 @@
 
 #include "Platform/Linux/window/LinuxWindow.hpp"
 
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
@@ -32,6 +32,7 @@ namespace AnEngine {
 
         AE_CORE_INFO("Creating window {0} (width {1}; height {2})", props.title,
                      props.width, props.height);
+
 
         if (!GLFWinitialised) {
             int success = glfwInit();

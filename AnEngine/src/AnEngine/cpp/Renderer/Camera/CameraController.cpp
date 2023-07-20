@@ -12,7 +12,10 @@
 namespace AnEngine {
     CameraController::CameraController(float aspectRatio, float fov, bool rotationEnabled,
                                        bool isOrthographic)
-        : aspectRatio(aspectRatio), fov(fov), isOrthographic(isOrthographic) {
+        : aspectRatio(aspectRatio),
+          fov(fov),
+          rotation(rotationEnabled),
+          orthographic(isOrthographic) {
         if (isOrthographic) {
             camera = std::make_unique<OrthographicCamera>(
                 -aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
@@ -35,7 +38,7 @@ namespace AnEngine {
             cameraPosition.y -= cameraTranslationSpeed * (zoom / 2) * deltaTime;
         }
 
-        if (rotationEnabled) {
+        if (rotation) {
             if (Input::isKeyPressed(AE_KEY_Q)) {
                 cameraRotation += cameraRotationSpeed * deltaTime;
             } else if (Input::isKeyPressed(AE_KEY_E)) {
@@ -67,10 +70,10 @@ namespace AnEngine {
 
         if (distanceScrolled < 0) {
             // Zoom in
-            newZoom = currentZoom * (1 - distanceScrolled * zoomInFactor);
+            newZoom = currentZoom / (1 + distanceScrolled * zoomInFactor);
         } else {
             // Zoom out
-            newZoom = currentZoom / (1 + distanceScrolled * zoomOutFactor);
+            newZoom = currentZoom * (1 - distanceScrolled * zoomOutFactor);
         }
 
         // Ensure the new zoom level stays within the defined range [minZoom, maxZoom]

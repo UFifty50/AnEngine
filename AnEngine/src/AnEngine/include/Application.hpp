@@ -28,11 +28,13 @@ namespace AnEngine {
         static Application* instance;
         Scope<Window> window;
         Ref<ImGuiLayer> imGuiLayer;
+        bool minimized = false;
         bool running = true;
         LayerStack layerStack;
         float lastFrameTime = 0;
 
-        bool onWindowClose(WindowCloseEvent& e);
+        bool onWindowClose(WindowCloseEvent& closeEvent);
+        bool onWindowResize(WindowResizeEvent& resizeEvent);
     };
 
     // user defined

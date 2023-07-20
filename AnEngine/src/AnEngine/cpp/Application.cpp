@@ -56,6 +56,8 @@ namespace AnEngine {
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.dispatch<WindowResizeEvent>(
+            BIND_EVENT_FN(Application::onWindowResize));
 
         for (auto it = layerStack.end(); it != layerStack.begin();) {
             (*--it)->onEvent(e);
@@ -63,9 +65,20 @@ namespace AnEngine {
         }
     }
 
-    bool Application::onWindowClose(WindowCloseEvent& e) {
+    bool Application::onWindowClose(WindowCloseEvent& closeEvent) {
         running = false;
         return true;
+    }
+
+    bool Application::onWindowResize(WindowResizeEvent& resizeEvent) {
+        if (resizeEvent.getWidth() == 0 || resizeEvent.getHeight() == 0) {
+            minimized = true;
+            return false;
+        }
+
+        Renderer::onWindowResize(resizeEvent.getWidth(), resizeEvent.getHeight());
+
+        return false;
     }
 
     void Application::Run() {
@@ -74,8 +87,10 @@ namespace AnEngine {
             TimeStep deltaTime = time - lastFrameTime;
             lastFrameTime = time;
 
-            for (Ref<Layer> layer : layerStack) {
-                layer->onUpdate(deltaTime);
+            if (!minimized) {
+                for (Ref<Layer> layer : layerStack) {
+                    layer->onUpdate(deltaTime);
+                }
             }
 
             imGuiLayer->begin();

@@ -21,6 +21,10 @@ namespace AnEngine {
         sceneData->viewProjectionMatrix = camera->getViewProjectionMatrix();
     }
 
+    void Renderer::onWindowResize(uint32_t width, uint32_t height) {
+        RenderCommandQueue::setViewport(0, 0, width, height);
+    }
+
     void Renderer::endScene() {}
 
     void Renderer::submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray,

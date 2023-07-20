@@ -20,12 +20,15 @@ namespace AnEngine {
         Ref<Camera> getCamera() { return camera; }
         const Ref<Camera>& getCamera() const { return camera; }
 
+        void setZoom(float level) { zoom = level; }
+        float getZoom() const { return zoom; }
+
     private:
         float aspectRatio;
         float fov;
         float zoom = 1.0f;
-        bool isOrthographic;
-        bool rotationEnabled;
+        bool orthographic;
+        bool rotation;
 
         Ref<Camera> camera;
 
