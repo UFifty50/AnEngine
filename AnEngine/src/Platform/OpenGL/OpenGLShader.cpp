@@ -172,19 +172,19 @@ namespace AnEngine {
         // 4D vectors
         else if (uniform.type() == typeid(glm::vec4)) {
             glm::vec4 vec = std::any_cast<glm::vec4>(uniform);
-            glUniform4f(location, vec.r, vec.b, vec.g, vec.a);
+            glUniform4f(location, vec.r, vec.g, vec.b, vec.a);
         } else if (uniform.type() == typeid(glm::ivec4)) {
             glm::ivec4 vec = std::any_cast<glm::ivec4>(uniform);
-            glUniform4i(location, vec.r, vec.b, vec.g, vec.a);
+            glUniform4i(location, vec.r, vec.g, vec.b, vec.a);
         } else if (uniform.type() == typeid(glm::uvec4)) {
             glm::uvec4 vec = std::any_cast<glm::uvec4>(uniform);
-            glUniform4ui(location, vec.r, vec.b, vec.g, vec.a);
+            glUniform4ui(location, vec.r, vec.g, vec.b, vec.a);
         } else if (uniform.type() == typeid(glm::dvec4)) {
             glm::dvec4 vec = std::any_cast<glm::dvec4>(uniform);
-            glUniform4d(location, vec.r, vec.b, vec.g, vec.a);
+            glUniform4d(location, vec.r, vec.g, vec.b, vec.a);
         } else if (uniform.type() == typeid(glm::bvec4)) {
             glm::bvec4 vec = std::any_cast<glm::bvec4>(uniform);
-            glUniform4i(location, vec.r, vec.b, vec.g, vec.a);
+            glUniform4i(location, vec.r, vec.g, vec.b, vec.a);
         }
 
 

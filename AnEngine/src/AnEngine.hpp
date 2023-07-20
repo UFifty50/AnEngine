@@ -12,7 +12,8 @@
 #include "AnEngine/include/Renderer/Buffers/VertexBuffer.hpp"
 #include "AnEngine/include/Renderer/RenderAPI.hpp"
 #include "AnEngine/include/Renderer/RenderCommandQueue.hpp"
-#include "AnEngine/include/Renderer/Renderer.hpp"
+#include "AnEngine/include/Renderer/Renderer2D.hpp"
+// #include "AnEngine/include/Renderer/Renderer3D.hpp"
 #include "AnEngine/include/Renderer/Shader.hpp"
 #include "AnEngine/include/Renderer/ShaderUniform.hpp"
 #include "AnEngine/include/Renderer/VertexArray.hpp"
@@ -48,8 +49,5 @@
 
 // ---Log---
 #include "AnEngine/include/Core/Log.hpp"
-
-// ---Entry Point---
-#include "AnEngine/include/EntryPoint.hpp"
 
 #endif

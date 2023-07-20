@@ -26,6 +26,10 @@ namespace AnEngine {
         AE_CORE_DEBUG("  GLSL Version: {0}",
                       (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
         AE_CORE_DEBUG("Current RenderAPI: {0}", RenderAPI::getAPIName());
+
+        AE_CORE_ASSERT(
+            GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
+            "AnEngine requires at least OpenGL version 4.5!");
     }
 
     void OpenGLContext::swapBuffers() { glfwSwapBuffers(winPtr); }

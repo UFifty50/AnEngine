@@ -8,9 +8,8 @@ namespace AnEngine {
 
     LayerStack::~LayerStack() {
         for (Ref<Layer> layer : layers) {
-            // layer->onDetach();
+            layer->onDetach();
             layer->~Layer();
-            // delete layer;
         }
     }
 

@@ -1,5 +1,5 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef RENDERER2D_HPP
+#define RENDERER2D_HPP
 
 #include <memory>
 #include <vector>
@@ -11,7 +11,7 @@
 
 
 namespace AnEngine {
-    class Renderer {
+    class Renderer2D {
     public:
         static void init();
         static void onWindowResize(uint32_t width, uint32_t height);
