@@ -26,10 +26,10 @@
     #include <unistd.h>
 #endif
 
-#include "Core.hpp"
+#include "Core/Core.hpp"
+#include "Core/Log.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
-#include "Log.hpp"
 
 #endif

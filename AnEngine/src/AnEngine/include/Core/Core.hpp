@@ -42,7 +42,7 @@
     #define SPDLOG_FMT_EXTERNAL
     #define FORMAT(...) fmt::format(__VA_ARGS__)
 #else
-    #include <string>
+    #include <format>
     #define SPDLOG_USE_STD_FORMAT
     #define FORMAT(str, ...) std::vformat(str, std::make_format_args(__VA_ARGS__))
 #endif

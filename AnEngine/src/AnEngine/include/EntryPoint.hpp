@@ -6,12 +6,14 @@
 
 extern AnEngine::Application* AnEngine::CreateApplication();
 
-int main(int argc, char** argv) {
-    AnEngine::Log::init();
+#if defined(AE_PLATFORM_WINDOWS) && defined(AE_DIST)
+    #include <Windows.h>
 
-    auto app = AnEngine::CreateApplication();
-    app->Run();
-    delete app;
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    return AnEngine::main(__argc, __argv);
 }
+#endif
+
+int main(int argc, char** argv) { return AnEngine::main(argc, argv); }
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "Core.hpp"
+#include "Core/Core.hpp"
 #include "Texture/Texture.hpp"
 
 

@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "Core.hpp"
+#include "Core/Core.hpp"
 #include "Layer.hpp"
 
 namespace AnEngine {

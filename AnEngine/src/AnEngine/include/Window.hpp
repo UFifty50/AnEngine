@@ -4,7 +4,7 @@
 
 #include "aepch.hpp"
 
-#include "Core.hpp"
+#include "Core/Core.hpp"
 #include "Events/Event.hpp"
 
 namespace AnEngine {
@@ -13,8 +13,8 @@ namespace AnEngine {
         unsigned int width;
         unsigned int height;
 
-        WindowProperties(const std::string& title = "AnEngine",
-                         unsigned int width = 1280, unsigned int height = 720)
+        WindowProperties(const std::string& title = "AnEngine", unsigned int width = 1280,
+                         unsigned int height = 720)
             : title(title), width(width), height(height) {}
     };
 
@@ -37,8 +37,7 @@ namespace AnEngine {
         virtual void* getNativeWindow() const = 0;
 
         // platform specific
-        static Window* create(
-            const WindowProperties& props = WindowProperties());
+        static Window* create(const WindowProperties& props = WindowProperties());
     };
 }  // namespace AnEngine
 

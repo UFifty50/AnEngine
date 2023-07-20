@@ -2,9 +2,9 @@
 
 #include "Application.hpp"
 
+#include "Core/Input.hpp"
+#include "Core/Log.hpp"
 #include "Events/ApplicationEvent.hpp"
-#include "Input.hpp"
-#include "Log.hpp"
 #include "Renderer/RenderAPI.hpp"
 #include "Renderer/Renderer.hpp"
 #include "Time/Time.hpp"
@@ -101,5 +101,15 @@ namespace AnEngine {
 
             window->onUpdate();
         }
+    }
+
+    int main(int argc, char** argv) {
+        Log::init();
+
+        auto app = CreateApplication();
+        app->Run();
+        delete app;
+
+        return 0;
     }
 }  // namespace AnEngine

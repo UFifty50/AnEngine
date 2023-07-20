@@ -1,8 +1,12 @@
 #ifndef APPLICATION_EVENT_HPP
 #define APPLICATION_EVENT_HPP
 
-#include "aepch.hpp"
+#include <sstream>
+#include <string>
+
+#include "Core/Core.hpp"
 #include "Event.hpp"
+
 
 namespace AnEngine {
     class AE_API WindowResizeEvent : public Event {
@@ -10,7 +14,8 @@ namespace AnEngine {
         unsigned int width, height;
 
     public:
-        WindowResizeEvent(unsigned int width, unsigned int height) : width(width), height(height) {}
+        WindowResizeEvent(unsigned int width, unsigned int height)
+            : width(width), height(height) {}
 
         inline unsigned int getWidth() const { return width; }
         inline unsigned int getHeight() const { return height; }
@@ -54,6 +59,6 @@ namespace AnEngine {
         EVENT_CLASS_TYPE(AppRender)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
-}
+}  // namespace AnEngine
 
 #endif

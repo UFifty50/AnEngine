@@ -1,7 +1,7 @@
 #ifndef IMGUILAYER_HPP
 #define IMGUILAYER_HPP
 
-#include "Layer.hpp"
+#include "Core/Layer.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
@@ -10,7 +10,6 @@
 namespace AnEngine {
     class AE_API ImGuiLayer : public Layer {
     private:
-
         float prevTime = 0.0f;
 
     public:
@@ -24,6 +23,6 @@ namespace AnEngine {
         void begin();
         void end();
     };
-}
+}  // namespace AnEngine
 
 #endif

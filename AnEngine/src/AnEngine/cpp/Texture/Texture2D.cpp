@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "Core.hpp"
+#include "Core/Core.hpp"
 #include "Platform/OpenGL/Texture/OpenGLTexture2D.hpp"
 #include "Renderer/RenderAPI.hpp"
 

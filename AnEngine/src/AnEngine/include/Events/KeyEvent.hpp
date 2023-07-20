@@ -1,8 +1,12 @@
 #ifndef KEY_EVENT_HPP
 #define KEY_EVENT_HPP
 
-#include "aepch.hpp"
+#include <sstream>
+#include <string>
+
+#include "Core/Core.hpp"
 #include "Event.hpp"
+
 
 namespace AnEngine {
     class AE_API KeyEvent : public Event {
@@ -21,7 +25,8 @@ namespace AnEngine {
         int repeatCount;
 
     public:
-        KeyPressedEvent(int keyCode, int repeatCount) : KeyEvent(keyCode), repeatCount(repeatCount) {}
+        KeyPressedEvent(int keyCode, int repeatCount)
+            : KeyEvent(keyCode), repeatCount(repeatCount) {}
 
         inline int getRepeatCount() const { return repeatCount; }
 
@@ -49,7 +54,7 @@ namespace AnEngine {
 
     class AE_API KeyTypedEvent : public KeyEvent {
     public:
-        KeyTypedEvent(int keyCode) : KeyEvent(keyCode) { }
+        KeyTypedEvent(int keyCode) : KeyEvent(keyCode) {}
 
 
         std::string toString() const override {
@@ -60,6 +65,6 @@ namespace AnEngine {
 
         EVENT_CLASS_TYPE(KeyTyped)
     };
-}
+}  // namespace AnEngine
 
 #endif

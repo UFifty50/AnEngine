@@ -1,7 +1,9 @@
 #ifndef LAYER_HPP
 #define LAYER_HPP
 
-#include "Core.hpp"
+#include <string>
+
+#include "Core/Core.hpp"
 #include "Events/Event.hpp"
 #include "Time/TimeStep.hpp"
 

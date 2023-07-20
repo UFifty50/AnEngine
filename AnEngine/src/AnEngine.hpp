@@ -28,8 +28,8 @@
 #include "AnEngine/include/Time/TimeStep.hpp"
 
 // ---Layers---
+#include "AnEngine/include/Core/Layer.hpp"
 #include "AnEngine/include/ImGui/ImGuiLayer.hpp"
-#include "AnEngine/include/Layer.hpp"
 
 // ---Events---
 #include "AnEngine/include/Events/ApplicationEvent.hpp"
@@ -38,16 +38,16 @@
 #include "AnEngine/include/Events/MouseEvent.hpp"
 
 // ---Input---
-#include "AnEngine/include/Input.hpp"
+#include "AnEngine/include/Core/Input.hpp"
 
 // ---KeyCodes---
-#include "AnEngine/include/GamepadCodes.hpp"
-#include "AnEngine/include/JoystickButtonCodes.hpp"
-#include "AnEngine/include/KeyCodes.hpp"
-#include "AnEngine/include/MouseButtonCodes.hpp"
+#include "AnEngine/include/Core/GamepadCodes.hpp"
+#include "AnEngine/include/Core/JoystickButtonCodes.hpp"
+#include "AnEngine/include/Core/KeyCodes.hpp"
+#include "AnEngine/include/Core/MouseButtonCodes.hpp"
 
 // ---Log---
-#include "AnEngine/include/Log.hpp"
+#include "AnEngine/include/Core/Log.hpp"
 
 // ---Entry Point---
 #include "AnEngine/include/EntryPoint.hpp"

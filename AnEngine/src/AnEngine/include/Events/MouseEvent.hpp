@@ -1,10 +1,12 @@
 #ifndef MOUSE_EVENT_HPP
 #define MOUSE_EVENT_HPP
 
+#include <sstream>
+#include <string>
 
-#include "aepch.hpp"
-
+#include "Core/Core.hpp"
 #include "Event.hpp"
+
 
 namespace AnEngine {
     class AE_API MouseMovedEvent : public Event {

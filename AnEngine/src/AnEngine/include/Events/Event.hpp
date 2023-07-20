@@ -1,9 +1,11 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
-#include "aepch.hpp"
+#include <functional>
+#include <iostream>
+#include <string>
 
-#include "Core.hpp"
+#include "Core/Core.hpp"
 
 namespace AnEngine {
 

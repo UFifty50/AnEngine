@@ -1,7 +1,9 @@
 #ifndef INPUT_HPP
 #define INPUT_HPP
 
-#include "Core.hpp"
+#include <utility>
+
+#include "Core/Core.hpp"
 
 
 namespace AnEngine {

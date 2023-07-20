@@ -1,6 +1,6 @@
 #include "aepch.hpp"
 
-#include "LayerStack.hpp"
+#include "Core/LayerStack.hpp"
 
 
 namespace AnEngine {
@@ -19,9 +19,7 @@ namespace AnEngine {
         layerInsertIndex++;
     }
 
-    void LayerStack::pushOverlay(Ref<Layer> overlay) {
-        layers.emplace_back(overlay);
-    }
+    void LayerStack::pushOverlay(Ref<Layer> overlay) { layers.emplace_back(overlay); }
 
     void LayerStack::popLayer(Ref<Layer> layer) {
         auto it = std::ranges::find(layers, layer);

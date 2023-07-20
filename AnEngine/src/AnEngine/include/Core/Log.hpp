@@ -6,7 +6,7 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
 
-#include "Core.hpp"
+#include "Core/Core.hpp"
 
 
 namespace AnEngine {

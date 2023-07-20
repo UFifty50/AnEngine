@@ -1,11 +1,11 @@
 #ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
+#include "Core/LayerStack.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Events/Event.hpp"
 #include "File/InputFileStream.hpp"
 #include "ImGui/ImGuiLayer.hpp"
-#include "LayerStack.hpp"
 #include "Window.hpp"
 
 
@@ -36,6 +36,8 @@ namespace AnEngine {
         bool onWindowClose(WindowCloseEvent& closeEvent);
         bool onWindowResize(WindowResizeEvent& resizeEvent);
     };
+
+    int main(int argc, char** argv);
 
     // user defined
     Application* CreateApplication();
