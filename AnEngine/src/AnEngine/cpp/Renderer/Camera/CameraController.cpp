@@ -80,7 +80,7 @@ namespace AnEngine {
     }
 
     bool CameraController::onMouseScrolled(MouseScrolledEvent& scrollEvent) {
-        zoom = zoomingAlgorithm(zoom, scrollEvent.getYOffset(), 0.1f, 15.0f);
+        zoom = zoomAlgorithm(zoom, scrollEvent.getYOffset(), 0.1f, 15.0f);
         AE_CORE_TRACE("Zoom: {0}", zoom);
         camera->setProjection(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 
