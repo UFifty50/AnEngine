@@ -1,7 +1,7 @@
 #ifndef LINUXDOWSINPUT_HPP
 #define LINUXDOWSINPUT_HPP
 
-#include "Input.hpp"
+#include "Core/Input.hpp"
 
 
 namespace AnEngine {
@@ -14,6 +14,6 @@ namespace AnEngine {
         virtual float getMouseYImpl() override;
         virtual std::pair<float, float> getMousePositionImpl() override;
     };
-}
+}  // namespace AnEngine
 
 #endif
