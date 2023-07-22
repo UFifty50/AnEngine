@@ -1,6 +1,7 @@
 [submodule "AnEngine/vendor/spdlog"]
 	path = AnEngine/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+	branch = v2.x
 [submodule "AnEngine/vendor/GLFW"]
 	path = AnEngine/vendor/GLFW
 	url = https://github.com/UFifty50/glfw-premake
