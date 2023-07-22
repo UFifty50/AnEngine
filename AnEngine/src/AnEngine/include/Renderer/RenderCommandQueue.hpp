@@ -21,8 +21,6 @@ namespace AnEngine {
 
         inline static void clear() { api->clear(); }
 
-        inline static void clearDepth() { api->clearDepth(); }
-
         inline static void drawIndexed(const Ref<VertexArray>& vertexArray) {
             api->drawIndexed(vertexArray);
         };

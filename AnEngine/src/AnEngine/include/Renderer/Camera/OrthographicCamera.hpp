@@ -40,6 +40,11 @@ namespace AnEngine {
             return this->viewProjectionMatrix;
         }
 
+        static CameraType getStaticType() { return CameraType::Orthographic; }
+
+        virtual CameraType getType() const override { return getStaticType(); }
+
+
     private:
         glm::mat4 projectionMaxtrix;
         glm::mat4 viewMatrix;

@@ -5,6 +5,8 @@
 
 
 namespace AnEngine {
+    enum class CameraType { Perspective = 0, Orthographic = 1 };
+
     class Camera {
     public:
         virtual ~Camera() = default;
@@ -20,6 +22,8 @@ namespace AnEngine {
         virtual const glm::mat4& getProjectionMatrix() const = 0;
         virtual const glm::mat4& getViewMatrix() const = 0;
         virtual const glm::mat4& getViewProjectionMatrix() const = 0;
+
+        virtual CameraType getType() const = 0;
     };
 }  // namespace AnEngine
 

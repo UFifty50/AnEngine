@@ -1,34 +1,38 @@
 #ifndef RENDERER2D_HPP
 #define RENDERER2D_HPP
 
+#include <glm/glm.hpp>
+
 #include <memory>
-#include <vector>
+#include <type_traits>
 
 #include "Renderer/Camera/Camera.hpp"
-#include "Renderer/Shader.hpp"
-#include "Renderer/ShaderUniform.hpp"
-#include "Renderer/VertexArray.hpp"
+#include "Texture/Texture2D.hpp"
 
 
 namespace AnEngine {
     class Renderer2D {
     public:
+        struct Storage;
+
         static void init();
-        static void onWindowResize(uint32_t width, uint32_t height);
-        static void beginScene(Ref<Camera> camera);
+        static void shutdown();
+
+        static void beginScene(const Ref<Camera>& camera);
+
         static void endScene();
 
-        static void submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray,
-                           const glm::mat4& transform,
-                           const AnEngine::ShaderUniformVector& uniforms = {});
+        // Primitives
+        static void drawQuad(const glm::vec2& position, const glm::vec2& size,
+                             float rotation, const glm::vec4& colour);
+        static void drawQuad(const glm::vec3& position, const glm::vec2& size,
+                             float rotation, const glm::vec4& colour);
 
-    private:
-        struct SceneData {
-            glm::mat4 viewProjectionMatrix;
-        };
-
-        static Ref<SceneData> sceneData;
+        static void drawQuad(const glm::vec2& position, const glm::vec2& size,
+                             float rotation, const Ref<Texture2D>& texture);
+        static void drawQuad(const glm::vec3& position, const glm::vec2& size,
+                             float rotation, const Ref<Texture2D>& texture);
     };
-};  // namespace AnEngine
+}  // namespace AnEngine
 
 #endif

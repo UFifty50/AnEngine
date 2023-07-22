@@ -1,3 +1,6 @@
+#ifndef SANDBOX2D_HPP
+#define SANDBOX2D_HPP
+
 #include <AnEngine.hpp>
 #include <glm/glm.hpp>
 
@@ -17,13 +20,11 @@ public:
     virtual void onEvent(AnEngine::Event& event) override;
 
 private:
-    AnEngine::ShaderLibrary shaderLibrary;
-
-    AnEngine::Ref<AnEngine::VertexArray> squareVA;
-    AnEngine::Ref<AnEngine::VertexBuffer> squareVB;
-    AnEngine::Ref<AnEngine::IndexBuffer> squareIB;
-
     AnEngine::CameraController cameraController;
+    AnEngine::Ref<AnEngine::Texture2D> texture;
 
     glm::vec4 squareColour = {0.0f, 0.0f, 1.0f, 1.0f};
+    glm::vec4 squareColour2 = {1.0f, 0.0f, 0.0f, 1.0f};
 };
+
+#endif

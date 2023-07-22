@@ -40,6 +40,9 @@ namespace AnEngine {
 
         Ref<Shader> get(const std::string& name);
 
+        std::unordered_map<std::string, Ref<Shader>>::iterator begin();
+        std::unordered_map<std::string, Ref<Shader>>::iterator end();
+
     private:
         std::unordered_map<std::string, Ref<Shader>> shaders;
     };

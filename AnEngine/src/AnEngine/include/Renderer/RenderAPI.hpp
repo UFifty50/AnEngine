@@ -41,7 +41,6 @@ namespace AnEngine {
 
         virtual void clearColour(const glm::vec4& colour) = 0;
         virtual void clear() = 0;
-        virtual void clearDepth() = 0;
         virtual void drawIndexed(const Ref<VertexArray>& vertexArray) = 0;
 
     private:

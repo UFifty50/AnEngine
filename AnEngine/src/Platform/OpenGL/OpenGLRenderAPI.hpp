@@ -20,7 +20,6 @@ namespace AnEngine {
 
         virtual void clearColour(const glm::vec4& colour) override;
         virtual void clear() override;
-        virtual void clearDepth() override;
         virtual void drawIndexed(const Ref<VertexArray>& vertexArray) override;
     };
 };  // namespace AnEngine

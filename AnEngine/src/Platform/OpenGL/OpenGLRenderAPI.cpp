@@ -9,6 +9,8 @@ namespace AnEngine {
     void OpenGLRenderAPI::init() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glEnable(GL_DEPTH_TEST);
     }
 
     void OpenGLRenderAPI::setViewport(uint32_t x, uint32_t y, uint32_t width,
@@ -20,11 +22,7 @@ namespace AnEngine {
         glClearColor(colour.r, colour.g, colour.b, colour.a);
     }
 
-    void OpenGLRenderAPI::clear() { glClear(GL_COLOR_BUFFER_BIT); }
-
-    void OpenGLRenderAPI::clearDepth() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
+    void OpenGLRenderAPI::clear() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
 
     void OpenGLRenderAPI::drawIndexed(const Ref<VertexArray>& vertexArray) {
         glDrawElements(GL_TRIANGLES, vertexArray->getIndexBuffer()->getCount(),

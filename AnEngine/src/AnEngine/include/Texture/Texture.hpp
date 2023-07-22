@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <string>
 
+#include "Renderer/ShaderUniform.hpp"
+
 
 namespace AnEngine {
     class ImageFormat {
@@ -68,6 +70,8 @@ namespace AnEngine {
 
         virtual ImageFormat::FileFormat getFileFormat() const = 0;
         virtual ImageFormat::PixelFormat getPixelFormat() const = 0;
+
+        //  virtual Sampler2D getSampler() const = 0;
 
         virtual void bind(uint32_t slot = 0) const = 0;
     };

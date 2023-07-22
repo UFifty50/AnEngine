@@ -36,11 +36,11 @@
 #else
     #error No platform defined, or platform not supported
 #endif
-
-#if defined(USE_FMT)
+#define USE_FMT
+#if defined(USE_FMT) || !defined(__cpp_lib_format)
     #include <fmt/format.h>
     #define SPDLOG_FMT_EXTERNAL
-    #define FORMAT(...) fmt::format(__VA_ARGS__)
+    #define FORMAT(str, ...) fmt::vformat(str, fmt::make_format_args(__VA_ARGS__))
 #else
     #include <format>
     #define SPDLOG_USE_STD_FORMAT
@@ -81,6 +81,16 @@ namespace AnEngine {
 
     template <typename T>
     using Scope = std::unique_ptr<T>;
+
+    template <typename T, typename... Args>
+    Ref<T> MakeRef(Args&&... args) {
+        return std::make_shared<T>(std::forward<Args>(args)...);
+    }
+
+    template <typename T, typename... Args>
+    Scope<T> MakeScope(Args&&... args) {
+        return std::make_unique<T>(std::forward<Args>(args)...);
+    }
 }  // namespace AnEngine
 
 #endif

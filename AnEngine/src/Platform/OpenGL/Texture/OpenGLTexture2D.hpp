@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 
 #include "File/InputFileStream.hpp"
+#include "Renderer/ShaderUniform.hpp"
 #include "Texture/Texture2D.hpp"
 
 
@@ -23,6 +24,8 @@ namespace AnEngine {
         inline virtual ImageFormat::PixelFormat getPixelFormat() const override {
             return pixelFormat;
         }
+
+        // inline virtual Sampler2D getSampler() const override { return Sampler2D(); }
 
         virtual void bind(uint32_t slot) const override;
 

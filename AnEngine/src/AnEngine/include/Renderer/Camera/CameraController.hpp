@@ -18,7 +18,7 @@ namespace AnEngine {
         void onEvent(Event& event);
 
         Ref<Camera> getCamera() { return camera; }
-        const Ref<Camera>& getCamera() const { return camera; }
+        const Ref<Camera> getCamera() const { return camera; }
 
         void setZoom(float level) { zoom = level; }
         float getZoom() const { return zoom; }

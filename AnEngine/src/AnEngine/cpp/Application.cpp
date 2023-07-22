@@ -6,7 +6,7 @@
 #include "Core/Log.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Renderer/RenderAPI.hpp"
-#include "Renderer/Renderer2D.hpp"
+#include "Renderer/Renderer.hpp"
 #include "Time/Time.hpp"
 #include "Time/TimeStep.hpp"
 #include "Window.hpp"
@@ -21,7 +21,7 @@ namespace AnEngine {
 
         if (RenderAPI::getAPI() == RenderAPI::NoAPI) {
             std::stringstream msg;
-            msg << "AnEngine::Renderer2D::setAPI() needs to be called in "
+            msg << "AnEngine::Renderer::setAPI() needs to be called in "
                    "CreateApplication with one "
                    "of"
                 << std::endl;
@@ -35,7 +35,7 @@ namespace AnEngine {
         window = Scope<Window>(Window::create());
         window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
-        Renderer2D::init();
+        Renderer::init();
 
         imGuiLayer = std::make_shared<ImGuiLayer>();
         pushOverlay(imGuiLayer);
@@ -76,7 +76,7 @@ namespace AnEngine {
             return false;
         }
 
-        Renderer2D::onWindowResize(resizeEvent.getWidth(), resizeEvent.getHeight());
+        Renderer::onWindowResize(resizeEvent.getWidth(), resizeEvent.getHeight());
 
         return false;
     }

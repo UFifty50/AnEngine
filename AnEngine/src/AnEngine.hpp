@@ -12,8 +12,8 @@
 #include "AnEngine/include/Renderer/Buffers/VertexBuffer.hpp"
 #include "AnEngine/include/Renderer/RenderAPI.hpp"
 #include "AnEngine/include/Renderer/RenderCommandQueue.hpp"
+#include "AnEngine/include/Renderer/Renderer.hpp"
 #include "AnEngine/include/Renderer/Renderer2D.hpp"
-// #include "AnEngine/include/Renderer/Renderer3D.hpp"
 #include "AnEngine/include/Renderer/Shader.hpp"
 #include "AnEngine/include/Renderer/ShaderUniform.hpp"
 #include "AnEngine/include/Renderer/VertexArray.hpp"
@@ -23,6 +23,7 @@
 
 // ---Cameras---
 #include "AnEngine/include/Renderer/Camera/CameraController.hpp"
+#include "AnEngine/include/Renderer/Camera/OrthographicCamera.hpp"
 
 // ---Time---
 #include "AnEngine/include/Time/Time.hpp"

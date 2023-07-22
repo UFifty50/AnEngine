@@ -36,7 +36,7 @@ namespace AnEngine {
         for (uint32_t i = 0; i < indices.size(); i++) {
             idxs[i] = indices[i];
         }
-        return create(idxs, indices.size());
+        return create(idxs, (uint32_t)indices.size());
     }
 
     template <uint32_t _Size>

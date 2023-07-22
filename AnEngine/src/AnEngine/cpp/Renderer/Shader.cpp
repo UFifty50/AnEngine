@@ -66,4 +66,12 @@ namespace AnEngine {
         AE_CORE_ASSERT(shaders.find(name) != shaders.end(), "Shader not found!");
         return shaders[name];
     }
+
+    std::unordered_map<std::string, Ref<Shader>>::iterator ShaderLibrary::begin() {
+        return shaders.begin();
+    }
+
+    std::unordered_map<std::string, Ref<Shader>>::iterator ShaderLibrary::end() {
+        return shaders.end();
+    }
 }  // namespace AnEngine

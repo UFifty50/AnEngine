@@ -17,11 +17,11 @@ namespace AnEngine {
           rotation(rotationEnabled),
           orthographic(isOrthographic) {
         if (isOrthographic) {
-            camera = std::make_unique<OrthographicCamera>(
-                -aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+            camera = MakeRef<OrthographicCamera>(-aspectRatio * zoom, aspectRatio * zoom,
+                                                 -zoom, zoom);
         } else {
             AE_CORE_ASSERT(false, "Perspective camera not implemented yet!")
-            // camera = std::make_shared<PerspectiveCamera>(fov, aspectRatio, near, far);
+            // camera = MakeRef<PerspectiveCamera>(fov, aspectRatio, near, far);
         }
     }
 
@@ -59,14 +59,14 @@ namespace AnEngine {
             BIND_EVENT_FN(CameraController::onWindowResized));
     }
 
-    double zoomAlgorithm(double currentZoom, double distanceScrolled, double minZoom,
-                         double maxZoom) {
+    float zoomAlgorithm(float currentZoom, float distanceScrolled, float minZoom,
+                        float maxZoom) {
         // Define the scaling factors to control the speed of zooming
-        double zoomInFactor = 0.2;   // Controls how fast the zoom increases
-        double zoomOutFactor = 0.2;  // Controls how fast the zoom decreases
+        float zoomInFactor = 0.2f;   // Controls how fast the zoom increases
+        float zoomOutFactor = 0.2f;  // Controls how fast the zoom decreases
 
         // Calculate the new zoom level based on the distance scrolled
-        double newZoom;
+        float newZoom;
 
         if (distanceScrolled < 0) {
             // Zoom in
