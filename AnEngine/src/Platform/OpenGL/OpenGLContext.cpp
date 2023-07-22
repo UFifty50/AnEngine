@@ -3,7 +3,10 @@
 #include "OpenGLContext.hpp"
 
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
+
+#if defined(AE_WIN)
+    #include <glad/glad.h>
+#endif
 
 #include "Renderer/RenderAPI.hpp"
 
