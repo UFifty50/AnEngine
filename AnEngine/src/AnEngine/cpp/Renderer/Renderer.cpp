@@ -13,8 +13,7 @@
 
 
 namespace AnEngine {
-    Ref<Renderer::SceneData> Renderer::sceneData =
-        std::make_shared<Renderer::SceneData>();
+    Ref<Renderer::SceneData> Renderer::sceneData = MakeRef<Renderer::SceneData>();
 
     void Renderer::init() {
         RenderCommandQueue::init();

@@ -8,5 +8,5 @@
 
 namespace AnEngine {
     Scope<RenderAPI> RenderCommandQueue::api =
-        std::make_unique<OpenGLRenderAPI>();  // RenderAPI::create();
+        MakeScope<OpenGLRenderAPI>();  // RenderAPI::create();
 }

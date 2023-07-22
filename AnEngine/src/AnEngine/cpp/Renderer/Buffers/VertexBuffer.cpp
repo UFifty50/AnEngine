@@ -11,19 +11,19 @@ namespace AnEngine {
     Ref<VertexBuffer> VertexBuffer::create(float* vertices, size_t size) {
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+                return MakeRef<OpenGLVertexBuffer>(vertices, size);
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
-                // return std::make_shared<DX11VertexBuffer>(vertices, size);
+                // return MakeRef<DX11VertexBuffer>(vertices, size);
 
             case RenderAPI::DirectX12:
                 throw NotImplementedException();
-                // return std::make_shared<DX12VertexBuffer>(vertices, size);
+                // return MakeRef<DX12VertexBuffer>(vertices, size);
 
             case RenderAPI::Vulkan:
                 throw NotImplementedException();
-                // return std::make_shared<VulkanVertexBuffer>(vertices, size);
+                // return MakeRef<VulkanVertexBuffer>(vertices, size);
 
             default:
                 AE_CORE_ASSERT(false, "Unknown RendererAPI!");

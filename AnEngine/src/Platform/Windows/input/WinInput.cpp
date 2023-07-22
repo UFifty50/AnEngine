@@ -8,7 +8,7 @@
 
 
 namespace AnEngine {
-    Scope<Input> Input::instance = std::make_unique<WinInput>();
+    Scope<Input> Input::instance = MakeScope<WinInput>();
 
     bool WinInput::isKeyPressedImpl(int keycode) {
         auto window =

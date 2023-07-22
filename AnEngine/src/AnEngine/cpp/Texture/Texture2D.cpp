@@ -13,7 +13,7 @@ namespace AnEngine {
     Ref<Texture2D> Texture2D::create(const std::string& path) {
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLTexture2D>(path);
+                return MakeRef<OpenGLTexture2D>(path);
         };
 
         AE_CORE_ASSERT(false, "Unknown RendererAPI!");

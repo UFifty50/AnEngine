@@ -44,7 +44,7 @@ namespace AnEngine {
         window = glfwCreateWindow((int)props.width, (int)props.height,
                                   props.title.c_str(), nullptr, nullptr);
 
-        graphicsContext = std::make_shared<OpenGLContext>(window);
+        graphicsContext = MakeRef<OpenGLContext>(window);
         graphicsContext->init();
 
         glfwSetWindowUserPointer(window, &data);

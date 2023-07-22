@@ -12,22 +12,22 @@ namespace AnEngine {
     Ref<VertexArray> VertexArray::create() {
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLVertexArray>(OpenGLVertexArray());
+                return MakeRef<OpenGLVertexArray>(OpenGLVertexArray());
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
                 //     return
-                //     std::make_shared<DX11VertexArray>(DX11VertexArray());
+                //     MakeRef<DX11VertexArray>(DX11VertexArray());
 
             case RenderAPI::DirectX12:
                 throw NotImplementedException();
                 //      return
-                //      std::make_shared<DX12VertexArray>(DX12VertexArray());
+                //      MakeRef<DX12VertexArray>(DX12VertexArray());
 
             case RenderAPI::Vulkan:
                 throw NotImplementedException();
                 //     return
-                //     std::make_shared<VulkanVertexArray>(VulkanVertexArray());
+                //     MakeRef<VulkanVertexArray>(VulkanVertexArray());
 
             default:
                 AE_CORE_ASSERT(false, "Unknown RendererAPI!");

@@ -37,7 +37,7 @@ namespace AnEngine {
 
         Renderer::init();
 
-        imGuiLayer = std::make_shared<ImGuiLayer>();
+        imGuiLayer = MakeRef<ImGuiLayer>();
         pushOverlay(imGuiLayer);
     }
 

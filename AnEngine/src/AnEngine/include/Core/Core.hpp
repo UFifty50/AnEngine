@@ -36,15 +36,15 @@
 #else
     #error No platform defined, or platform not supported
 #endif
-#define USE_FMT
+
 #if defined(USE_FMT) || !defined(__cpp_lib_format)
     #include <fmt/format.h>
     #define SPDLOG_FMT_EXTERNAL
-    #define FORMAT(str, ...) fmt::vformat(str, fmt::make_format_args(__VA_ARGS__))
+    #define AE_FMT_STR(str, ...) fmt::vformat(str, fmt::make_format_args(__VA_ARGS__))
 #else
     #include <format>
     #define SPDLOG_USE_STD_FORMAT
-    #define FORMAT(str, ...) std::vformat(str, std::make_format_args(__VA_ARGS__))
+    #define AE_FMT_STR(str, ...) std::vformat(str, std::make_format_args(__VA_ARGS__))
 #endif
 
 #if defined(AE_DEBUG_FLAG) and not defined(AE_ENABLE_ASSERTS)
@@ -52,19 +52,19 @@
 #endif
 
 #if defined(AE_ENABLE_ASSERTS)
-    #define AE_ASSERT(x, str, ...)                                              \
-        {                                                                       \
-            if (!(x)) {                                                         \
-                AE_CRITICAL("Assertion Failed: {0}", FORMAT(str, __VA_ARGS__)); \
-                DEBUG_BREAK();                                                  \
-            }                                                                   \
+    #define AE_ASSERT(x, str, ...)                                                  \
+        {                                                                           \
+            if (!(x)) {                                                             \
+                AE_CRITICAL("Assertion Failed: {0}", AE_FMT_STR(str, __VA_ARGS__)); \
+                DEBUG_BREAK();                                                      \
+            }                                                                       \
         }
-    #define AE_CORE_ASSERT(x, str, ...)                                              \
-        {                                                                            \
-            if (!(x)) {                                                              \
-                AE_CORE_CRITICAL("Assertion Failed: {0}", FORMAT(str, __VA_ARGS__)); \
-                DEBUG_BREAK();                                                       \
-            }                                                                        \
+    #define AE_CORE_ASSERT(x, str, ...)                                                  \
+        {                                                                                \
+            if (!(x)) {                                                                  \
+                AE_CORE_CRITICAL("Assertion Failed: {0}", AE_FMT_STR(str, __VA_ARGS__)); \
+                DEBUG_BREAK();                                                           \
+            }                                                                            \
         }
 #else
     #define AE_ASSERT(x, ...)

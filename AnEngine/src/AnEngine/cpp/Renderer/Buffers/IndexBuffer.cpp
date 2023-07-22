@@ -11,19 +11,19 @@ namespace AnEngine {
     Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t count) {
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLIndexBuffer>(indices, count);
+                return MakeRef<OpenGLIndexBuffer>(indices, count);
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
-                // return std::make_shared<DX11IndexBuffer>(indices, size);
+                // return MakeRef<DX11IndexBuffer>(indices, size);
 
             case RenderAPI::DirectX12:
                 throw NotImplementedException();
-                // return std::make_shared<DX12IndexBuffer>(indices, size);
+                // return MakeRef<DX12IndexBuffer>(indices, size);
 
             case RenderAPI::Vulkan:
                 throw NotImplementedException();
-                // return std::make_shared<VulkanIndexBuffer>(indices, size);
+                // return MakeRef<VulkanIndexBuffer>(indices, size);
 
             default:
                 AE_CORE_ASSERT(false, "Unknown RendererAPI!");

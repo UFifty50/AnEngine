@@ -15,21 +15,21 @@ namespace AnEngine {
 
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return std::make_shared<OpenGLShader>(mixedShaderStream, name);
+                return MakeRef<OpenGLShader>(mixedShaderStream, name);
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
-                // return std::make_shared<DX11Shader>(vertShaderStream,
+                // return MakeRef<DX11Shader>(vertShaderStream,
                 // fragShaderStream);
 
             case RenderAPI::DirectX12:
                 throw NotImplementedException();
-                // return std::make_shared<DX12Shader>(vertShaderStream,
+                // return MakeRef<DX12Shader>(vertShaderStream,
                 // fragShaderStream);
 
             case RenderAPI::Vulkan:
                 throw NotImplementedException();
-                // return std::make_shared<VulkanShader>(vertShaderStream,
+                // return MakeRef<VulkanShader>(vertShaderStream,
                 // fragShaderStream);
 
             default:
