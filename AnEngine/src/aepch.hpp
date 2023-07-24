@@ -31,5 +31,7 @@
 #include "Events/ApplicationEvent.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
+#include "Profiling/InstrumentationTimer.hpp"
+#include "Profiling/Instrumentor.hpp"
 
 #endif

@@ -10,16 +10,11 @@
 
 
 namespace AnEngine {
-    OpenGLVertexArray::OpenGLVertexArray() {
-        glCreateVertexArrays(1, &rendererID);
-    }
+    OpenGLVertexArray::OpenGLVertexArray() { glCreateVertexArrays(1, &rendererID); }
 
-    OpenGLVertexArray::~OpenGLVertexArray() {
-        glDeleteVertexArrays(1, &rendererID);
-    }
+    OpenGLVertexArray::~OpenGLVertexArray() { glDeleteVertexArrays(1, &rendererID); }
 
-    void OpenGLVertexArray::addVertexBuffer(
-        const Ref<VertexBuffer>& vertexBuffer) {
+    void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) {
         glBindVertexArray(this->rendererID);
         vertexBuffer->bind();
 
@@ -33,8 +28,7 @@ namespace AnEngine {
             glVertexAttribPointer(index, element.getComponentCount(),
                                   toOpenGLBaseType(element.type),
                                   element.normalised ? GL_TRUE : GL_FALSE,
-                                  layout.getStride(),
-                                  (const void*)element.offset);
+                                  layout.getStride(), (const void*)element.offset);
 
             index++;
         }
@@ -42,8 +36,7 @@ namespace AnEngine {
         vertexBuffers.push_back(vertexBuffer);
     }
 
-    void OpenGLVertexArray::setIndexBuffer(
-        const Ref<IndexBuffer>& indexBuffer) {
+    void OpenGLVertexArray::setIndexBuffer(const Ref<IndexBuffer>& indexBuffer) {
         glBindVertexArray(this->rendererID);
         indexBuffer->bind();
 

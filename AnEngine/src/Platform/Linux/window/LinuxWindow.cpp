@@ -26,6 +26,8 @@ namespace AnEngine {
     LinuxWindow::~LinuxWindow() { shutdown(); }
 
     void LinuxWindow::init(const WindowProperties& props) {
+        AE_PROFILE_FUNCTION()
+
         data.title = props.title;
         data.width = props.width;
         data.height = props.height;

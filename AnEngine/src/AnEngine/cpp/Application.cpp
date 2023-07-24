@@ -16,6 +16,8 @@ namespace AnEngine {
     Application* Application::Application::instance = nullptr;
 
     Application::Application() {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(!instance, "Application already exists!");
         instance = this;
 
@@ -106,9 +108,19 @@ namespace AnEngine {
     int main(int argc, char** argv) {
         Log::init();
 
+        AE_PROFILE_BEGIN_SESSION("Startup", "AnEngineProfile-Startup.json");
         auto app = CreateApplication();
+        AE_PROFILE_END_SESSION()
+
+        AE_PROFILE_BEGIN_SESSION("Runtime", "AnEngineProfile-Runtime.json");
         app->Run();
+        AE_PROFILE_END_SESSION()
+
+        AE_PROFILE_BEGIN_SESSION("Shutdown", "AnEngineProfile-Shutdown.json");
         delete app;
+        AE_PROFILE_END_SESSION()
+
+        AE_PROFILE_END_SESSION()
 
         return 0;
     }

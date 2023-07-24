@@ -14,6 +14,8 @@ namespace AnEngine {
     }
 
     void OpenGLContext::init() {
+        AE_PROFILE_FUNCTION()
+
         glfwMakeContextCurrent(winPtr);
 
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -32,5 +34,9 @@ namespace AnEngine {
             "AnEngine requires at least OpenGL version 4.5!");
     }
 
-    void OpenGLContext::swapBuffers() { glfwSwapBuffers(winPtr); }
+    void OpenGLContext::swapBuffers() {
+        AE_PROFILE_FUNCTION()
+
+        glfwSwapBuffers(winPtr);
+    }
 }  // namespace AnEngine

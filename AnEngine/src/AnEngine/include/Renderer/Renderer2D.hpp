@@ -24,14 +24,18 @@ namespace AnEngine {
 
         // Primitives
         static void drawQuad(const glm::vec2& position, const glm::vec2& size,
-                             float rotation, const glm::vec4& colour);
+                             float rotation, const glm::vec4& colour,
+                             const AnEngine::ShaderUniformVector& attributes = {});
         static void drawQuad(const glm::vec3& position, const glm::vec2& size,
-                             float rotation, const glm::vec4& colour);
+                             float rotation, const glm::vec4& colour,
+                             const AnEngine::ShaderUniformVector& attributes = {});
 
         static void drawQuad(const glm::vec2& position, const glm::vec2& size,
-                             float rotation, const Ref<Texture2D>& texture);
+                             float rotation, const Ref<Texture2D>& texture,
+                             const AnEngine::ShaderUniformVector& attributes = {});
         static void drawQuad(const glm::vec3& position, const glm::vec2& size,
-                             float rotation, const Ref<Texture2D>& texture);
+                             float rotation, const Ref<Texture2D>& texture,
+                             const AnEngine::ShaderUniformVector& attributes = {});
     };
 }  // namespace AnEngine
 

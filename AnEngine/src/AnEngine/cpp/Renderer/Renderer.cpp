@@ -16,6 +16,8 @@ namespace AnEngine {
     Ref<Renderer::SceneData> Renderer::sceneData = MakeRef<Renderer::SceneData>();
 
     void Renderer::init() {
+        AE_PROFILE_FUNCTION()
+
         RenderCommandQueue::init();
         Renderer2D::init();
     }
@@ -33,6 +35,8 @@ namespace AnEngine {
     void Renderer::submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray,
                           const glm::mat4& transform,
                           const AnEngine::ShaderUniformVector& uniforms) {
+        AE_PROFILE_FUNCTION()
+
         shader->bind();
         shader->uploadUniform("viewProjectionMatrix", sceneData->viewProjectionMatrix);
         shader->uploadUniform("modelMatrix", transform);

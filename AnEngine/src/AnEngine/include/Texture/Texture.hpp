@@ -12,8 +12,8 @@ namespace AnEngine {
     public:
         enum PixelFormat {
             None = 0,
-            RGB = 1,
-            RGBA = 2,
+            RGB = 3,
+            RGBA = 4,
         };
 
         enum FileFormat {
@@ -24,7 +24,7 @@ namespace AnEngine {
             DDS = 4,
         };
 
-        static uint32_t getChannelCount(PixelFormat format) {
+        static uint8_t getChannelCount(PixelFormat format) {
             switch (format) {
                 case RGB:
                     return 3;
@@ -33,6 +33,8 @@ namespace AnEngine {
             }
             return 0;
         }
+
+        static uint8_t getBPP(PixelFormat format) { return getChannelCount(format); }
 
         static std::string toString(PixelFormat format) {
             switch (format) {
@@ -72,6 +74,7 @@ namespace AnEngine {
         virtual ImageFormat::PixelFormat getPixelFormat() const = 0;
 
         //  virtual Sampler2D getSampler() const = 0;
+        virtual void setData(void* data, uint32_t size) = 0;
 
         virtual void bind(uint32_t slot = 0) const = 0;
     };

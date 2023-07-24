@@ -4,8 +4,11 @@
 #include <AnEngine.hpp>
 #include <glm/glm.hpp>
 
-#define UNIFORMS(varName, ...) AnEngine::ShaderUniformVector varName = {__VA_ARGS__}
+//#define ATTRIBUTE_ARRAY(varName, ...) \
+//    AnEngine::ShaderUniformVector varName = {__VA_ARGS__}
 
+#define ATTRIBUTE_ARRAY(...) \
+    AnEngine::ShaderUniformVector { __VA_ARGS__ }
 
 class SandBox2D : public AnEngine::Layer {
 public:

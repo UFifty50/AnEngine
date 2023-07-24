@@ -4,28 +4,34 @@
 #include <fstream>
 #include <string>
 
+#include "File/FileStream.hpp"
+
 
 namespace AnEngine {
-    class InputFileStream : private std::ifstream {
+    class InputFileStream : private FileStream<Direction::Input> {
     public:
         InputFileStream(const std::string& path,
-                        ios_base::openmode type = std::ios::binary);
+                        std::ios_base::openmode type = std::ios::binary);
 
-        ~InputFileStream();
+        InputFileStream(nullptr_t);
+
+        virtual ~InputFileStream() override;
 
         const std::string readAll() const;
+        virtual void close() override;
 
-        inline const std::string& getFilePath() const { return this->path; }
-        inline const std::string& getFileName() const { return this->name; }
-        inline const std::string& getFileExtension() const { return this->extension; }
+        bool is_open() const { return this->stream.is_open(); }
 
-        using std::ifstream::close;
-        using std::ifstream::is_open;
+        const std::string& getFilePath() const override { return this->path; }
+        const std::string& getFileName() const override { return this->name; }
+        const std::string& getFileExtension() const override { return this->extension; }
 
     private:
         std::string path;
         std::string name;
         std::string extension;
+
+        std::ifstream stream;
     };
 }  // namespace AnEngine
 

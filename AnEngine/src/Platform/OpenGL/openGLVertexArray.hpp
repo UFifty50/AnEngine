@@ -16,9 +16,15 @@ namespace AnEngine {
         virtual ~OpenGLVertexArray();
 
         inline virtual void bind() const override {
+            AE_PROFILE_FUNCTION()
+
             glBindVertexArray(this->rendererID);
         }
-        inline virtual void unBind() const override { glBindVertexArray(0); }
+        inline virtual void unBind() const override {
+            AE_PROFILE_FUNCTION()
+
+            glBindVertexArray(0);
+        }
 
         virtual void addVertexBuffer(const Ref<VertexBuffer>& layout) override;
         virtual void setIndexBuffer(const Ref<IndexBuffer>& layout) override;

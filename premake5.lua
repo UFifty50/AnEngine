@@ -129,15 +129,15 @@ project "AnEngine"
         }
 
     filter "toolset:msc*"
-        buildoptions "/analyze:external-"
+        buildoptions { "/analyze:external-" }
 
     filter "configurations:Debug"
-        defines { "AE_DEBUG_FLAG", "_DEBUG" }
+        defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }
         runtime "Debug"
         symbols "on"
 
     filter "configurations:Release"
-        defines { "AE_RELEASE" }
+        defines { "AE_RELEASE", "AE_RELEASE_PROFILING" }
         runtime "Release"
         optimize "on"
 
@@ -201,15 +201,15 @@ project "Sandbox"
         }
 
     filter "toolset:msc*"
-        buildoptions "/analyze:external-"
+        buildoptions { "/analyze:external-" }
 
     filter "configurations:Debug"
-        defines { "AE_DEBUG_FLAG", "_DEBUG" }
+        defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }
         runtime "Debug"
         symbols "on"
 
     filter "configurations:Release"
-        defines { "AE_RELEASE" }
+        defines { "AE_RELEASE", "AE_RELEASE_PROFILING" }
         runtime "Release"
         optimize "on"
 

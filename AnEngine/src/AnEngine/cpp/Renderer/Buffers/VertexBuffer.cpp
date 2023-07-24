@@ -9,6 +9,8 @@
 
 namespace AnEngine {
     Ref<VertexBuffer> VertexBuffer::create(float* vertices, size_t size) {
+        AE_PROFILE_FUNCTION()
+
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
                 return MakeRef<OpenGLVertexBuffer>(vertices, size);

@@ -9,6 +9,8 @@
 
 namespace AnEngine {
     Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t count) {
+        AE_PROFILE_FUNCTION()
+
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
                 return MakeRef<OpenGLIndexBuffer>(indices, count);

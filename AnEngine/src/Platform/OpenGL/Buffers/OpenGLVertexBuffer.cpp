@@ -1,8 +1,9 @@
 #include "aepch.hpp"
 
+#include "Platform/OpenGL/Buffers/OpenGLVertexBuffer.hpp"
+
 #include <glad/glad.h>
 
-#include "Platform/OpenGL/Buffers/OpenGLVertexBuffer.hpp"
 #include "Renderer/Buffers/BufferLayout.hpp"
 
 
@@ -13,19 +14,19 @@ namespace AnEngine {
         glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
     }
 
-    OpenGLVertexBuffer::~OpenGLVertexBuffer() {
-        glDeleteBuffers(1, &rendererID);
-    }
+    OpenGLVertexBuffer::~OpenGLVertexBuffer() { glDeleteBuffers(1, &rendererID); }
 
-    size_t OpenGLVertexBuffer::getSize() const {
-        return this->size;
-    }
+    size_t OpenGLVertexBuffer::getSize() const { return this->size; }
 
     void OpenGLVertexBuffer::bind() const {
+        AE_PROFILE_FUNCTION()
+
         glBindBuffer(GL_ARRAY_BUFFER, rendererID);
     }
 
     void OpenGLVertexBuffer::unBind() const {
+        AE_PROFILE_FUNCTION()
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-}
+}  // namespace AnEngine

@@ -26,6 +26,8 @@ namespace AnEngine {
     Win32Window::~Win32Window() { shutdown(); }
 
     void Win32Window::init(const WindowProperties& props) {
+        AE_PROFILE_FUNCTION()
+
         data.title = props.title;
         data.width = props.width;
         data.height = props.height;
@@ -48,7 +50,7 @@ namespace AnEngine {
         graphicsContext->init();
 
         glfwSetWindowUserPointer(window, &data);
-        setVSync(true);
+        setVSync(false);
 
         // GLFW callbacks
         glfwSetWindowSizeCallback(window, [](GLFWwindow* win, int width, int height) {
@@ -132,9 +134,15 @@ namespace AnEngine {
         });
     }
 
-    void Win32Window::shutdown() { glfwDestroyWindow(window); }
+    void Win32Window::shutdown() {
+        AE_PROFILE_FUNCTION()
+
+        glfwDestroyWindow(window);
+    }
 
     void Win32Window::onUpdate() {
+        AE_PROFILE_FUNCTION()
+
         glfwPollEvents();
         graphicsContext->swapBuffers();
     }

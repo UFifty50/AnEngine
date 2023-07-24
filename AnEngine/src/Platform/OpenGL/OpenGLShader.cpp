@@ -34,6 +34,8 @@ namespace AnEngine {
 
     std::unordered_map<GLenum, std::string> OpenGLShader::preProcess(
         const std::string& mixedShaderSrc) {
+        AE_PROFILE_FUNCTION()
+
         std::unordered_map<GLenum, std::string> shaderSources;
 
         ShaderParser parser(mixedShaderSrc);
@@ -47,6 +49,8 @@ namespace AnEngine {
 
     uint32_t OpenGLShader::compile(
         const std::unordered_map<uint32_t, std::string>& shaderSources) const {
+        AE_PROFILE_FUNCTION()
+
         std::vector<GLuint> shaderIDs;
         shaderIDs.resize(shaderSources.size());
 
@@ -110,11 +114,19 @@ namespace AnEngine {
 
     OpenGLShader::~OpenGLShader() { glDeleteProgram(this->rendererID); }
 
-    void OpenGLShader::bind() const { glUseProgram(this->rendererID); }
+    void OpenGLShader::bind() const {
+        AE_PROFILE_FUNCTION()
+        glUseProgram(this->rendererID);
+    }
 
-    void OpenGLShader::unbind() const { glUseProgram(0); }
+    void OpenGLShader::unbind() const {
+        AE_PROFILE_FUNCTION()
+        glUseProgram(0);
+    }
 
     void OpenGLShader::uploadUniform(const std::string& name, std::any uniform) {
+        AE_PROFILE_FUNCTION()
+
         GLint location = glGetUniformLocation(this->rendererID, name.c_str());
         if (location == -1) {
             AE_CORE_ERROR("Uniform {0} doesn't exist.", name);

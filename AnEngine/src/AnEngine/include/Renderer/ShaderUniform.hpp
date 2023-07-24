@@ -67,12 +67,19 @@ namespace AnEngine {
     public:
         using std::vector<ShaderUniformBase>::vector;
 
-        std::any& operator[](std::string name) {
+        std::any& operator[](const std::string& name) {
             for (auto& item : *this) {
                 if (item.name == name) return item.uniform;
             }
             throw std::out_of_range("ShaderUniformVector::operator[] unable to find" +
                                     name);
+        }
+
+        std::any getOr(const std::string& name, std::any emptyType) const {
+            for (auto& item : *this) {
+                if (item.name == name) return item.uniform;
+            }
+            return emptyType;
         }
     };
 

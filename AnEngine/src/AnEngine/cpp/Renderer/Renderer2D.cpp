@@ -21,11 +21,14 @@ namespace AnEngine {
 
     struct Renderer2D::Storage {
         Ref<VertexArray> quadVA;
+        Ref<Texture2D> blankTexture;
         ShaderLibrary shaderLibrary;
     };
 
 
     void Renderer2D::init() {
+        AE_PROFILE_FUNCTION()
+
         rendererData = MakeScope<Renderer2D::Storage>();
 
         rendererData->quadVA = VertexArray::create();
@@ -54,48 +57,62 @@ namespace AnEngine {
 
         rendererData->quadVA->setIndexBuffer(quadIB);
 
+        rendererData->blankTexture = Texture2D::create(1, 1);
+        uint32_t whiteTextureData = 0xffffffff;
+        rendererData->blankTexture->setData(&whiteTextureData, sizeof(uint32_t));
 
-        rendererData->shaderLibrary.load("SmallSquares", "assets/shaders/basic.glsl");
-        rendererData->shaderLibrary.load("TextureShader", "assets/shaders/texture.glsl");
+        Ref<Shader> quadShader =
+            rendererData->shaderLibrary.load("QuadShader", "assets/shaders/quad.glsl");
+        quadShader->bind();
+        quadShader->uploadUniform("textureSampler", Sampler2D{0});
     }
 
     void Renderer2D::beginScene(const Ref<Camera>& camera) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(camera->getType() == CameraType::Orthographic,
                        "Renderer2D only supports Orthographic Cameras!");
 
-        Ref<Shader> quadShader = rendererData->shaderLibrary.get("SmallSquares");
-        Ref<Shader> textureShader = rendererData->shaderLibrary.get("TextureShader");
+        Ref<Shader> quadShader = rendererData->shaderLibrary.get("QuadShader");
 
         quadShader->bind();
         quadShader->uploadUniform("viewProjectionMatrix",
                                   camera->getViewProjectionMatrix());
-
-        textureShader->bind();
-        textureShader->uploadUniform("viewProjectionMatrix",
-                                     camera->getViewProjectionMatrix());
-        textureShader->uploadUniform("Utexture", Sampler2D{0});
     }
 
     void Renderer2D::shutdown() { rendererData.reset(nullptr); }
 
-    void Renderer2D::endScene() {}
+    void Renderer2D::endScene() { AE_PROFILE_FUNCTION() }
 
     // Primitives
     void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
-                              float rotation, const glm::vec4& colour) {
-        drawQuad({position.x, position.y, 0.0f}, size, rotation, colour);
+                              float rotation, const glm::vec4& colour,
+                              const AnEngine::ShaderUniformVector& attributes) {
+        drawQuad({position.x, position.y, 0.0f}, size, rotation, colour, attributes);
     }
 
     void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size,
-                              float rotation, const glm::vec4& colour) {
-        Ref<Shader> quadShader = rendererData->shaderLibrary.get("SmallSquares");
-        quadShader->bind();
-        quadShader->uploadUniform("Ucolour", colour);
+                              float rotation, const glm::vec4& colour,
+                              const AnEngine::ShaderUniformVector& attributes) {
+        AE_PROFILE_FUNCTION()
 
-        glm::mat4 transform =
-            glm::translate(glm::mat4(1.0f), position) *
-            glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) *
-            glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+        Ref<Shader> quadShader = rendererData->shaderLibrary.get("QuadShader");
+
+        quadShader->uploadUniform("Ucolour", colour);
+        quadShader->uploadUniform("tint", glm::vec4(1.0f));
+        quadShader->uploadUniform("tilingFactor", 1.0f);
+        rendererData->blankTexture->bind();
+
+
+        glm::mat4 rotationMatrix;
+        if ((int)rotation % 180 != 0) {
+            glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+        } else {
+            rotationMatrix = glm::mat4(1.0f);
+        }
+
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
+                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
         quadShader->uploadUniform("modelMatrix", transform);
 
@@ -104,22 +121,35 @@ namespace AnEngine {
     }
 
     void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
-                              float rotation, const Ref<Texture2D>& texture) {
-        drawQuad({position.x, position.y, 0.0f}, size, rotation, texture);
+                              float rotation, const Ref<Texture2D>& texture,
+                              const AnEngine::ShaderUniformVector& attributes) {
+        drawQuad({position.x, position.y, 0.0f}, size, rotation, texture, attributes);
     }
 
     void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size,
-                              float rotation, const Ref<Texture2D>& texture) {
-        Ref<Shader> textureShader = rendererData->shaderLibrary.get("TextureShader");
-        textureShader->bind();
+                              float rotation, const Ref<Texture2D>& texture,
+                              const AnEngine::ShaderUniformVector& attributes) {
+        AE_PROFILE_FUNCTION()
 
-        glm::mat4 transform =
-            glm::translate(glm::mat4(1.0f), position) *
-            glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) *
-            glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+        Ref<Shader> quadShader = rendererData->shaderLibrary.get("QuadShader");
 
-        textureShader->uploadUniform("modelMatrix", transform);
-        texture->bind(0);
+        quadShader->uploadUniform("Ucolour", glm::vec4(1.0f));
+
+        quadShader->uploadUniform("tint", attributes.getOr("tint", glm::vec4(1.0f)));
+        quadShader->uploadUniform("tilingFactor", attributes.getOr("tilingFactor", 1.0f));
+        texture->bind();
+
+        glm::mat4 rotationMatrix;
+        if ((int)rotation % 180 != 0) {
+            glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+        } else {
+            rotationMatrix = glm::mat4(1.0f);
+        }
+
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
+                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+
+        quadShader->uploadUniform("modelMatrix", transform);
 
         rendererData->quadVA->bind();
         RenderCommandQueue::drawIndexed(rendererData->quadVA);

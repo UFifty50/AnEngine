@@ -3,6 +3,9 @@
 
 #include <memory>
 
+#include "CoreConfig.hpp"
+
+
 #undef near
 #undef far
 
@@ -37,7 +40,7 @@
     #error No platform defined, or platform not supported
 #endif
 
-#if defined(USE_FMT) || !defined(__cpp_lib_format)
+#if USE_FMT == 1 || !defined(__cpp_lib_format)
     #include <fmt/format.h>
     #define SPDLOG_FMT_EXTERNAL
     #define AE_FMT_STR(str, ...) fmt::vformat(str, fmt::make_format_args(__VA_ARGS__))
@@ -69,6 +72,35 @@
 #else
     #define AE_ASSERT(x, ...)
     #define AE_CORE_ASSERT(x, ...)
+#endif
+
+#if AE_PROFILING == 1
+    #include "Profiling/InstrumentationTimer.hpp"
+    #define CONCAT(x, y) x##y
+    #define C(x, y) CONCAT(x, y)
+
+    #define AE_PROFILE_BEGIN_SESSION(name, filepath) \
+        ::AnEngine::Instrumentor::Get().beginSession(name, filepath);
+    #define AE_PROFILE_END_SESSION() ::AnEngine::Instrumentor::Get().endSession();
+    #define AE_PROFILE_SCOPE(name) \
+        ::AnEngine::InstrumentationTimer C(timer, __LINE__)(name);
+    #define AE_PROFILE_FUNCTION() AE_PROFILE_SCOPE(__FUNCSIG__)
+
+    #define PROFILE_UI()
+    /* #define PROFILE_UI() \
+         ImGui::Begin("Timings");                                                        \
+         for (auto& result : profileResults) {                                           \
+             ImGui::Text(AE_FMT_STR("{0}: {1:.3f}ms", result.name, result.time * 0.001f) \
+                             .c_str());                                                  \
+         }                                                                               \
+         ImGui::End();                                                                   \
+         profileResults.clear();*/
+#else
+    #define AE_PROFILE_BEGIN_SESSION(name, filepath)
+    #define AE_PROFILE_END_SESSION()
+    #define AE_PROFILE_SCOPE(name)
+    #define AE_PROFILE_FUNCTION()
+    #define PROFILE_UI()
 #endif
 
 #define BIT(x) (1 << x)

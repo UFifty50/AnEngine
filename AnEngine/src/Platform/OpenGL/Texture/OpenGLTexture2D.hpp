@@ -12,6 +12,7 @@ namespace AnEngine {
     class OpenGLTexture2D : public Texture2D {
     public:
         OpenGLTexture2D(const std::string& path);
+        OpenGLTexture2D(uint32_t width, uint32_t height);
         virtual ~OpenGLTexture2D();
 
         inline virtual uint32_t getWidth() const override { return width; }
@@ -26,6 +27,7 @@ namespace AnEngine {
         }
 
         // inline virtual Sampler2D getSampler() const override { return Sampler2D(); }
+        virtual void setData(void* data, uint32_t size) override;
 
         virtual void bind(uint32_t slot) const override;
 

@@ -10,9 +10,11 @@
 
 namespace AnEngine {
     Ref<VertexArray> VertexArray::create() {
+        AE_PROFILE_FUNCTION()
+
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return MakeRef<OpenGLVertexArray>(OpenGLVertexArray());
+                return MakeRef<OpenGLVertexArray>();
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();

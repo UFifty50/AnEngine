@@ -9,7 +9,11 @@
 namespace AnEngine {
     class RenderCommandQueue {
     public:
-        static void init() { api->init(); }
+        static void init() {
+            AE_PROFILE_FUNCTION()
+
+            api->init();
+        }
 
         static void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
             api->setViewport(0, 0, width, height);
@@ -22,6 +26,8 @@ namespace AnEngine {
         inline static void clear() { api->clear(); }
 
         inline static void drawIndexed(const Ref<VertexArray>& vertexArray) {
+            AE_PROFILE_FUNCTION()
+
             api->drawIndexed(vertexArray);
         };
 
