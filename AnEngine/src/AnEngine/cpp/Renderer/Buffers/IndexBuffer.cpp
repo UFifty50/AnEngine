@@ -8,7 +8,8 @@
 
 
 namespace AnEngine {
-    Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t count) {
+    Ref<IndexBuffer> IndexBuffer::create(const Scope<uint32_t[]>& indices,
+                                         uint32_t count) {
         AE_PROFILE_FUNCTION()
 
         switch (RenderAPI::getAPI()) {
@@ -31,22 +32,5 @@ namespace AnEngine {
                 AE_CORE_ASSERT(false, "Unknown RendererAPI!");
                 throw NotImplementedException();
         }
-    }
-
-    Ref<IndexBuffer> IndexBuffer::create(std::vector<uint32_t> indices) {
-        uint32_t* idxs = new uint32_t[indices.size() + 1];
-        for (uint32_t i = 0; i < indices.size(); i++) {
-            idxs[i] = indices[i];
-        }
-        return create(idxs, (uint32_t)indices.size());
-    }
-
-    template <uint32_t _Size>
-    Ref<IndexBuffer> IndexBuffer::create(std::array<uint32_t, _Size> indices) {
-        uint32_t* idxs = new uint32_t[_Size + 1];
-        for (uint32_t i = 0; i < _Size; i++) {
-            idxs[i] = indices[i];
-        }
-        return create(idxs, _Size);
     }
 }  // namespace AnEngine

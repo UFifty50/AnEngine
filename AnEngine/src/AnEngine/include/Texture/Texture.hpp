@@ -73,10 +73,12 @@ namespace AnEngine {
         virtual ImageFormat::FileFormat getFileFormat() const = 0;
         virtual ImageFormat::PixelFormat getPixelFormat() const = 0;
 
-        //  virtual Sampler2D getSampler() const = 0;
+        virtual Sampler2D getSampler() const = 0;
         virtual void setData(void* data, uint32_t size) = 0;
 
         virtual void bind(uint32_t slot = 0) const = 0;
+
+        virtual bool operator==(const Texture& other) const = 0;
     };
     ;
 };  // namespace AnEngine

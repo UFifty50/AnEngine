@@ -26,8 +26,8 @@ private:
     AnEngine::CameraController cameraController;
     AnEngine::Ref<AnEngine::Texture2D> texture;
 
-    glm::vec4 squareColour = {0.0f, 0.0f, 1.0f, 1.0f};
-    glm::vec4 squareColour2 = {1.0f, 0.0f, 0.0f, 1.0f};
+    glm::vec4 squareColour = {0.2f, 0.3f, 0.8f, 1.0f};
+    glm::vec4 squareColour2 = {0.8f, 0.3f, 0.2f, 1.0f};
 };
 
 #endif

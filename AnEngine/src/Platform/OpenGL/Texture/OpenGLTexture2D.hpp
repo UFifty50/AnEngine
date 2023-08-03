@@ -26,10 +26,16 @@ namespace AnEngine {
             return pixelFormat;
         }
 
-        // inline virtual Sampler2D getSampler() const override { return Sampler2D(); }
+        inline virtual Sampler2D getSampler() const override {
+            return Sampler2D{rendererID};
+        }
         virtual void setData(void* data, uint32_t size) override;
 
         virtual void bind(uint32_t slot) const override;
+
+        virtual bool operator==(const Texture& other) const override {
+            return rendererID == ((OpenGLTexture2D&)other).rendererID;
+        }
 
     private:
         InputFileStream file;

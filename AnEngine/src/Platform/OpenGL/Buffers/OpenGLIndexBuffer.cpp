@@ -6,11 +6,11 @@
 
 
 namespace AnEngine {
-    OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
+    OpenGLIndexBuffer::OpenGLIndexBuffer(const Scope<uint32_t[]>& indices, uint32_t count)
         : count(count) {
         glCreateBuffers(1, &rendererID);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererID);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices,
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices.get(),
                      GL_STATIC_DRAW);
     }
     OpenGLIndexBuffer::~OpenGLIndexBuffer() { glDeleteBuffers(1, &rendererID); }

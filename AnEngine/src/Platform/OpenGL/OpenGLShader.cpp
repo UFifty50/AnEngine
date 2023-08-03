@@ -10,6 +10,7 @@
 #include <cctype>
 
 #include "File/InputFileStream.hpp"
+#include "Renderer/Renderer2D.hpp"
 #include "Renderer/ShaderUniform.hpp"
 
 
@@ -127,6 +128,8 @@ namespace AnEngine {
     void OpenGLShader::uploadUniform(const std::string& name, std::any uniform) {
         AE_PROFILE_FUNCTION()
 
+        const uint32_t maxTextureSlots = Renderer2D::rendererData.maxTextureSlots;
+
         GLint location = glGetUniformLocation(this->rendererID, name.c_str());
         if (location == -1) {
             AE_CORE_ERROR("Uniform {0} doesn't exist.", name);
@@ -213,6 +216,17 @@ namespace AnEngine {
         else if (uniform.type() == typeid(Sampler2D)) {
             uint32_t slot = std::any_cast<Sampler2D>(uniform).slot;
             glUniform1i(location, slot);
+        } else if (uniform.type() == typeid(std::array<Sampler2D, maxTextureSlots>)) {
+            auto samplerArray =
+                std::any_cast<std::array<Sampler2D, maxTextureSlots>>(uniform);
+            int32_t data[maxTextureSlots];
+
+            for (uint32_t i = 0; i < maxTextureSlots; i++) {
+                data[i] = samplerArray[i].slot;
+            }
+
+            glUniform1iv(location, maxTextureSlots, data);
+
         }
 
         else {

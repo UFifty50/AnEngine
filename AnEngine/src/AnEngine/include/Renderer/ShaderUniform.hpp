@@ -10,6 +10,8 @@
 namespace AnEngine {
     struct Sampler2D {
         uint32_t slot;
+
+        bool operator==(const Sampler2D& other) const { return slot == other.slot; }
     };
 
 
@@ -75,9 +77,13 @@ namespace AnEngine {
                                     name);
         }
 
-        std::any getOr(const std::string& name, std::any emptyType) const {
+        template <typename T>
+        T getOr(const std::string& name, T emptyType) const {
             for (auto& item : *this) {
-                if (item.name == name) return item.uniform;
+                if (item.name == name)
+                    return item.uniform.type() == typeid(T)
+                               ? std::any_cast<T>(item.uniform)
+                               : emptyType;
             }
             return emptyType;
         }

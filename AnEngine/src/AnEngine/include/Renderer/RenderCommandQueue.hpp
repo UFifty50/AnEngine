@@ -25,10 +25,11 @@ namespace AnEngine {
 
         inline static void clear() { api->clear(); }
 
-        inline static void drawIndexed(const Ref<VertexArray>& vertexArray) {
+        inline static void drawIndexed(const Ref<VertexArray>& vertexArray,
+                                       uint32_t indexCount = 0) {
             AE_PROFILE_FUNCTION()
 
-            api->drawIndexed(vertexArray);
+            api->drawIndexed(vertexArray, indexCount);
         };
 
     private:

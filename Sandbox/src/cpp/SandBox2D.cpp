@@ -37,28 +37,23 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
 
         for (int x = 0; x < 20; x++) {
             for (int y = 0; y < 20; y++) {
-                AnEngine::Renderer2D::drawQuad({x + 0.3f, y + 0.3f, -0.1f}, {1.0f, 1.0f},
+                AnEngine::Renderer2D::drawQuad({x + 0.5f, y + 0.5f, -0.2f}, {1.0f, 1.0f},
                                                45.0f, squareColour);
             }
         }
 
         for (int x = 0; x < 19; x++) {
             for (int y = 0; y < 19; y++) {
-                AnEngine::Renderer2D::drawQuad({x + 0.8f, y + 0.8f, 0.0f}, {0.5f, 0.5f},
+                AnEngine::Renderer2D::drawQuad({x + 1.2f, y + 1.2f, -0.1f}, {0.5f, 0.5f},
                                                45.0f, squareColour2);
             }
         }
-
-        /*ATTRIBUTE_ARRAY(
-            attributes,
-            AnEngine::ShaderUniform("tint", glm::vec4(1.0f, 0.0f, 0.0f, 0.5f)),
-            AnEngine::ShaderUniform("tilingFactor", 2.0f));*/
 
         auto attributes = ATTRIBUTE_ARRAY(
             AnEngine::ShaderUniform("tint", glm::vec4(1.0f, 0.0f, 0.0f, 0.5f)),
             AnEngine::ShaderUniform("tilingFactor", 2.0f));
 
-        AnEngine::Renderer2D::drawQuad({10.0f, 10.0f, -0.2f}, {50.0f, 50.0f}, 0.0f,
+        AnEngine::Renderer2D::drawQuad({10.0f, 10.0f, 0.0f}, {50.0f, 50.0f}, 0.0f,
                                        texture, attributes);
 
         AnEngine::Renderer2D::endScene();

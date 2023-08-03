@@ -8,15 +8,26 @@
 
 
 namespace AnEngine {
-    OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, size_t size) : size(size) {
+    OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size) : size(size) {
         glCreateBuffers(1, &rendererID);
         glBindBuffer(GL_ARRAY_BUFFER, rendererID);
         glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
     }
 
+    OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size) {
+        glCreateBuffers(1, &rendererID);
+        glBindBuffer(GL_ARRAY_BUFFER, rendererID);
+        glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+    }
+
     OpenGLVertexBuffer::~OpenGLVertexBuffer() { glDeleteBuffers(1, &rendererID); }
 
-    size_t OpenGLVertexBuffer::getSize() const { return this->size; }
+    uint32_t OpenGLVertexBuffer::getSize() const { return this->size; }
+
+    void OpenGLVertexBuffer::setData(const void* data, uint32_t size) {
+        glBindBuffer(GL_ARRAY_BUFFER, rendererID);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+    }
 
     void OpenGLVertexBuffer::bind() const {
         AE_PROFILE_FUNCTION()
