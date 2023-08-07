@@ -18,6 +18,7 @@ namespace AnEngine {
         void writeString(const std::string& str) override;
         void operator=(OutputFileStream stream);
 
+
         template <typename T,
                   std::enable_if_t<std::is_same_v<T, std::string>, bool> = true>
         OutputFileStream& operator<<(const T& data) {
@@ -31,6 +32,7 @@ namespace AnEngine {
             this->stream << data;
             return *this;
         }
+
 
         bool is_open() const { return this->stream.is_open(); }
 
