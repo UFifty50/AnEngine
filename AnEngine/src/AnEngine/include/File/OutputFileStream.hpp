@@ -1,6 +1,7 @@
 #ifndef OUTPUTFILESTREAM_HPP
 #define OUTPUTFILESTREAM_HPP
 
+#include "Core/Utils.hpp"
 #include "File/FileStream.hpp"
 
 
@@ -19,13 +20,7 @@ namespace AnEngine {
 
         template <typename T>
         OutputFileStream& operator<<(const T& data) {
-            stream << data;
-            return *this;
-        }
-
-        template <>
-        OutputFileStream& operator<< <std::string>(const std::string& data) {
-            this->operator<<(data.c_str());
+            Utils::writeToStream(*this, data);
             return *this;
         }
 
