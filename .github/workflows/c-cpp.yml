@@ -1,8 +1,20 @@
-name: C/C++ CI
+name: C/C++ CI with manual trigger
 
 on:
   push:
     branches: [ "main" ]
+
+  workflow_dispatch:
+    inputs:
+      buildType:
+        description: 'Build type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+        - debug
+        - release
+        - distribution
 
 jobs:
   build-ubuntu:
@@ -15,7 +27,7 @@ jobs:
         submodules: recursive
 
     - name: install stuff
-      run: sudo apt install -y libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglew-dev
+      run: sudo apt update && sudo apt upgrade && sudo apt install -y libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglew-dev
 
     - name: configure
       run: vendor/premake/premake5 gmake2
