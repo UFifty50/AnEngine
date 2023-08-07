@@ -1,15 +1,8 @@
-#include "File/FileStream.hpp"
+#ifndef AE_UTILS_HPP
+#define AE_UTILS_HPP
 
 
-namespace AnEngine::Utils {
-    template <typename T, Direction Dir>
-    FileStream<Dir>& writeToStream(FileStream<Dir>& stream, const T& data) {
-        stream << data;
-        return stream;
-    }
+namespace AnEngine::Utils {};  // namespace AnEngine::Utils
 
-    template <Direction Dir>
-    FileStream<Dir>& writeToStream(FileStream<Dir>& stream, const std::string& data) {
-        return writeToStream(stream, data.c_str());
-    }
-};  // namespace AnEngine::Utils
+
+#endif

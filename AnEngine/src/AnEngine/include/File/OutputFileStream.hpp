@@ -15,12 +15,20 @@ namespace AnEngine {
 
         virtual ~OutputFileStream();
 
-        void writeString(const std::string& str);
+        void writeString(const std::string& str) override;
         void operator=(OutputFileStream stream);
 
-        template <typename T>
+        template <typename T,
+                  std::enable_if_t<std::is_same_v<T, std::string>, bool> = true>
         OutputFileStream& operator<<(const T& data) {
-            Utils::writeToStream(*this, data);
+            this->writeString(data);
+            return *this;
+        }
+
+        template <typename T,
+                  std::enable_if_t<!std::is_same_v<T, std::string>, bool> = true>
+        OutputFileStream& operator<<(const T& data) {
+            this->stream << data;
             return *this;
         }
 
