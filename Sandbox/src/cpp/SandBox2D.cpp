@@ -37,23 +37,23 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
 
         for (int x = 0; x < 20; x++) {
             for (int y = 0; y < 20; y++) {
-                AnEngine::Renderer2D::drawQuad({x + 0.5f, y + 0.5f, -0.2f}, {1.0f, 1.0f},
-                                               45.0f, squareColour);
+                AnEngine::Renderer2D::drawQuad({x + 0.5f, y + 0.5f, 0.1f}, {1.0f, 1.0f},
+                                               squareRotation, squareColour);
             }
         }
 
         for (int x = 0; x < 19; x++) {
             for (int y = 0; y < 19; y++) {
-                AnEngine::Renderer2D::drawQuad({x + 1.2f, y + 1.2f, -0.1f}, {0.5f, 0.5f},
-                                               45.0f, squareColour2);
+                AnEngine::Renderer2D::drawQuad({x + 1.2f, y + 1.2f, 0.0f}, {0.5f, 0.5f},
+                                               squareRotation2, squareColour2);
             }
         }
 
-        auto attributes = ATTRIBUTE_ARRAY(
-            AnEngine::ShaderUniform("tint", glm::vec4(1.0f, 0.0f, 0.0f, 0.5f)),
-            AnEngine::ShaderUniform("tilingFactor", 2.0f));
+        auto attributes =
+            ATTRIBUTE_ARRAY(AnEngine::ShaderUniform("tint", tint),
+                            AnEngine::ShaderUniform("tilingFactor", tilingFactor));
 
-        AnEngine::Renderer2D::drawQuad({10.0f, 10.0f, 0.0f}, {50.0f, 50.0f}, 0.0f,
+        AnEngine::Renderer2D::drawQuad({25.0f, 25.0f, -0.1f}, {10.0f, 10.0f}, 0.0f,
                                        texture, attributes);
 
         AnEngine::Renderer2D::endScene();
@@ -65,6 +65,10 @@ void SandBox2D::onImGuiRender() {
     ImGui::Begin("Settings");
     ImGui::ColorEdit4("Colour Picker 1", glm::value_ptr(squareColour));
     ImGui::ColorEdit4("Colour Picker 2", glm::value_ptr(squareColour2));
+    ImGui::ColorEdit4("Tint", glm::value_ptr(tint));
+    ImGui::DragFloat("Rotation 1", &squareRotation, 0.1f, 0.0f, 180.0f);
+    ImGui::DragFloat("Rotation 2", &squareRotation2, 0.1f, 0.0f, 180.0f);
+    ImGui::DragFloat("Tiling Factor", &tilingFactor, 0.1f, 0.0f, 10.0f);
     ImGui::End();
 
     PROFILE_UI()

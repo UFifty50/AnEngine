@@ -23,7 +23,6 @@ namespace AnEngine {
             float texIndex;
             float tilingFactor;
             glm::vec4 tint;
-            float rotation;
             // ShaderUniformVector attributes;
         };
 
@@ -44,6 +43,8 @@ namespace AnEngine {
 
             std::array<Ref<Texture2D>, maxTextureSlots> textureSlots;
             uint32_t textureSlotIndex = 1;  // 0 = blank texture
+
+            glm::vec4 quadVertexPositions[4];
         };
 
         static Storage rendererData;

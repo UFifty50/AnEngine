@@ -12,38 +12,38 @@ layout(location = 5) in vec4 TintIn;
 out vec4 Colour;
 out vec2 TexCoord;
 out float TexIndex;
-out float TilingFactor;
 out vec4 Tint;
 
 uniform mat4 viewProjectionMatrix;
-uniform mat4 modelMatrix;
 
 
 void main() {
     Colour = ColourIn;
-    TexCoord = TexCoordIn;// * tilingFactor;
+    TexCoord = TexCoordIn * TilingFactorIn;
     TexIndex = TexIndexIn;
-    TilingFactor = TilingFactorIn;
     Tint = TintIn;
-    gl_Position = viewProjectionMatrix * vec4(Position, 1.0); // * modelMatrix;
+    gl_Position = viewProjectionMatrix * vec4(Position, 1.0);
 }
 
 
 #type pixel
 #version 460 core
 
-layout(location = 0) out vec4 colourOut;
+layout(location = 0) out vec4 colour;
 
 in vec4 Colour;
 in vec2 TexCoord;
 in float TexIndex;
-in float TilingFactor;
 in vec4 Tint;
 
 uniform sampler2D textureSamplers[32];
-
+	
 
 void main() {
     // maybe int switch() or if() for texture index
-    colourOut = texture(textureSamplers[int(TexIndex)], TexCoord * TilingFactor) * Colour * Tint;
+    vec4 texColour = texture(textureSamplers[int(TexIndex)], TexCoord) * Colour * Tint;
+    if(texColour.a < 0.05)
+        discard;
+
+    colour = texColour;
 }

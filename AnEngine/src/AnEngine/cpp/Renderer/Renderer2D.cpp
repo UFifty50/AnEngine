@@ -36,7 +36,6 @@ namespace AnEngine {
             {ShaderDataType::Float, "TexIndexIn"},
             {ShaderDataType::Float, "TilingFactorIn"},
             {ShaderDataType::Vec4, "TintIn"},
-            {ShaderDataType::Float, "Rotation"},
         };
         // clang-format on
 
@@ -83,6 +82,11 @@ namespace AnEngine {
 
         // Set texture slot 0 to blank texture
         rendererData.textureSlots[0] = rendererData.blankTexture;
+
+        rendererData.quadVertexPositions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
+        rendererData.quadVertexPositions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
+        rendererData.quadVertexPositions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
+        rendererData.quadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
     }
 
     void Renderer2D::beginScene(const Ref<Camera>& camera) {  // begin batch
@@ -142,44 +146,32 @@ namespace AnEngine {
         constexpr float tilingFactor = 1.0f;
         constexpr glm::vec4 tint(1.0f);
 
-        rendererData.quadVertexBufferPtr->position = position;
-        rendererData.quadVertexBufferPtr->colour = colour;
-        rendererData.quadVertexBufferPtr->texCoord = {0.0f, 0.0f};
-        rendererData.quadVertexBufferPtr->texIndex = texIndex;
-        rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
-        rendererData.quadVertexBufferPtr->tint = tint;
-        rendererData.quadVertexBufferPtr->rotation = rotation;
-        rendererData.quadVertexBufferPtr++;
+        glm::mat4 rotationMatrix(1.0f);
+        if ((int)rotation % 180 != 0) {
+            rotationMatrix =
+                glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+        }
 
-        rendererData.quadVertexBufferPtr->position = {position.x + size.x, position.y,
-                                                      position.z};
-        rendererData.quadVertexBufferPtr->colour = colour;
-        rendererData.quadVertexBufferPtr->texCoord = {1.0f, 0.0f};
-        rendererData.quadVertexBufferPtr->texIndex = texIndex;
-        rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
-        rendererData.quadVertexBufferPtr->tint = tint;
-        rendererData.quadVertexBufferPtr->rotation = rotation;
-        rendererData.quadVertexBufferPtr++;
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
+                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
-        rendererData.quadVertexBufferPtr->position = {position.x + size.x,
-                                                      position.y + size.y, position.z};
-        rendererData.quadVertexBufferPtr->colour = colour;
-        rendererData.quadVertexBufferPtr->texCoord = {1.0f, 1.0f};
-        rendererData.quadVertexBufferPtr->texIndex = texIndex;
-        rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
-        rendererData.quadVertexBufferPtr->tint = tint;
-        rendererData.quadVertexBufferPtr->rotation = rotation;
-        rendererData.quadVertexBufferPtr++;
+        glm::vec2 texCoords[4] = {
+            glm::vec2{0.0f, 0.0f},
+            glm::vec2{1.0f, 0.0f},
+            glm::vec2{1.0f, 1.0f},
+            glm::vec2{0.0f, 1.0f},
+        };
 
-        rendererData.quadVertexBufferPtr->position = {position.x, position.y + size.y,
-                                                      position.z};
-        rendererData.quadVertexBufferPtr->colour = colour;
-        rendererData.quadVertexBufferPtr->texCoord = {0.0f, 1.0f};
-        rendererData.quadVertexBufferPtr->texIndex = texIndex;
-        rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
-        rendererData.quadVertexBufferPtr->tint = tint;
-        rendererData.quadVertexBufferPtr->rotation = rotation;
-        rendererData.quadVertexBufferPtr++;
+        for (uint32_t i = 0; i < 4; i++) {
+            rendererData.quadVertexBufferPtr->position =
+                transform * rendererData.quadVertexPositions[i];
+            rendererData.quadVertexBufferPtr->colour = colour;
+            rendererData.quadVertexBufferPtr->texCoord = texCoords[i];
+            rendererData.quadVertexBufferPtr->texIndex = texIndex;
+            rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
+            rendererData.quadVertexBufferPtr->tint = tint;
+            rendererData.quadVertexBufferPtr++;
+        }
 
         rendererData.quadIndexCount += 6;
 
@@ -237,45 +229,33 @@ namespace AnEngine {
         float tilingFactor = attributes.getOr("tilingFactor", 1.0f);
         glm::vec4 tint = attributes.getOr("tint", glm::vec4(1.0f));
 
+        glm::mat4 rotationMatrix(1.0f);
+        if ((int)rotation % 180 != 0) {
+            rotationMatrix =
+                glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+        }
 
-        rendererData.quadVertexBufferPtr->position = position;
-        rendererData.quadVertexBufferPtr->colour = colour;
-        rendererData.quadVertexBufferPtr->texCoord = {0.0f, 0.0f};
-        rendererData.quadVertexBufferPtr->texIndex = textureIndex;
-        rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
-        rendererData.quadVertexBufferPtr->tint = tint;
-        rendererData.quadVertexBufferPtr->rotation = rotation;
-        rendererData.quadVertexBufferPtr++;
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
+                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
-        rendererData.quadVertexBufferPtr->position = {position.x + size.x, position.y,
-                                                      position.z};
-        rendererData.quadVertexBufferPtr->colour = colour;
-        rendererData.quadVertexBufferPtr->texCoord = {1.0f, 0.0f};
-        rendererData.quadVertexBufferPtr->texIndex = textureIndex;
-        rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
-        rendererData.quadVertexBufferPtr->tint = tint;
-        rendererData.quadVertexBufferPtr->rotation = rotation;
-        rendererData.quadVertexBufferPtr++;
 
-        rendererData.quadVertexBufferPtr->position = {position.x + size.x,
-                                                      position.y + size.y, position.z};
-        rendererData.quadVertexBufferPtr->colour = colour;
-        rendererData.quadVertexBufferPtr->texCoord = {1.0f, 1.0f};
-        rendererData.quadVertexBufferPtr->texIndex = textureIndex;
-        rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
-        rendererData.quadVertexBufferPtr->tint = tint;
-        rendererData.quadVertexBufferPtr->rotation = rotation;
-        rendererData.quadVertexBufferPtr++;
+        glm::vec2 texCoords[4] = {
+            glm::vec2{0.0f, 0.0f},
+            glm::vec2{1.0f, 0.0f},
+            glm::vec2{1.0f, 1.0f},
+            glm::vec2{0.0f, 1.0f},
+        };
 
-        rendererData.quadVertexBufferPtr->position = {position.x, position.y + size.y,
-                                                      position.z};
-        rendererData.quadVertexBufferPtr->colour = colour;
-        rendererData.quadVertexBufferPtr->texCoord = {0.0f, 1.0f};
-        rendererData.quadVertexBufferPtr->texIndex = textureIndex;
-        rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
-        rendererData.quadVertexBufferPtr->tint = tint;
-        rendererData.quadVertexBufferPtr->rotation = rotation;
-        rendererData.quadVertexBufferPtr++;
+        for (uint32_t i = 0; i < 4; i++) {
+            rendererData.quadVertexBufferPtr->position =
+                transform * rendererData.quadVertexPositions[i];
+            rendererData.quadVertexBufferPtr->colour = colour;
+            rendererData.quadVertexBufferPtr->texCoord = texCoords[i];
+            rendererData.quadVertexBufferPtr->texIndex = textureIndex;
+            rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
+            rendererData.quadVertexBufferPtr->tint = tint;
+            rendererData.quadVertexBufferPtr++;
+        }
 
         rendererData.quadIndexCount += 6;
 
