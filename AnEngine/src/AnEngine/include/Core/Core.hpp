@@ -54,13 +54,6 @@
     #define AE_ENABLE_ASSERTS
 #endif
 
-// if MSVC
-#if defined(_MSC_VER)
-    #define VAOPTC ,
-#else
-    #define VAOPTC __VA_OPT__(, )
-#endif
-
 #if defined(AE_ENABLE_ASSERTS)
     #define AE_ASSERT(x, str, ...)                                                  \
         {                                                                           \
@@ -76,6 +69,7 @@
                 DEBUG_BREAK();                                                           \
             }                                                                            \
         }
+
 #else
     #define AE_ASSERT(x, ...)
     #define AE_CORE_ASSERT(x, ...)
