@@ -129,7 +129,10 @@ project "AnEngine"
         }
 
     filter "toolset:msc*"
-        buildoptions { "/analyze:external-" }
+        buildoptions { 
+            "/analyze:external-",
+            "/Zc:preprocessor"
+        }
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }
@@ -201,7 +204,10 @@ project "Sandbox"
         }
 
     filter "toolset:msc*"
-        buildoptions { "/analyze:external-" }
+        buildoptions {
+            "/analyze:external-",
+            "/Zc:preprocessor"
+        }
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }

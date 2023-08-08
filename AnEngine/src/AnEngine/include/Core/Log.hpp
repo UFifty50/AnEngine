@@ -30,28 +30,28 @@ namespace AnEngine {
 
 // core engine logging macros
 // clang-format off
-#define AE_CORE_TRACE(str, ...)     ::AnEngine::Log::getCoreLogger()->trace(str, __VA_ARGS__)
-#define AE_CORE_INFO(str, ...)      ::AnEngine::Log::getCoreLogger()->info(str, __VA_ARGS__)
-#define AE_CORE_WARN(str, ...)      ::AnEngine::Log::getCoreLogger()->warn(str, __VA_ARGS__)
-#define AE_CORE_ERROR(str, ...)     ::AnEngine::Log::getCoreLogger()->error(str , __VA_ARGS__)
-#define AE_CORE_CRITICAL(str, ...)  ::AnEngine::Log::getCoreLogger()->critical(str, __VA_ARGS__)
+#define AE_CORE_TRACE(str, ...)     ::AnEngine::Log::getCoreLogger()->trace(str  __VA_OPT__(,) __VA_ARGS__)
+#define AE_CORE_INFO(str, ...)      ::AnEngine::Log::getCoreLogger()->info(str  __VA_OPT__(,) __VA_ARGS__)
+#define AE_CORE_WARN(str, ...)      ::AnEngine::Log::getCoreLogger()->warn(str  __VA_OPT__(,) __VA_ARGS__)
+#define AE_CORE_ERROR(str, ...)     ::AnEngine::Log::getCoreLogger()->error(str  __VA_OPT__(,) __VA_ARGS__)
+#define AE_CORE_CRITICAL(str, ...)  ::AnEngine::Log::getCoreLogger()->critical(str  __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef AE_DEBUG_FLAG
-    #define AE_CORE_DEBUG(str, ...) ::AnEngine::Log::getCoreLogger()->debug(str, __VA_ARGS__)
+    #define AE_CORE_DEBUG(str, ...) ::AnEngine::Log::getCoreLogger()->debug(str  __VA_OPT__(,) __VA_ARGS__)
 #else
     #define AE_CORE_DEBUG
 #endif
 
 
 // client logging maros
-#define AE_TRACE(str, ...)     ::AnEngine::Log::getClientLogger()->trace(str, __VA_ARGS__)
-#define AE_INFO(str, ...)      ::AnEngine::Log::getClientLogger()->info(str, __VA_ARGS__)
-#define AE_WARN(str, ...)      ::AnEngine::Log::getClientLogger()->warn(str, __VA_ARGS__)
-#define AE_ERROR(str, ...)     ::AnEngine::Log::getClientLogger()->error(str, __VA_ARGS__)
-#define AE_CRITICAL(str, ...)  ::AnEngine::Log::getClientLogger()->critical(str, __VA_ARGS__)
+#define AE_TRACE(str, ...)     ::AnEngine::Log::getClientLogger()->trace(str  __VA_OPT__(,) __VA_ARGS__)
+#define AE_INFO(str, ...)      ::AnEngine::Log::getClientLogger()->info(str  __VA_OPT__(,) __VA_ARGS__)
+#define AE_WARN(str, ...)      ::AnEngine::Log::getClientLogger()->warn(str  __VA_OPT__(,) __VA_ARGS__)
+#define AE_ERROR(str, ...)     ::AnEngine::Log::getClientLogger()->error(str  __VA_OPT__(,) __VA_ARGS__)
+#define AE_CRITICAL(str, ...)  ::AnEngine::Log::getClientLogger()->critical(str  __VA_OPT__(,) __VA_ARGS__)
 
 #ifdef _DEBUG
-    #define AE_DEBUG(str, ...) ::AnEngine::Log::getClientLogger()->debug(str, __VA_ARGS__)
+    #define AE_DEBUG(str, ...) ::AnEngine::Log::getClientLogger()->debug(str  __VA_OPT__(,) __VA_ARGS__)
 #else
     #define AE_DEBUG
 #endif
