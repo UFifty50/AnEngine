@@ -54,6 +54,13 @@
     #define AE_ENABLE_ASSERTS
 #endif
 
+// if MSVC
+#if defined(_MSC_VER)
+    #define VAOPTC ,
+#else
+    #define VAOPTC __VA_OPT__(, )
+#endif
+
 #if defined(AE_ENABLE_ASSERTS)
     #define AE_ASSERT(x, str, ...)                                                  \
         {                                                                           \
@@ -87,14 +94,14 @@
     #define AE_PROFILE_FUNCTION() AE_PROFILE_SCOPE(__FUNCSIG__)
 
     #define PROFILE_UI()
-    /* #define PROFILE_UI() \
-         ImGui::Begin("Timings");                                                        \
-         for (auto& result : profileResults) {                                           \
-             ImGui::Text(AE_FMT_STR("{0}: {1:.3f}ms", result.name, result.time * 0.001f) \
-                             .c_str());                                                  \
-         }                                                                               \
-         ImGui::End();                                                                   \
-         profileResults.clear();*/
+/* #define PROFILE_UI() \
+     ImGui::Begin("Timings"); \
+     for (auto& result : profileResults) { \
+         ImGui::Text(AE_FMT_STR("{0}: {1:.3f}ms", result.name, result.time *
+   0.001f) \
+                         .c_str()); \
+     } \
+     ImGui::End(); \ profileResults.clear();*/
 #else
     #define AE_PROFILE_BEGIN_SESSION(name, filepath)
     #define AE_PROFILE_END_SESSION()
