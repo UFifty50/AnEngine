@@ -18,6 +18,7 @@
 
 namespace AnEngine {
     Renderer2D::Storage Renderer2D::rendererData;
+    Renderer2D::Statistics Renderer2D::rendererStats;
 
 
     void Renderer2D::init() {
@@ -128,6 +129,16 @@ namespace AnEngine {
         }
 
         RenderCommandQueue::drawIndexed(rendererData.quadVA, rendererData.quadIndexCount);
+        rendererStats.draws++;
+    }
+
+    void Renderer2D::newBatch() {
+        endScene();
+
+        rendererData.quadIndexCount = 0;
+        rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
+
+        rendererData.textureSlotIndex = 1;
     }
 
     // Primitives
@@ -141,6 +152,10 @@ namespace AnEngine {
                               float rotation, const glm::vec4& colour,
                               const AnEngine::ShaderUniformVector& attributes) {
         AE_PROFILE_FUNCTION()
+
+        if (rendererData.quadIndexCount >= rendererData.maxIndices) {
+            newBatch();
+        }
 
         constexpr float texIndex = 0.0f;
         constexpr float tilingFactor = 1.0f;
@@ -174,28 +189,7 @@ namespace AnEngine {
         }
 
         rendererData.quadIndexCount += 6;
-
-        /* Ref<Shader> quadShader = rendererData->shaderLibrary.get("QuadShader");
-
-         quadShader->uploadUniform("tint", glm::vec4(1.0f));
-         quadShader->uploadUniform("tilingFactor", 1.0f);
-         rendererData->blankTexture->bind();
-
-
-         glm::mat4 rotationMatrix;
-         if ((int)rotation % 180 != 0) {
-             glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
-         } else {
-             rotationMatrix = glm::mat4(1.0f);
-         }
-
-         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix
-         * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-
-         quadShader->uploadUniform("modelMatrix", transform);
-
-         rendererData->quadVA->bind();
-         RenderCommandQueue::drawIndexed(rendererData->quadVA);*/
+        rendererStats.quadCount++;
     }
 
     void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
@@ -208,6 +202,10 @@ namespace AnEngine {
                               float rotation, const Ref<Texture2D>& texture,
                               const AnEngine::ShaderUniformVector& attributes) {
         AE_PROFILE_FUNCTION()
+
+        if (rendererData.quadIndexCount >= rendererData.maxIndices) {
+            newBatch();
+        }
 
         constexpr glm::vec4 colour(1.0f);
 
@@ -258,28 +256,6 @@ namespace AnEngine {
         }
 
         rendererData.quadIndexCount += 6;
-
-        /*Ref<Shader> quadShader = rendererData.shaderLibrary.get("QuadShader");
-
-        quadShader->uploadUniform("Ucolour", glm::vec4(1.0f));
-
-        quadShader->uploadUniform("tint", attributes.getOr("tint", glm::vec4(1.0f)));
-        quadShader->uploadUniform("tilingFactor", attributes.getOr("tilingFactor", 1.0f));
-        texture->bind();
-
-        glm::mat4 rotationMatrix;
-        if ((int)rotation % 180 != 0) {
-            glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
-        } else {
-            rotationMatrix = glm::mat4(1.0f);
-        }
-
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
-                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-
-        quadShader->uploadUniform("modelMatrix", transform);
-
-        rendererData.quadVA->bind();
-        RenderCommandQueue::drawIndexed(rendererData.quadVA);*/
+        rendererStats.quadCount++;
     }
 }  // namespace AnEngine

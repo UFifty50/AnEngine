@@ -29,6 +29,11 @@
 #include "AnEngine/include/Time/Time.hpp"
 #include "AnEngine/include/Time/TimeStep.hpp"
 
+// ---Particle System---
+#include "AnEngine/include/ParticleSystem/Particle.hpp"
+#include "AnEngine/include/ParticleSystem/Particle2D.hpp"
+#include "AnEngine/include/ParticleSystem/ParticleSpawner.hpp"
+
 // ---Layers---
 #include "AnEngine/include/Core/Layer.hpp"
 #include "AnEngine/include/ImGui/ImGuiLayer.hpp"

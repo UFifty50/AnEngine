@@ -4,6 +4,7 @@
 
 #include "Core/Input.hpp"
 #include "Core/Log.hpp"
+#include "Core/Random.hpp"
 #include "Events/ApplicationEvent.hpp"
 #include "Renderer/RenderAPI.hpp"
 #include "Renderer/Renderer.hpp"
@@ -38,6 +39,7 @@ namespace AnEngine {
         window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
         Renderer::init();
+        Random::init();
 
         imGuiLayer = MakeRef<ImGuiLayer>();
         pushOverlay(imGuiLayer);
