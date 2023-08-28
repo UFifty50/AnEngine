@@ -134,10 +134,10 @@ project "AnEngine"
             "/Zc:preprocessor"
         }
 
-   -- filter "toolset:gcc*"
-   --     buildoptions {
-   --         "-msse2"
-   --     }
+    filter "toolset:gcc"
+        buildoptions {
+            "-msse2"
+        }
 
     filter "configurations:Debug"
         defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }
