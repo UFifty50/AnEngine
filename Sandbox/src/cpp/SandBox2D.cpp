@@ -130,7 +130,7 @@ void SandBox2D::onImGuiRender() {
 
     ImGui::Begin("Statistics");
     ImGui::Text("Renderer2D Stats:");
-    ImGui::Text("Frametime: %fms", AnEngine::Renderer2D::getStats().lastFrameTime);
+    ImGui::Text("Frametime: %fms", (float)AnEngine::Renderer2D::getStats().lastFrameTime);
     ImGui::Text("FPS: %.1fms",
                 1.0f / (AnEngine::Renderer2D::getStats().lastFrameTime / 1000.0f));
     ImGui::Text("Draw Calls: %d", AnEngine::Renderer2D::getStats().draws);
