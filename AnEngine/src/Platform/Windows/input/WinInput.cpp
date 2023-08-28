@@ -1,5 +1,7 @@
 #include "aepch.hpp"
 
+#include <glm/glm.hpp>
+
 #include "Platform/Windows/input/WinInput.hpp"
 
 #include <GLFW/glfw3.h>
@@ -24,7 +26,7 @@ namespace AnEngine {
         return state == GLFW_PRESS;
     }
 
-    std::pair<float, float> WinInput::getMousePositionImpl() {
+    glm::vec2 WinInput::getMousePositionImpl() {
         double xpos, ypos;
         auto window =
             static_cast<GLFWwindow*>(Application::get().getWindow().getNativeWindow());
@@ -32,13 +34,7 @@ namespace AnEngine {
         return {(float)xpos, (float)ypos};
     }
 
-    float WinInput::getMouseXImpl() {
-        auto [x, y] = getMousePositionImpl();
-        return x;
-    }
+    float WinInput::getMouseXImpl() { return getMousePositionImpl().x; }
 
-    float WinInput::getMouseYImpl() {
-        auto [x, y] = getMousePositionImpl();
-        return y;
-    }
+    float WinInput::getMouseYImpl() { return getMousePositionImpl().y; }
 }  // namespace AnEngine

@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#include "Core/Input.hpp"
 #include "Core/Random.hpp"
 #include "ParticleSystem/Particle.hpp"
 #include "ParticleSystem/Particle2D.hpp"
@@ -21,13 +22,56 @@ namespace AnEngine {
             particle.reset();
         }
 
-        particlePool = masterParticlePool;
+        activeParticles.clear();
     }
 
     void ParticleSpawner::onUpdate(TimeStep deltaTime) {
         if (!enabled) return;
 
-        for (auto& particle : particlePool) {
+        timeSinceLastAdd += deltaTime;
+        int toAdd = static_cast<int>(timeSinceLastAdd * spawnRate);
+        float fraction = timeSinceLastAdd * spawnRate - toAdd;
+        timeSinceLastAdd -= toAdd / spawnRate;
+
+        if (spawnRate > 0.0f && toAdd > 0) {
+            for (int i = 0; i < toAdd; i++) {
+                int index = Random::getInt(0, masterParticlePool.size() - 1);
+                Particle2D value = masterParticlePool[index];
+
+                if (sizeVariation > 0.0f) {
+                    float variate = Random::getFloat(0.0f, sizeVariation);
+                    //    Random::getFloat() * sizeVariation - sizeVariation / 2.0f;
+
+                    value.props.startSize +=
+                        Random::choice(std::array{variate / 2, -variate / 2});
+                    value.props.endSize +=
+                        Random::choice(std::array{variate / 2, -variate / 2});
+                }
+                value.currentPosition = position;
+
+                activeParticles.push_back(value);
+            }
+
+            if (fraction > 0.0f && Random::getFloat() < fraction) {
+                int index = Random::getInt(0, masterParticlePool.size() - 1);
+                Particle2D value = masterParticlePool[index];
+
+                if (sizeVariation > 0.0f) {
+                    float variate = Random::getFloat(0.0f, sizeVariation);
+                    //    Random::getFloat() * sizeVariation - sizeVariation / 2.0f;
+
+                    value.props.startSize +=
+                        Random::choice(std::array{variate / 2, -variate / 2});
+                    value.props.endSize +=
+                        Random::choice(std::array{variate / 2, -variate / 2});
+                }
+                value.currentPosition = position;
+
+                activeParticles.push_back(value);
+            }
+        }
+
+        for (auto& particle : activeParticles) {
             if (!particle.isAlive()) {
                 continue;
             }
@@ -38,6 +82,13 @@ namespace AnEngine {
             }
 
             particle.update(deltaTime);
+
+            activeParticles.erase(
+                std::remove_if(activeParticles.begin(), activeParticles.end(),
+                               [](const Particle2D& particle) {
+                                   return !particle.isAlive() || particle.shouldDie();
+                               }),
+                activeParticles.end());
         }
     }
 
@@ -46,12 +97,12 @@ namespace AnEngine {
 
         Renderer2D::beginScene(camera);
 
-        for (auto& particle : particlePool) {
+        for (auto& particle : activeParticles) {
             if (!particle.isAlive()) {
                 continue;
             }
 
-            particle.emit(sizeVariation);
+            particle.emit();
         }
 
         Renderer2D::endScene();
@@ -59,46 +110,33 @@ namespace AnEngine {
 
     void ParticleSpawner::setSizeVariation(float variation) { sizeVariation = variation; }
 
-    void ParticleSpawner::setSpawnRate(float rate) {
-        int repetitions = static_cast<int>(rate);
-        float fraction = rate - repetitions;
+    void ParticleSpawner::setSpawnRate(float rate) { spawnRate = rate; }
 
-        if (rate <= 0.0f) return;
+    void ParticleSpawner::setPosition(glm::vec3 newPosition) { position = newPosition; }
 
-        for (auto& value : masterParticlePool) {
-            std::generate_n(std::back_inserter(particlePool), repetitions,
-                            [&value]() { return value; });
-
-
-            // Handle fractional part by random chance
-            if (fraction > 0.0f && Random::getFloat() < fraction) {
-                particlePool.push_back(value);
-            }
-        }
-
-        // std::random_shuffle(particlePool.begin(), particlePool.end());
-    }
-
-    void ParticleSpawner::addParticle(const Particle2D& particle) {
-        particlePool.push_back(particle);
+    void ParticleSpawner::addParticle(Particle2D& particle) {
+        particle.currentPosition = position;
         masterParticlePool.push_back(particle);
     }
 
-    void ParticleSpawner::addParticle(const Particle2D& particle, uint32_t count) {
-        for (uint32_t i = 0; i < count; i++) addParticle(particle);
+    void ParticleSpawner::addParticle(Particle2D& particle, uint32_t count) {
+        for (uint32_t i = 0; i < count; i++) {
+            particle.currentPosition = position;
+            addParticle(particle);
+        }
     }
 
-    void ParticleSpawner::addParticles(const std::vector<Particle2D>& particles) {
-        particlePool.insert(particlePool.end(), particles.begin(), particles.end());
+    void ParticleSpawner::addParticles(std::vector<Particle2D>& particles) {
+        for (auto& particle : particles) {
+            particle.currentPosition = position;
+        }
         masterParticlePool.insert(masterParticlePool.end(), particles.begin(),
                                   particles.end());
     }
 
-    void ParticleSpawner::operator+=(const Particle2D& particle) {
-        addParticle(particle);
-    }
+    void ParticleSpawner::operator+=(Particle2D& particle) { addParticle(particle); }
 
-    void ParticleSpawner::operator+=(const std::vector<Particle2D>& particles) {
+    void ParticleSpawner::operator+=(std::vector<Particle2D>& particles) {
         addParticles(particles);
     }
 }  // namespace AnEngine

@@ -10,25 +10,52 @@
 namespace AnEngine {
     class Particle2D : public Particle {
     public:
-        Particle2D();
-        Particle2D(glm::vec3 position, glm::vec2 velocity,
-                   std::pair<glm::vec4, glm::vec4> colourRange, float rotation,
-                   float rotationSpeed, std::pair<float, float> sizeRange,
-                   float lifeTime);
-
+        virtual void init() override;
         virtual void reset() override;
 
         virtual void update(TimeStep delta) override;
 
-        virtual void emit(float sizevariation) override;
+        virtual void emit() override;
 
         virtual bool isAlive() const override;
         virtual bool shouldDie() const override;
         virtual void kill() override;
 
+
+        friend class ParticleSpawner;
+
+        struct {
+            glm::vec3 velocity;
+            glm::vec4 startColour;
+            glm::vec4 endColour;
+            float startRotation = 0.0f;
+            float endRotation = 0.0f;
+            float startSize;
+            float endSize;
+            float lifeTime;
+        } props;
+
+        float currentSize;
+
     private:
-        ParticleProperties props;
-        ParticleProperties oldProps;
+        bool initialised = false;
+
+        struct {
+            glm::vec3 velocity;
+            glm::vec4 startColour;
+            glm::vec4 endColour;
+            float startRotation = 0.0f;
+            float endRotation = 0.0f;
+            float startSize;
+            float endSize;
+            float lifeTime;
+        } masterProps;
+
+        glm::vec4 currentColour;
+        glm::vec3 currentPosition;
+        float currentRotation;
+        float lifeRemaining;
+        bool alive;
     };
 };  // namespace AnEngine
 

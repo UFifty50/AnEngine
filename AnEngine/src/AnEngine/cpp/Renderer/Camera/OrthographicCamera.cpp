@@ -13,6 +13,11 @@ namespace AnEngine {
           viewMatrix(1.0f),
           position(0.0f) {
         this->viewProjectionMatrix = this->projectionMaxtrix * this->viewMatrix;
+
+        bounds.left = left;
+        bounds.right = right;
+        bounds.bottom = bottom;
+        bounds.top = top;
     }
 
     void OrthographicCamera::recalculateViewMatrix() {

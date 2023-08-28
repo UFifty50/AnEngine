@@ -12,66 +12,53 @@
 
 
 namespace AnEngine {
-    Particle2D::Particle2D() {
-        props = {.position = glm::vec3(0.0f),
-                 .velocity = glm::vec3(0.0f),
-                 .startColour = glm::vec4(1.0f),
-                 .endColour = glm::vec4(1.0f),
-                 .rotation = 0.0f,
-                 .rotationSpeed = 0.0f,
-                 .startSize = 0.0f,
-                 .endSize = 0.0f,
-                 .lifeTime = 1.0f,
-                 .lifeRemaining = 0.0f,
-                 .alive = false};
-        oldProps = props;
+    void Particle2D::init() {
+        if (initialised) return;
+        initialised = true;
+
+        memcpy(&this->masterProps, &this->props, sizeof(masterProps));
+        currentColour = props.startColour;
+        currentSize = props.startSize;
+        currentRotation = props.startRotation;
+        lifeRemaining = props.lifeTime;
+        alive = true;
     }
 
-    Particle2D::Particle2D(glm::vec3 position, glm::vec2 velocity,
-                           std::pair<glm::vec4, glm::vec4> colourRange, float rotation,
-                           float rotationSpeed, std::pair<float, float> sizeRange,
-                           float lifeTime) {
-        props = {.position = position,
-                 .velocity = {velocity, 0.0f},
-                 .startColour = colourRange.first,
-                 .endColour = colourRange.second,
-                 .rotation = rotation,
-                 .rotationSpeed = rotationSpeed,
-                 .startSize = sizeRange.first,
-                 .endSize = sizeRange.second,
-                 .lifeTime = lifeTime,
-                 .lifeRemaining = lifeTime,
-                 .alive = true};
-        oldProps = props;
+    void Particle2D::reset() {
+        if (!initialised) return;
+        // initialised = false;
+
+        std::memcpy(&this->props, &this->masterProps, sizeof(props));
+        currentColour = props.startColour;
+        currentSize = props.startSize;
+        currentRotation = props.startRotation;
+        lifeRemaining = props.lifeTime;
+        alive = true;
     }
-
-
-    void Particle2D::reset() { props = oldProps; }
 
     void Particle2D::update(TimeStep delta) {
-        props.lifeRemaining -= delta;
-        props.position += props.velocity * (float)delta;
-        props.rotation += props.rotationSpeed * delta;
+        if (!initialised) return;
 
-        float life = props.lifeRemaining / props.lifeTime;
-        props.colour = glm::lerp(props.endColour, props.startColour, life);
-        props.colour.a *= life;
+        lifeRemaining -= delta;
+        currentPosition += props.velocity * (float)delta;
 
-        props.size = glm::lerp(props.endSize, props.startSize, life);
+        float life = lifeRemaining / props.lifeTime;
+        currentColour = glm::lerp(props.endColour, props.startColour, life);
+        currentColour.a *= life;
+
+        currentSize = glm::lerp(props.endSize, props.startSize, life);
+        currentRotation = glm::lerp(props.endRotation, props.startRotation, life);
     }
 
-    void Particle2D::emit(float sizeVariation) {
-        if (sizeVariation > 0.0f) {
-            props.size += Random::getFloat() * sizeVariation - sizeVariation / 2.0f;
-            // props.size += Random::getFloat(0.0f, sizeVariation);
-        }
+    void Particle2D::emit() {
+        if (!initialised) return;
 
-        Renderer2D::drawQuad(props.position, glm::vec2(props.size), props.rotation,
-                             props.colour);
+        Renderer2D::drawQuad(currentPosition, glm::vec2(currentSize), currentRotation,
+                             currentColour);
     }
 
-    bool Particle2D::isAlive() const { return props.alive == true; }
-    bool Particle2D::shouldDie() const { return props.lifeRemaining <= 0.0f; }
+    bool Particle2D::isAlive() const { return alive == true; }
+    bool Particle2D::shouldDie() const { return lifeRemaining <= 0.0f; }
 
-    void Particle2D::kill() { props.alive = false; }
+    void Particle2D::kill() { alive = false; }
 }  // namespace AnEngine

@@ -1,6 +1,8 @@
 #ifndef WINDOWSINPUT_HPP
 #define WINDOWSINPUT_HPP
 
+#include <glm/glm.hpp>
+
 #include "Core/Input.hpp"
 
 
@@ -12,7 +14,7 @@ namespace AnEngine {
         virtual bool isMouseButtonPressedImpl(int button) override;
         virtual float getMouseXImpl() override;
         virtual float getMouseYImpl() override;
-        virtual std::pair<float, float> getMousePositionImpl() override;
+        virtual glm::vec2 getMousePositionImpl() override;
     };
 }  // namespace AnEngine
 

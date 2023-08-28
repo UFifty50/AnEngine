@@ -1,6 +1,8 @@
 #ifndef PARTICLESPAWNER_HPP
 #define PARTICLESPAWNER_HPP
 
+#include <glm/glm.hpp>
+
 #include <vector>
 
 #include "ParticleSystem/Particle.hpp"
@@ -12,8 +14,7 @@
 namespace AnEngine {
     class ParticleSpawner {
     public:
-        ParticleSpawner() = default;
-        ~ParticleSpawner() = default;
+        ParticleSpawner(glm::vec3 position) : position(position) {}
 
         void enable();
         void disable();
@@ -24,19 +25,24 @@ namespace AnEngine {
 
         void setSizeVariation(float variation);
         void setSpawnRate(float rate);
+        void setPosition(glm::vec3 newPosition);
 
-        void addParticle(const Particle2D& particle);
-        void addParticle(const Particle2D& particle, uint32_t count);
-        void addParticles(const std::vector<Particle2D>& particles);
+        void addParticle(Particle2D& particle);
+        void addParticle(Particle2D& particle, uint32_t count);
+        void addParticles(std::vector<Particle2D>& particles);
 
-        void operator+=(const Particle2D& particle);
-        void operator+=(const std::vector<Particle2D>& particles);
+        void operator+=(Particle2D& particle);
+        void operator+=(std::vector<Particle2D>& particles);
 
     private:
         bool enabled = false;
-        float sizeVariation = 1.0f;
-        float spawnRate = 0.0f;
-        std::vector<Particle2D> particlePool;
+        float spawnRate = 1.0f;
+        float timeSinceLastAdd = 0.0f;
+        float sizeVariation = 0.0f;
+
+        glm::vec3 position;
+
+        std::vector<Particle2D> activeParticles;
         std::vector<Particle2D> masterParticlePool;
     };
 }  // namespace AnEngine

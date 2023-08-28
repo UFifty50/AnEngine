@@ -93,6 +93,12 @@ namespace AnEngine {
     void Renderer2D::beginScene(const Ref<Camera>& camera) {  // begin batch
         AE_PROFILE_FUNCTION()
 
+        if (rendererData.activeScene) {
+            AE_CORE_ERROR(
+                "Renderer2D::beginScene() called when already rendering a scene!");
+            return;
+        }
+
         AE_CORE_ASSERT(camera->getType() == CameraType::Orthographic,
                        "Renderer2D only supports Orthographic Cameras!");
 
@@ -106,6 +112,8 @@ namespace AnEngine {
         rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
 
         rendererData.textureSlotIndex = 1;
+
+        rendererData.activeScene = true;
     }
 
     void Renderer2D::shutdown() {}
@@ -113,11 +121,31 @@ namespace AnEngine {
     void Renderer2D::endScene() {  // draw batch
         AE_PROFILE_FUNCTION()
 
+        if (!rendererData.activeScene) {
+            AE_CORE_ERROR("Renderer2D::endScene() called without active scene!");
+            return;
+        }
+
+        endBatch();
+        flush();
+
+        rendererData.activeScene = false;
+    }
+
+    void Renderer2D::endBatch() {
         uint32_t dataSize = (uint8_t*)rendererData.quadVertexBufferPtr -
                             (uint8_t*)rendererData.quadVertexBufferBase;
         rendererData.quadVB->setData(rendererData.quadVertexBufferBase, dataSize);
+    }
 
+    void Renderer2D::newBatch() {
+        endBatch();
         flush();
+
+        rendererData.quadIndexCount = 0;
+        rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
+
+        rendererData.textureSlotIndex = 1;
     }
 
     void Renderer2D::flush() {
@@ -130,15 +158,6 @@ namespace AnEngine {
 
         RenderCommandQueue::drawIndexed(rendererData.quadVA, rendererData.quadIndexCount);
         rendererStats.draws++;
-    }
-
-    void Renderer2D::newBatch() {
-        endScene();
-
-        rendererData.quadIndexCount = 0;
-        rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
-
-        rendererData.textureSlotIndex = 1;
     }
 
     // Primitives

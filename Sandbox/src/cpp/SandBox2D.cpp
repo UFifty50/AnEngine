@@ -9,38 +9,26 @@
 
 
 SandBox2D::SandBox2D()
-    : Layer("Sandbox2D"), cameraController(1280.0f / 720.0f, 75, true, true) {}
+    : Layer("Sandbox2D"),
+      cameraController(1280.0f / 720.0f, 75, true, true),
+      particleSpawner({0.0f, 0.0f, 0.1f}) {}
 
 void SandBox2D::onAttach() {
     texture = AnEngine::Texture2D::create("assets/textures/Checkerboard.png");
 
 
-    AnEngine::Particle2D particle1 =
-        AnEngine::Particle2D({0.0f, 0.0f, 0.1f}, {0.0f, 0.0f},
-                             {{0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, 45.0f,
-                             10.0f, {1.0f, 0.5f}, 5.0f);
+    AnEngine::Particle2D particle;
+    particle.props.velocity = {0.2f, -1.0f, 0.0f};
+    particle.props.startColour = {0.0f, 0.0f, 1.0f, 1.0f};
+    particle.props.endColour = {0.0f, 1.0f, 0.0f, 1.0f};
+    particle.props.startSize = 1.0f;
+    particle.props.endSize = 0.0f;
+    particle.props.lifeTime = 2.0f;
 
-    AnEngine::Particle2D particle2 =
-        AnEngine::Particle2D({10.0f, 0.0f, 0.1f}, {0.0f, 1.0f},
-                             {{1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}}, 10.0f,
-                             1.0f, {1.0f, 0.5f}, 5.0f);
+    particle.init();
 
-    AnEngine::Particle2D particle3 =
-        AnEngine::Particle2D({10.0f, 10.0f, 0.1f}, {1.0f, 1.0f},
-                             {{0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 1.0f}}, 0.0f,
-                             10.0f, {1.0f, 0.5f}, 5.0f);
+    particleSpawner += particle;
 
-    AnEngine::Particle2D particle4 =
-        AnEngine::Particle2D({0.0f, 10.0f, 0.1f}, {1.0f, 0.0f},
-                             {{0.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, 5.0f,
-                             20.0f, {1.0f, 0.5f}, 5.0f);
-
-    particleSpawner.addParticles({
-        particle1,
-        particle2,
-        particle3,
-        particle4,
-    });
     particleSpawner.reset();
     particleSpawner.enable();
 }
@@ -52,6 +40,19 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
 
     particleSpawner.setSizeVariation(sizeVariation);
     particleSpawner.setSpawnRate(spawnRate);
+
+    glm::vec2 mousePos = AnEngine::Input::getMousePosition();
+    float winWidth = AnEngine::Application::get().getWindow().getWidth();
+    float winHeight = AnEngine::Application::get().getWindow().getHeight();
+    auto camBounds = cameraController.getCamera()->asOrthographic()->getBounds();
+    glm::vec3 pos = cameraController.getCamera()->getPosition();
+
+    float x =
+        (mousePos.x / winWidth) * camBounds.getWidth() - camBounds.getWidth() * 0.5f;
+    float y =
+        camBounds.getHeight() * 0.5f - (mousePos.y / winHeight) * camBounds.getHeight();
+
+    particleSpawner.setPosition({x + pos.x, y + pos.y, 0.1f});
 
     {
         AE_PROFILE_SCOPE("Camera")
@@ -89,18 +90,18 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
         ///*AnEngine::Renderer2D::endScene();
 
 
-        AnEngine::Renderer2D::beginScene(cameraController.getCamera());
+        /*AnEngine::Renderer2D::beginScene(cameraController.getCamera());
 
 
-        for (float x = -10.0f; x < 10.0f; x += 0.5f) {
-            for (float y = -10.0f; y < 10.0f; y += 0.5f) {
+        for (float x = -20.0f; x < 20.0f; x += 0.5f) {
+            for (float y = -20.0f; y < 20.0f; y += 0.5f) {
                 glm::vec4 colour = {(y + 5.0f) / 10.0f, 0.4f, (x + 5.0f) / 10.0f, 0.5f};
                 AnEngine::Renderer2D::drawQuad({x, y, 0.0f}, {0.45f, 0.45f}, 0.0f,
                                                colour);
             }
         }
 
-        AnEngine::Renderer2D::endScene();
+        AnEngine::Renderer2D::endScene();*/
 
         particleSpawner.emit(cameraController.getCamera());
     }
@@ -111,7 +112,7 @@ void SandBox2D::onImGuiRender() {
     ImGui::Begin("Settings");
     ImGui::ColorEdit4("Tint", glm::value_ptr(tint));
     ImGui::DragFloat("Tiling Factor", &tilingFactor, 0.1f, 0.0f, 10.0f);
-    ImGui::DragFloat("Spawn Rate", &spawnRate, 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat("Spawn Rate", &spawnRate, 0.1f, 0.0f, 100.0f);
     ImGui::DragFloat("Size Variation", &sizeVariation, 0.1f, 0.0f, 10.0f);
     if (ImGui::Button("Enable Particles")) {
         particleSpawner.enable();

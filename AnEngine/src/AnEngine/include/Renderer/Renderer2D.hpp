@@ -28,7 +28,7 @@ namespace AnEngine {
         };
 
         struct Storage {
-            static const uint32_t maxQuads = 10'000;
+            static const uint32_t maxQuads = 1'000;
             static const uint32_t maxVertices = maxQuads * 4;
             static const uint32_t maxIndices = maxQuads * 6;
             static const uint32_t maxTextureSlots = 32;  // TODO: Render Capabilities
@@ -46,6 +46,8 @@ namespace AnEngine {
             uint32_t textureSlotIndex = 1;  // 0 = blank texture
 
             glm::vec4 quadVertexPositions[4];
+
+            bool activeScene = false;
         };
 
         struct Statistics {
@@ -89,6 +91,7 @@ namespace AnEngine {
         static void resetStats() { rendererStats.reset(); }
 
     private:
+        static void endBatch();
         static void newBatch();
     };
 }  // namespace AnEngine

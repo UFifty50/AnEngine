@@ -5,6 +5,8 @@
 
 
 namespace AnEngine {
+    class OrthographicCamera;
+
     enum class CameraType { Perspective = 0, Orthographic = 1 };
 
     class Camera {
@@ -24,6 +26,10 @@ namespace AnEngine {
         virtual const glm::mat4& getViewProjectionMatrix() const = 0;
 
         virtual CameraType getType() const = 0;
+
+        virtual OrthographicCamera* asOrthographic() {
+            return reinterpret_cast<OrthographicCamera*>(this);
+        }
     };
 }  // namespace AnEngine
 

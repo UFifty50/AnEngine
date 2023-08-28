@@ -32,7 +32,7 @@ private:
     glm::vec4 tint = {1.0f, 1.0f, 1.0f, 1.0f};
 
     float sizeVariation = 0.0f;
-    float spawnRate = 1.0f;
+    float spawnRate = 10.0f;
 };
 
 #endif
