@@ -44,7 +44,7 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
     glm::vec2 mousePos = AnEngine::Input::getMousePosition();
     float winWidth = AnEngine::Application::get().getWindow().getWidth();
     float winHeight = AnEngine::Application::get().getWindow().getHeight();
-    auto camBounds = cameraController.getCamera()->asOrthographic()->getBounds();
+    auto camBounds = cameraController.getOrthographicCamera()->getBounds();
     glm::vec3 pos = cameraController.getCamera()->getPosition();
 
     float x =

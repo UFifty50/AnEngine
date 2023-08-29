@@ -20,6 +20,16 @@ namespace AnEngine {
         Ref<Camera> getCamera() { return camera; }
         const Ref<Camera> getCamera() const { return camera; }
 
+        Ref<OrthographicCamera> getOrthographicCamera() {
+            AE_CORE_ASSERT(orthographic, "Camera is not orthographic!");
+            return std::dynamic_pointer_cast<OrthographicCamera>(camera);
+        }
+
+        Ref<PerspectiveCamera> getPerspectiveCamera() {
+            AE_CORE_ASSERT(!orthographic, "Camera is not perspective!");
+            return std::dynamic_pointer_cast<PerspectiveCamera>(camera);
+        }
+
         void setZoom(float level) { zoom = level; }
         float getZoom() const { return zoom; }
 
