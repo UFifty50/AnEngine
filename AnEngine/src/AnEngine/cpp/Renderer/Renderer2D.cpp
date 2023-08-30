@@ -172,6 +172,11 @@ namespace AnEngine {
                               const AnEngine::ShaderUniformVector& attributes) {
         AE_PROFILE_FUNCTION()
 
+        if (!rendererData.activeScene) {
+            AE_CORE_ERROR("Renderer2D::drawQuad() called without active scene!");
+            return;
+        }
+
         if (rendererData.quadIndexCount >= rendererData.maxIndices) {
             newBatch();
         }
@@ -221,6 +226,11 @@ namespace AnEngine {
                               float rotation, const Ref<Texture2D>& texture,
                               const AnEngine::ShaderUniformVector& attributes) {
         AE_PROFILE_FUNCTION()
+
+        if (!rendererData.activeScene) {
+            AE_CORE_ERROR("Renderer2D::drawQuad() called without active scene!");
+            return;
+        }
 
         if (rendererData.quadIndexCount >= rendererData.maxIndices) {
             newBatch();

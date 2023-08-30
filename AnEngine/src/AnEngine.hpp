@@ -19,6 +19,7 @@
 #include "AnEngine/include/Renderer/VertexArray.hpp"
 
 // ---Textures---
+#include "AnEngine/include/Texture/Sprite.hpp"
 #include "AnEngine/include/Texture/Texture2D.hpp"
 
 // ---Cameras---

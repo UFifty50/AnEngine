@@ -26,6 +26,7 @@ namespace AnEngine {
 
         struct {
             glm::vec3 velocity;
+            glm::vec3 velocityVariation = {0.0f, 0.0f, 0.0f};
             glm::vec4 startColour;
             glm::vec4 endColour;
             float startRotation = 0.0f;
@@ -42,6 +43,7 @@ namespace AnEngine {
 
         struct {
             glm::vec3 velocity;
+            glm::vec3 velocityVariation = {0.0f, 0.0f, 0.0f};
             glm::vec4 startColour;
             glm::vec4 endColour;
             float startRotation = 0.0f;

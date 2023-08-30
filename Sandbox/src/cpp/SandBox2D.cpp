@@ -15,19 +15,40 @@ SandBox2D::SandBox2D()
 
 void SandBox2D::onAttach() {
     texture = AnEngine::Texture2D::create("assets/textures/Checkerboard.png");
+    player = AnEngine::Sprite(texture);
 
 
-    AnEngine::Particle2D particle;
-    particle.props.velocity = {0.2f, -1.0f, 0.0f};
-    particle.props.startColour = {0.0f, 0.0f, 1.0f, 1.0f};
-    particle.props.endColour = {0.0f, 1.0f, 0.0f, 1.0f};
-    particle.props.startSize = 1.0f;
-    particle.props.endSize = 0.0f;
-    particle.props.lifeTime = 2.0f;
+    AnEngine::Particle2D particle1;
+    AnEngine::Particle2D particle2;
 
-    particle.init();
+    {
+        particle1.props.velocity = {0.5f, -1.0f, 0.0f};
+        particle1.props.startColour = {0.0f, 0.0f, 1.0f, 1.0f};
+        particle1.props.endColour = {0.0f, 1.0f, 0.0f, 1.0f};
+        particle2.props.startRotation = 45.0f;
+        particle2.props.endRotation = 100.0f;
+        particle1.props.startSize = 0.7f;
+        particle1.props.endSize = 0.0f;
+        particle1.props.lifeTime = 5.0f;
+    }
 
-    particleSpawner += particle;
+    {
+        particle2.props.velocity = {0.0f, 0.0f, 0.0f};
+        particle2.props.velocityVariation = {3.0f, 1.0f, 0.0f};
+        particle2.props.startColour = {1.0f, 0.0f, 0.0f, 1.0f};
+        particle2.props.endColour = {0.0f, 0.0f, 1.0f, 1.0f};
+        particle2.props.startRotation = 0.0f;
+        particle2.props.endRotation = 90.0f;
+        particle2.props.startSize = 0.5f;
+        particle2.props.endSize = 0.0f;
+        particle2.props.lifeTime = 1.0f;
+    }
+
+    particle1.init();
+    particle2.init();
+
+    particleSpawner += particle1;
+    particleSpawner += particle2;
 
     particleSpawner.reset();
     particleSpawner.enable();
@@ -38,21 +59,25 @@ void SandBox2D::onDetach() {}
 void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
     AE_PROFILE_FUNCTION()
 
-    particleSpawner.setSizeVariation(sizeVariation);
-    particleSpawner.setSpawnRate(spawnRate);
+    if (AnEngine::Input::isMouseButtonPressed(AE_MOUSE_BUTTON_RIGHT)) {
+        particleSpawner.setSpawnRate(10.0f);
+        particleSpawner.setSizeVariation(sizeVariation);
 
-    glm::vec2 mousePos = AnEngine::Input::getMousePosition();
-    float winWidth = AnEngine::Application::get().getWindow().getWidth();
-    float winHeight = AnEngine::Application::get().getWindow().getHeight();
-    auto camBounds = cameraController.getOrthographicCamera()->getBounds();
-    glm::vec3 pos = cameraController.getCamera()->getPosition();
+        glm::vec2 mousePos = AnEngine::Input::getMousePosition();
+        float winWidth = AnEngine::Application::get().getWindow().getWidth();
+        float winHeight = AnEngine::Application::get().getWindow().getHeight();
+        auto camBounds = cameraController.getOrthographicCamera()->getBounds();
+        glm::vec3 pos = cameraController.getCamera()->getPosition();
 
-    float x =
-        (mousePos.x / winWidth) * camBounds.getWidth() - camBounds.getWidth() * 0.5f;
-    float y =
-        camBounds.getHeight() * 0.5f - (mousePos.y / winHeight) * camBounds.getHeight();
+        float x =
+            (mousePos.x / winWidth) * camBounds.getWidth() - camBounds.getWidth() * 0.5f;
+        float y = camBounds.getHeight() * 0.5f -
+                  (mousePos.y / winHeight) * camBounds.getHeight();
 
-    particleSpawner.setPosition({x + pos.x, y + pos.y, 0.1f});
+        particleSpawner.setPosition({x + pos.x, y + pos.y, 0.1f});
+    } else {
+        particleSpawner.setSpawnRate(0.0f);
+    }
 
     {
         AE_PROFILE_SCOPE("Camera")
@@ -76,18 +101,17 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
     }
 
     {
-        // AE_PROFILE_SCOPE("Scene")
-        // AnEngine::Renderer2D::beginScene(cameraController.getCamera());
+        AE_PROFILE_SCOPE("Scene")
+        /*AnEngine::Renderer2D::beginScene(cameraController.getCamera());
 
-        // auto attributes =
-        //     ATTRIBUTE_ARRAY(AnEngine::ShaderUniform("tint", tint),
-        //                     AnEngine::ShaderUniform("tilingFactor", tilingFactor));
+        auto attributes =
+            ATTRIBUTE_ARRAY(AnEngine::ShaderUniform("tint", tint),
+                            AnEngine::ShaderUniform("tilingFactor", tilingFactor));
 
-        // AnEngine::Renderer2D::drawQuad({0.0f, 0.0f, -0.1f}, {50.0f, 50.0f}, 0.0f,
-        // texture,
-        //                                attributes);
+        AnEngine::Renderer2D::drawQuad({0.0f, 0.0f, -0.1f}, {50.0f, 50.0f}, 0.0f, texture,
+                                       attributes);
 
-        ///*AnEngine::Renderer2D::endScene();
+        AnEngine::Renderer2D::endScene();*/
 
 
         /*AnEngine::Renderer2D::beginScene(cameraController.getCamera());
@@ -102,6 +126,28 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
         }
 
         AnEngine::Renderer2D::endScene();*/
+
+        AnEngine::Renderer2D::beginScene(cameraController.getCamera());
+
+
+        // gravity
+        glm::vec3 gravity = {0.0f, -9.8f, 0.0f};
+
+        if (AnEngine::Input::isKeyPressed(AE_KEY_LEFT)) {
+            playerX -= 0.03f;
+        } else if (AnEngine::Input::isKeyPressed(AE_KEY_RIGHT)) {
+            playerX += 0.03f;
+        }
+
+        if (playerY > 0.0f) {
+            playerY += gravity.y * deltaTime.getSeconds();
+        }
+
+        player.render({playerX, playerY, 0.1f}, 0.0f);
+
+
+        AnEngine::Renderer2D::endScene();
+
 
         particleSpawner.emit(cameraController.getCamera());
     }
@@ -142,4 +188,24 @@ void SandBox2D::onImGuiRender() {
     PROFILE_UI()
 }
 
-void SandBox2D::onEvent(AnEngine::Event& event) { cameraController.onEvent(event); }
+void SandBox2D::onEvent(AnEngine::Event& event) {
+    cameraController.onEvent(event);
+    AnEngine::EventDispatcher dispatcher(event);
+
+    dispatcher.dispatch<AnEngine::KeyPressedEvent>(
+        [&](AnEngine::KeyPressedEvent& e) -> bool {
+            if (e.getKeyCode() == AE_KEY_UP && playerY <= 0.1f) {
+                playerY += 5.00f;
+                return true;
+            }
+            return false;
+        });
+
+    /*dispatcher.dispatch<AnEngine::MouseButtonPressedEvent>(
+        [&](AnEngine::MouseButtonPressedEvent& e) -> bool {
+            if (e.getMouseButton() == AE_MOUSE_BUTTON_RIGHT)
+                particleSpawner.setSpawnRate(toggle ? 50.0f : 0.0f);
+            toggle = !toggle;
+            return false;
+        });*/
+}

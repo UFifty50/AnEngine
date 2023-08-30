@@ -41,6 +41,8 @@ namespace AnEngine {
 
         lifeRemaining -= delta;
         currentPosition += props.velocity * (float)delta;
+        props.velocity.x += props.velocityVariation.x * (Random::getFloat() - 0.5f);
+        props.velocity.y += props.velocityVariation.y * (Random::getFloat() - 0.5f);
 
         float life = lifeRemaining / props.lifeTime;
         currentColour = glm::lerp(props.endColour, props.startColour, life);

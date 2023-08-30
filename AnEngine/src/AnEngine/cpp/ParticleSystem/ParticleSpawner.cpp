@@ -25,49 +25,41 @@ namespace AnEngine {
         activeParticles.clear();
     }
 
+    void ParticleSpawner::addToActive(int count) {
+        for (int i = 0; i < count; i++) {
+            int index = Random::getInt(0, masterParticlePool.size() - 1);
+            Particle2D value = masterParticlePool[index];
+
+            if (sizeVariation > 0.0f) {
+                float variate = Random::getFloat(0.0f, sizeVariation);
+                //    Random::getFloat() * sizeVariation - sizeVariation / 2.0f;
+
+                value.props.startSize +=
+                    Random::choice(std::array{variate / 2, -variate / 2});
+                value.props.endSize +=
+                    Random::choice(std::array{variate / 2, -variate / 2});
+            }
+            value.currentPosition = position;
+
+            activeParticles.push_back(value);
+        }
+    }
+
     void ParticleSpawner::onUpdate(TimeStep deltaTime) {
         if (!enabled) return;
 
-        timeSinceLastAdd += deltaTime;
-        int toAdd = static_cast<int>(timeSinceLastAdd * spawnRate);
-        float fraction = timeSinceLastAdd * spawnRate - toAdd;
-        timeSinceLastAdd -= toAdd / spawnRate;
+        if (spawnRate > 0.0f) {
+            timeSinceLastAdd += deltaTime;
+            int toAdd = static_cast<int>(timeSinceLastAdd * spawnRate);
+            float fraction = timeSinceLastAdd * spawnRate - toAdd;
+            timeSinceLastAdd -= toAdd / spawnRate;
 
-        if (spawnRate > 0.0f && toAdd > 0) {
-            for (int i = 0; i < toAdd; i++) {
-                int index = Random::getInt(0, masterParticlePool.size() - 1);
-                Particle2D value = masterParticlePool[index];
+            if (toAdd > 0) {
+                addToActive(toAdd);
 
-                if (sizeVariation > 0.0f) {
-                    float variate = Random::getFloat(0.0f, sizeVariation);
-                    //    Random::getFloat() * sizeVariation - sizeVariation / 2.0f;
-
-                    value.props.startSize +=
-                        Random::choice(std::array{variate / 2, -variate / 2});
-                    value.props.endSize +=
-                        Random::choice(std::array{variate / 2, -variate / 2});
+                if (fraction > 0.0f && Random::getFloat() < fraction) {
+                    addToActive(1);
                 }
-                value.currentPosition = position;
-
-                activeParticles.push_back(value);
-            }
-
-            if (fraction > 0.0f && Random::getFloat() < fraction) {
-                int index = Random::getInt(0, masterParticlePool.size() - 1);
-                Particle2D value = masterParticlePool[index];
-
-                if (sizeVariation > 0.0f) {
-                    float variate = Random::getFloat(0.0f, sizeVariation);
-                    //    Random::getFloat() * sizeVariation - sizeVariation / 2.0f;
-
-                    value.props.startSize +=
-                        Random::choice(std::array{variate / 2, -variate / 2});
-                    value.props.endSize +=
-                        Random::choice(std::array{variate / 2, -variate / 2});
-                }
-                value.currentPosition = position;
-
-                activeParticles.push_back(value);
             }
         }
 
@@ -76,20 +68,19 @@ namespace AnEngine {
                 continue;
             }
 
+            particle.update(deltaTime);
+
             if (particle.shouldDie()) {
                 particle.kill();
                 continue;
             }
-
-            particle.update(deltaTime);
-
-            activeParticles.erase(
-                std::remove_if(activeParticles.begin(), activeParticles.end(),
-                               [](const Particle2D& particle) {
-                                   return !particle.isAlive() || particle.shouldDie();
-                               }),
-                activeParticles.end());
         }
+
+        activeParticles.erase(
+            std::remove_if(
+                activeParticles.begin(), activeParticles.end(),
+                [](const Particle2D& particle) { return !particle.isAlive(); }),
+            activeParticles.end());
     }
 
     void ParticleSpawner::emit(Ref<Camera> camera) {

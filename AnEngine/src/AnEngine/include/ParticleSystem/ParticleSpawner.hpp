@@ -35,6 +35,9 @@ namespace AnEngine {
         void operator+=(std::vector<Particle2D>& particles);
 
     private:
+        void addToActive(int count);
+
+
         bool enabled = false;
         float spawnRate = 1.0f;
         float timeSinceLastAdd = 0.0f;
