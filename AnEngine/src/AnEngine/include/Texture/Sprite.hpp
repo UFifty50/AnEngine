@@ -10,9 +10,11 @@
 namespace AnEngine {
     class Sprite {
     public:
+        Sprite() = default;
         Sprite(const Ref<SpriteSheet>& sheet, glm::vec2 index);
 
-        void render(glm::vec3 position, float rotation) const;
+        void render(glm::vec3 position, float rotation,
+                    glm::vec2 scale = {1.0f, 1.0f}) const;
 
     private:
         glm::vec2 index;

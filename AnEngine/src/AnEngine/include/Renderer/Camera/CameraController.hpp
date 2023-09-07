@@ -30,7 +30,10 @@ namespace AnEngine {
             return std::dynamic_pointer_cast<PerspectiveCamera>(camera);
         }
 
-        void setZoom(float level) { zoom = level; }
+        void setZoom(float level) {
+            zoom = level;
+            camera->setProjection(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+        }
         float getZoom() const { return zoom; }
 
     private:

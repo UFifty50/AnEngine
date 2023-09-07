@@ -12,7 +12,7 @@ namespace AnEngine {
     Sprite::Sprite(const Ref<SpriteSheet>& sheet, glm::vec2 index)
         : sheet(sheet), index(index) {}
 
-    void Sprite::render(glm::vec3 position, float rotation) const {
-        sheet->renderSprite(index, position, rotation);
+    void Sprite::render(glm::vec3 position, float rotation, glm::vec2 scale) const {
+        sheet->renderSprite(index, position, rotation, scale);
     }
 }  // namespace AnEngine

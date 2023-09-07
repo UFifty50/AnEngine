@@ -10,6 +10,7 @@
 #define ATTRIBUTE_ARRAY(...) \
     AnEngine::ShaderUniformVector { __VA_ARGS__ }
 
+
 class SandBox2D : public AnEngine::Layer {
 public:
     SandBox2D();
@@ -26,6 +27,9 @@ private:
     AnEngine::CameraController cameraController;
     AnEngine::Ref<AnEngine::Texture2D> texture;
     AnEngine::SpriteSheet tiles;
+    std::unordered_map<char, AnEngine::Sprite> tileMap;
+    AnEngine::Sprite player;
+    AnEngine::Sprite invalidTile;
 
     AnEngine::ParticleSpawner particleSpawner;
 
@@ -40,5 +44,14 @@ private:
 
     bool toggle = false;
 };
+
+/*
+class TiledWorld2D {
+public:
+    TiledWorld2D(const std::vector<std::vector<AnEngine::Sprite>>& tiles);
+
+    void render();
+};
+*/
 
 #endif

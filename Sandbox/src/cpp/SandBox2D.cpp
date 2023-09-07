@@ -8,6 +8,31 @@
 #include "imgui_internal.h"
 
 
+static const uint32_t mapWidth = 20;
+static const uint32_t mapHeight = 20;
+static const char mapTiles[(mapWidth * mapHeight) + 1] =
+    "WWWDDDDDWWWWDWWWWWWW"
+    "WDDDDDDDDDWDDDWWWWWW"
+    "WDDDDDDDDDDDDDDWWWWW"
+    "WDDDDDDDDDDDDDDWWWWW"
+    "DDDDDWWDDDDDDDDDWWWW"
+    "WDDDDWWWDDDDDDDDDDWW"
+    "WWWDWWWWDDDDDDDDDDWW"
+    "WWWWWWWDDDDDDDDDDDDW"
+    "DDWWWDDDDDDDDDDDDDDW"
+    "DWWWDDDDERDSDDDDDDDW"
+    "WWWDDDDDDDDDDDDDDDDD"
+    "WWWDDDDDDDDDDDDDDDDD"
+    "WWDDDDDDDDDQDDDDDDDD"
+    "WDDDDDDDDDDDDDDDDDDD"
+    "WDDDDDDDDDDDDDDDDDDW"
+    "DDDDDDDDDDDDDDDDDDDD"
+    "DDDDDDDDDDDWWDDDDDDW"
+    "WDDDDDDDDDDWWWDDDDDW"
+    "WDDDDDDDDDWWWWDDDDWW"
+    "WWWDDDDWWWWWWWWDWWWW";
+
+
 SandBox2D::SandBox2D()
     : Layer("Sandbox2D"),
       cameraController(1280.0f / 720.0f, 75, true, true),
@@ -16,6 +41,11 @@ SandBox2D::SandBox2D()
 
 void SandBox2D::onAttach() {
     texture = AnEngine::Texture2D::create("assets/textures/Checkerboard.png");
+
+    tileMap['W'] = tiles.getSprite({11, 11});
+    tileMap['D'] = tiles.getSprite({6, 11});
+    player = tiles.getSprite({0, 3});
+    invalidTile = tiles.getSprite({0, 0});
 
     AnEngine::Particle2D particle1;
     AnEngine::Particle2D particle2;
@@ -58,6 +88,8 @@ void SandBox2D::onDetach() {}
 void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
     AE_PROFILE_FUNCTION()
 
+    cameraController.setZoom(10.0f);
+
     if (AnEngine::Input::isMouseButtonPressed(AE_MOUSE_BUTTON_RIGHT)) {
         particleSpawner.setSpawnRate(10.0f);
         particleSpawner.setSizeVariation(sizeVariation);
@@ -89,7 +121,7 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
     }
 
     AnEngine::Renderer2D::resetStats();
-    AnEngine::Renderer2D::getStats().lastFrameTime = deltaTime;
+    AnEngine::Renderer2D::getStats().lastFrameTime = deltaTime.getMilliseconds();
     AE_CORE_INFO("FrameTime: {0}     FPS: {1}", deltaTime.getMilliseconds(),
                  1.0f / deltaTime);
 
@@ -101,49 +133,14 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
 
     {
         AE_PROFILE_SCOPE("Scene")
-        /*AnEngine::Renderer2D::beginScene(cameraController.getCamera());
-
-        auto attributes =
-            ATTRIBUTE_ARRAY(AnEngine::ShaderUniform("tint", tint),
-                            AnEngine::ShaderUniform("tilingFactor", tilingFactor));
-
-        AnEngine::Renderer2D::drawQuad({0.0f, 0.0f, -0.1f}, {50.0f, 50.0f}, 0.0f, texture,
-                                       attributes);
-
-        AnEngine::Renderer2D::endScene();
-        */
 
 
-        /*AnEngine::Renderer2D::beginScene(cameraController.getCamera());
-
-
-        for (float x = -20.0f; x < 20.0f; x += 0.5f) {
-            for (float y = -20.0f; y < 20.0f; y += 0.5f) {
-                glm::vec4 colour = {(y + 5.0f) / 10.0f, 0.4f, (x + 5.0f) / 10.0f,
-        0.5f}; AnEngine::Renderer2D::drawQuad({x, y, 0.0f}, {0.45f, 0.45f}, 0.0f,
-                                               colour);
-            }
-        }
-
-        AnEngine::Renderer2D::endScene();*/
-
-        AnEngine::Renderer2D::beginScene(cameraController.getCamera());
-
-
-        // gravity
+        /*
         glm::vec3 gravity = {0.0f, -9.8f, 0.0f};
-
-        if (AnEngine::Input::isKeyPressed(AE_KEY_LEFT)) {
-            playerX -= 0.03f;
-        } else if (AnEngine::Input::isKeyPressed(AE_KEY_RIGHT)) {
-            playerX += 0.03f;
-        }
 
         if (playerY > 0.0f) {
             playerY += gravity.y * deltaTime.getSeconds();
         }
-
-        AnEngine::Sprite sprite = tiles.getSprite({6, 5});
 
         for (int x = 0; x < 20; x++) {
             for (int y = 0; y < 13; y++) {
@@ -158,9 +155,39 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
                 sprite.render({50.0f, 50.0f, 0.1f}, 45.0f);
             }
         }
-        // tiles.renderSprite({6, 5}, {playerX, playerY, 0.1f}, 0.0f);
-        // tiles.renderSheetWithIndices({0.0f, 0.0f, 0.1f}, 0.0f);
+        tiles.renderSprite({6, 5}, {playerX, playerY, 0.1f}, 0.0f);
+        tiles.renderSheetWithIndices({0.0f, 0.0f, 0.1f}, 0.0f);
+        */
 
+        if (AnEngine::Input::isKeyPressed(AE_KEY_LEFT)) {
+            playerX -= 0.02f;
+        } else if (AnEngine::Input::isKeyPressed(AE_KEY_RIGHT)) {
+            playerX += 0.02f;
+        }
+
+        if (AnEngine::Input::isKeyPressed(AE_KEY_UP)) {
+            playerY += 0.01f;
+        } else if (AnEngine::Input::isKeyPressed(AE_KEY_DOWN)) {
+            playerY -= 0.01f;
+        }
+
+        AnEngine::Renderer2D::beginScene(cameraController.getCamera());
+
+        for (int y = 0; y < mapHeight; y++) {
+            for (int x = 0; x < mapWidth; x++) {
+                char tileID = mapTiles[y * mapWidth + x];
+                if (tileMap.find(tileID) != tileMap.end())
+                    tileMap.at(tileID).render(
+                        {x - mapWidth / 2.0f, mapHeight - y - mapHeight / 2.0f, 0.0f},
+                        0.0f);
+                else
+                    invalidTile.render(
+                        {x - mapWidth / 2.0f, mapHeight - y - mapHeight / 2.0f, 0.0f},
+                        0.0f);
+            }
+        }
+
+        player.render({playerX, playerY, 0.1f}, 0.0f, {0.5f, 0.5f});
 
         AnEngine::Renderer2D::endScene();
 

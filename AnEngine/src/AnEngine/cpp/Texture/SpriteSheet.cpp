@@ -27,8 +27,8 @@ namespace AnEngine {
           texHeight(float(spriteHeight) / sheet->getHeight()),
           spritesPerRow(sheet->getWidth() / spriteWidth) {}
 
-    void SpriteSheet::renderSprite(glm::vec2 index, glm::vec3 position,
-                                   float rotation) const {
+    void SpriteSheet::renderSprite(glm::vec2 index, glm::vec3 position, float rotation,
+                                   glm::vec2 scale) const {
         const int spritesPerRow = sheet->getWidth() / spriteWidth;
         const int spritesPerColumn = sheet->getHeight() / spriteHeight;
 

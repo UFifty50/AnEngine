@@ -15,7 +15,8 @@ namespace AnEngine {
         SpriteSheet(const Ref<Texture2D>& path, int spriteWidth, int spriteHeight);
         ~SpriteSheet() = default;
 
-        void renderSprite(glm::vec2 index, glm::vec3 position, float rotation) const;
+        void renderSprite(glm::vec2 index, glm::vec3 position, float rotation,
+                          glm::vec2 scale = {1.0f, 1.0f}) const;
         Sprite getSprite(glm::vec2 index) const;
         // void renderSheetWithIndices(glm::vec3 position, float rotation) const;
 
