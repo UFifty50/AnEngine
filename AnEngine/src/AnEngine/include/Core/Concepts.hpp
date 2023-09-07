@@ -25,9 +25,12 @@ concept VectorGLSLDataType =
     std::is_same_v<V, glm::dvec3> || std::is_same_v<V, glm::dvec4>;
 
 template <typename M>
-concept MatrixGLSLDataType = std::is_same_v<M, glm::mat2> ||  // glm::mat2x3, glm::mat2x4,
-                             std::is_same_v<M, glm::mat3> ||  // glm::mat3x2, glm::mat3x4,
-                             std::is_same_v<M, glm::mat4>;  // glm::mat4x2,  glm::mat4x3,
+concept MatrixGLSLDataType =
+    std::is_same_v<M, glm::mat2> || std::is_same_v<M, glm::mat2x3> ||
+    std::is_same_v<M, glm::mat2x4> || std::is_same_v<M, glm::mat3> ||
+    std::is_same_v<M, glm::mat3x2> || std::is_same_v<M, glm::mat3x4> ||
+    std::is_same_v<M, glm::mat4> || std::is_same_v<M, glm::mat4x2> ||
+    std::is_same_v<M, glm::mat4x3>;
 
 /* glm::dmat2, glm::dmat2x3, glm::dmat2x4,
    glm::dmat3, glm::dmat3x2, glm::dmat3x4,

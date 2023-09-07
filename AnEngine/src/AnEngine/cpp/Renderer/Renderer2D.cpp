@@ -76,8 +76,8 @@ namespace AnEngine {
         }
 
 
-        Ref<Shader> quadShader =
-            rendererData.shaderLibrary.load("QuadShader", "assets/shaders/quad.glsl");
+        Ref<Shader> quadShader = rendererData.shaderLibrary.load(
+            "QuadShader", "builtins/assets/shaders/quad.glsl");
         quadShader->bind();
         quadShader->uploadUniform("textureSamplers", samplers);
 
@@ -232,7 +232,8 @@ namespace AnEngine {
             return;
         }
 
-        if (rendererData.quadIndexCount >= rendererData.maxIndices) {
+        if (rendererData.quadIndexCount >= rendererData.maxIndices ||
+            rendererData.textureSlotIndex >= rendererData.maxTextureSlots) {
             newBatch();
         }
 
@@ -266,12 +267,13 @@ namespace AnEngine {
                               glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
 
-        glm::vec2 texCoords[4] = {
+        glm::mat4x2 coords = {
             glm::vec2{0.0f, 0.0f},
             glm::vec2{1.0f, 0.0f},
             glm::vec2{1.0f, 1.0f},
             glm::vec2{0.0f, 1.0f},
         };
+        glm::mat4x2 texCoords = attributes.getOr("texCoords", coords);
 
         for (uint32_t i = 0; i < 4; i++) {
             rendererData.quadVertexBufferPtr->position =

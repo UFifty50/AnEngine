@@ -66,6 +66,8 @@ namespace AnEngine {
         glTextureSubImage2D(this->rendererID, 0, 0, 0, this->width, this->height,
                             dataFormat, GL_UNSIGNED_BYTE, data);
 
+        imageData = new uint8_t[width * height * ImageFormat::getBPP(pixelFormat)];
+        *imageData = *data;
         stbi_image_free(data);
     }
 
@@ -74,6 +76,7 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         this->pixelFormat = ImageFormat::RGBA;
+        imageData = new uint8_t[width * height * ImageFormat::getBPP(pixelFormat)];
 
 
         glCreateTextures(GL_TEXTURE_2D, 1, &this->rendererID);
@@ -92,6 +95,8 @@ namespace AnEngine {
         AE_CORE_ASSERT(
             size == this->width * this->height * ImageFormat::getBPP(pixelFormat),
             "Data must be entire texture!");
+
+        if (imageData != nullptr) *imageData = *(uint8_t*)data;
 
         GLenum dataFormat;
         switch (pixelFormat) {
@@ -114,5 +119,36 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         glBindTextureUnit(slot, this->rendererID);
+    }
+
+    Ref<Texture> OpenGLTexture2D::getSubImage(glm::vec2 coords, glm::vec2 size) const {
+        /*AE_CORE_ASSERT(coords.x >= 0 && coords.x <= 1 && coords.y >= 0 && coords.y <= 1
+           && size.x >= 0 && size.x <= 1 && size.y >= 0 && size.y <= 1, "Invalid subimage
+           coordinates!");*/
+
+        uint32_t x = (uint32_t)coords.x;  // * this->width;
+        uint32_t y = (uint32_t)coords.y;  // * this->height;
+        uint32_t w = (uint32_t)size.x;    // * this->width;
+        uint32_t h = (uint32_t)size.y;    // * this->height;
+
+        Ref<Texture2D> subImage = Texture2D::create(w, h);
+        uint8_t* subImageData = new uint8_t[w * h * ImageFormat::getBPP(pixelFormat)];
+
+        for (uint32_t i = 0; i < h; i++) {
+            for (uint32_t j = 0; j < w; j++) {
+                for (uint32_t k = 0; k < ImageFormat::getBPP(pixelFormat); k++) {
+                    subImageData[(i * w + j) * ImageFormat::getBPP(pixelFormat) + k] =
+                        imageData[((i + y) * this->width + j + x) *
+                                      ImageFormat::getBPP(pixelFormat) +
+                                  k];
+                }
+            }
+        }
+
+        subImage->setData(subImageData, w * h * ImageFormat::getBPP(pixelFormat));
+
+        delete[] subImageData;
+
+        return subImage;
     }
 };  // namespace AnEngine

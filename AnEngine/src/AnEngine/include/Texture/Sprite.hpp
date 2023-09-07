@@ -3,20 +3,20 @@
 
 #include <glm/glm.hpp>
 
+#include "Texture/SpriteSheet.hpp"
 #include "Texture/Texture2D.hpp"
 
 
 namespace AnEngine {
     class Sprite {
     public:
-        Sprite();
-        Sprite(const std::string& path);
-        Sprite(const Ref<Texture2D>& texture);
+        Sprite(const Ref<SpriteSheet>& sheet, glm::vec2 index);
 
         void render(glm::vec3 position, float rotation) const;
 
     private:
-        Ref<Texture2D> texture;
+        glm::vec2 index;
+        Ref<SpriteSheet> sheet;
     };
 }  // namespace AnEngine
 

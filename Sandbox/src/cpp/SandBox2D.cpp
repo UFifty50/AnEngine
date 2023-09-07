@@ -11,12 +11,11 @@
 SandBox2D::SandBox2D()
     : Layer("Sandbox2D"),
       cameraController(1280.0f / 720.0f, 75, true, true),
-      particleSpawner({0.0f, 0.0f, 0.1f}) {}
+      particleSpawner({0.0f, 0.0f, 0.1f}),
+      tiles({"assets/textures/RPGpack_sheet_2X.png", 128, 128}) {}
 
 void SandBox2D::onAttach() {
     texture = AnEngine::Texture2D::create("assets/textures/Checkerboard.png");
-    player = AnEngine::Sprite(texture);
-
 
     AnEngine::Particle2D particle1;
     AnEngine::Particle2D particle2;
@@ -111,7 +110,8 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
         AnEngine::Renderer2D::drawQuad({0.0f, 0.0f, -0.1f}, {50.0f, 50.0f}, 0.0f, texture,
                                        attributes);
 
-        AnEngine::Renderer2D::endScene();*/
+        AnEngine::Renderer2D::endScene();
+        */
 
 
         /*AnEngine::Renderer2D::beginScene(cameraController.getCamera());
@@ -119,8 +119,8 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
 
         for (float x = -20.0f; x < 20.0f; x += 0.5f) {
             for (float y = -20.0f; y < 20.0f; y += 0.5f) {
-                glm::vec4 colour = {(y + 5.0f) / 10.0f, 0.4f, (x + 5.0f) / 10.0f, 0.5f};
-                AnEngine::Renderer2D::drawQuad({x, y, 0.0f}, {0.45f, 0.45f}, 0.0f,
+                glm::vec4 colour = {(y + 5.0f) / 10.0f, 0.4f, (x + 5.0f) / 10.0f,
+        0.5f}; AnEngine::Renderer2D::drawQuad({x, y, 0.0f}, {0.45f, 0.45f}, 0.0f,
                                                colour);
             }
         }
@@ -143,7 +143,23 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
             playerY += gravity.y * deltaTime.getSeconds();
         }
 
-        player.render({playerX, playerY, 0.1f}, 0.0f);
+        AnEngine::Sprite sprite = tiles.getSprite({6, 5});
+
+        for (int x = 0; x < 20; x++) {
+            for (int y = 0; y < 13; y++) {
+                sprite = tiles.getSprite({x, y});
+                sprite.render({playerX + x, playerY + y, 0.1f}, 0.0f);
+            }
+        }
+
+        for (int x = 0; x < 20; x++) {
+            for (int y = 0; y < 13; y++) {
+                sprite = tiles.getSprite({x, y});
+                sprite.render({50.0f, 50.0f, 0.1f}, 45.0f);
+            }
+        }
+        // tiles.renderSprite({6, 5}, {playerX, playerY, 0.1f}, 0.0f);
+        // tiles.renderSheetWithIndices({0.0f, 0.0f, 0.1f}, 0.0f);
 
 
         AnEngine::Renderer2D::endScene();

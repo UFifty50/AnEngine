@@ -20,6 +20,7 @@
 
 // ---Textures---
 #include "AnEngine/include/Texture/Sprite.hpp"
+#include "AnEngine/include/Texture/SpriteSheet.hpp"
 #include "AnEngine/include/Texture/Texture2D.hpp"
 
 // ---Cameras---

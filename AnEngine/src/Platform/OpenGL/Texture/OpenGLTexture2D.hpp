@@ -37,6 +37,8 @@ namespace AnEngine {
             return rendererID == ((OpenGLTexture2D&)other).rendererID;
         }
 
+        Ref<Texture> getSubImage(glm::vec2 coords, glm::vec2 size) const;
+
     private:
         InputFileStream file;
 
@@ -47,6 +49,8 @@ namespace AnEngine {
 
         ImageFormat::FileFormat fileFormat;
         ImageFormat::PixelFormat pixelFormat;
+
+        uint8_t* imageData;
     };
 };  // namespace AnEngine
 

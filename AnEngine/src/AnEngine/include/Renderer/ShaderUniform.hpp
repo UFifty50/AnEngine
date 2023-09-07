@@ -37,8 +37,7 @@ namespace AnEngine {
             for (auto& item : *this) {
                 if (item.name == name) return item.uniform;
             }
-            throw std::out_of_range("ShaderUniformVector::operator[] unable to find" +
-                                    name);
+            AE_CORE_ERROR("{0} couldn't be found in ShaderUniformVector", name);
         }
 
         template <typename T>

@@ -5,16 +5,14 @@
 #include "Texture/Sprite.hpp"
 
 #include "Renderer/Renderer2D.hpp"
+#include "Texture/SpriteSheet.hpp"
 
 
 namespace AnEngine {
-    Sprite::Sprite() { texture = Texture2D::create(0, 0); }
-    Sprite::Sprite(const std::string& path) { texture = Texture2D::create(path); }
-    Sprite::Sprite(const Ref<Texture2D>& texture) { this->texture = texture; }
+    Sprite::Sprite(const Ref<SpriteSheet>& sheet, glm::vec2 index)
+        : sheet(sheet), index(index) {}
 
     void Sprite::render(glm::vec3 position, float rotation) const {
-        Renderer2D::drawQuad(
-            position, {texture->getWidth() / 100.0f, texture->getHeight() / 100.0f},
-            rotation, texture);
+        sheet->renderSprite(index, position, rotation);
     }
 }  // namespace AnEngine

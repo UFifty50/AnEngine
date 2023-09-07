@@ -25,10 +25,10 @@ public:
 private:
     AnEngine::CameraController cameraController;
     AnEngine::Ref<AnEngine::Texture2D> texture;
+    AnEngine::SpriteSheet tiles;
 
     AnEngine::ParticleSpawner particleSpawner;
 
-    AnEngine::Sprite player;
     float playerX = 0.0f;
     float playerY = 0.0f;
 

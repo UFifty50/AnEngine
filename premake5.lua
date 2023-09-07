@@ -81,7 +81,8 @@ project "AnEngine"
     postbuildcommands {
             "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
             "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox",
-            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets"
+            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets",
+            "{COPYDIR} ../AnEngine/src/AnEngine/assets/ ../bin/" .. outputDir .. "/Sandbox/builtins/assets"
     }
 
     filter "system:linux"
@@ -190,7 +191,8 @@ project "Sandbox"
     }
 
     postbuildcommands {
-            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets"
+            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets",
+            "{COPYDIR} ../AnEngine/src/AnEngine/assets/ ../bin/" .. outputDir .. "/Sandbox/builtins/assets"
     }
 
     filter "system:Linux"

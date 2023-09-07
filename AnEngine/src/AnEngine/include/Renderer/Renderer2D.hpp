@@ -43,7 +43,7 @@ namespace AnEngine {
             QuadVertex* quadVertexBufferPtr = nullptr;
 
             std::array<Ref<Texture2D>, maxTextureSlots> textureSlots;
-            uint32_t textureSlotIndex = 1;  // 0 = blank texture
+            uint8_t textureSlotIndex = 1;  // 0 = blank texture
 
             glm::vec4 quadVertexPositions[4];
 

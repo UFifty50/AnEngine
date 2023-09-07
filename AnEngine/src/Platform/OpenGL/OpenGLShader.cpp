@@ -204,12 +204,33 @@ namespace AnEngine {
 
 
         // Matrices
-        else if (uniform.type() == typeid(glm::mat3)) {
+        else if (uniform.type() == typeid(glm::mat2)) {
+            glUniformMatrix2fv(location, 1, GL_FALSE,
+                               glm::value_ptr(std::any_cast<glm::mat2>(uniform)));
+        } else if (uniform.type() == typeid(glm::mat2x3)) {
+            glUniformMatrix2x3fv(location, 1, GL_FALSE,
+                                 glm::value_ptr(std::any_cast<glm::mat4x2>(uniform)));
+        } else if (uniform.type() == typeid(glm::mat2x4)) {
+            glUniformMatrix2x4fv(location, 1, GL_FALSE,
+                                 glm::value_ptr(std::any_cast<glm::mat4x3>(uniform)));
+        } else if (uniform.type() == typeid(glm::mat3)) {
             glUniformMatrix3fv(location, 1, GL_FALSE,
                                glm::value_ptr(std::any_cast<glm::mat3>(uniform)));
+        } else if (uniform.type() == typeid(glm::mat3x2)) {
+            glUniformMatrix3x2fv(location, 1, GL_FALSE,
+                                 glm::value_ptr(std::any_cast<glm::mat4x2>(uniform)));
+        } else if (uniform.type() == typeid(glm::mat3x4)) {
+            glUniformMatrix3x4fv(location, 1, GL_FALSE,
+                                 glm::value_ptr(std::any_cast<glm::mat4x2>(uniform)));
         } else if (uniform.type() == typeid(glm::mat4)) {
             glUniformMatrix4fv(location, 1, GL_FALSE,
                                glm::value_ptr(std::any_cast<glm::mat4>(uniform)));
+        } else if (uniform.type() == typeid(glm::mat4x2)) {
+            glUniformMatrix4x2fv(location, 1, GL_FALSE,
+                                 glm::value_ptr(std::any_cast<glm::mat4x2>(uniform)));
+        } else if (uniform.type() == typeid(glm::mat4x3)) {
+            glUniformMatrix4x3fv(location, 1, GL_FALSE,
+                                 glm::value_ptr(std::any_cast<glm::mat4x3>(uniform)));
         }
 
         // Textures
@@ -226,7 +247,6 @@ namespace AnEngine {
             }
 
             glUniform1iv(location, maxTextureSlots, data);
-
         }
 
         else {
