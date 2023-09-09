@@ -2,6 +2,14 @@
 # AnEngine
 Learning gameEngine-dev using [TheCherno's Game Engine series](https://youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT)
 
+- [AnEngine](#AnEngine)
+  - [Setup](#setup)
+    - [Windows](#windows)
+    - [Linux](#linux)
+
+- **AnEngine/**: The core engine.
+- **Crank/**: The engine UI.
+- **Sandbox/**: Used for in-place testing.
 
 ## Setup
 First clone the repository with `git clone --recursive <URL>`.

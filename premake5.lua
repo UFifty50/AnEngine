@@ -1,8 +1,9 @@
 workspace "AnEngine"
     architecture "x86_64"
     configurations { "Debug", "Release", "Dist" }
-    startproject "Sandbox"
-    debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Sandbox"
+    flags { "MultiProcessorCompile" }
+    startproject "Crank"
+    debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Crank"
 
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -75,14 +76,18 @@ project "AnEngine"
     }
 
     prebuildcommands {
-            "{RMDIR} ../bin/" .. outputDir
+            "{RMDIR} ../bin/" .. outputDir,
     }
 
     postbuildcommands {
             "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
+            "{MKDIR} ../bin/" .. outputDir .. "/Crank",
             "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox",
+            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Crank",
             "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets",
-            "{COPYDIR} ../AnEngine/src/AnEngine/assets/ ../bin/" .. outputDir .. "/Sandbox/builtins/assets"
+            "{COPYDIR} ../Crank/assets ../bin/" .. outputDir .. "/Crank/assets",
+            "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Sandbox/builtins/assets",
+            "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Crank/builtins/assets"
     }
 
     filter "system:linux"
@@ -147,17 +152,18 @@ project "AnEngine"
 
     filter "configurations:Release"
         defines { "AE_RELEASE", "AE_RELEASE_PROFILING" }
+        flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
 
     filter "configurations:Dist"
         defines { "AE_DIST" }
+        flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
 
-
-project "Sandbox"
-    location "Sandbox"
+project "Crank"
+    location "Crank"
     kind "ConsoleApp"
     staticruntime "on"
     language "C++"
@@ -180,7 +186,6 @@ project "Sandbox"
         "%{prj.name}/src/include/",
         "AnEngine/src",
         "AnEngine/src/AnEngine/include/",
-        "AnEngine/src/Platform/",
         "%{includeDir.ImGui}",
         "%{includeDir.glm}",
         "%{includeDir.fmt}"
@@ -191,8 +196,8 @@ project "Sandbox"
     }
 
     postbuildcommands {
-            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets",
-            "{COPYDIR} ../AnEngine/src/AnEngine/assets/ ../bin/" .. outputDir .. "/Sandbox/builtins/assets"
+            "{COPYDIR} ../Crank/assets ../bin/" .. outputDir .. "/Crank/assets",
+            "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Crank/builtins/assets"
     }
 
     filter "system:Linux"
@@ -223,10 +228,89 @@ project "Sandbox"
 
     filter "configurations:Release"
         defines { "AE_RELEASE", "AE_RELEASE_PROFILING" }
+        flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
 
     filter "configurations:Dist"
         defines { "AE_DIST" }
+        flags { "LinkTimeOptimization" }
+        runtime "Release"
+        optimize "on"
+
+
+project "Sandbox"
+    location "Sandbox"
+    kind "ConsoleApp"
+    staticruntime "on"
+    language "C++"
+    cppdialect "C++20"
+
+    links {
+        "AnEngine",
+        "GLFW",
+        "Glad",
+        "ImGui",
+        "fmt"
+    }
+
+    targetdir ("bin/" .. outputDir .. "/%{prj.name}")
+    objdir ("bin/intermediate/" .. outputDir .. "/%{prj.name}")
+
+    files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
+
+    includedirs { 
+        "%{prj.name}/src/include/",
+        "AnEngine/src",
+        "AnEngine/src/AnEngine/include/",
+        "%{includeDir.ImGui}",
+        "%{includeDir.glm}",
+        "%{includeDir.fmt}"
+    }
+
+    externalincludedirs {
+        "AnEngine/vendor/spdlog/include/"
+    }
+
+    postbuildcommands {
+            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets",
+            "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Sandbox/builtins/assets"
+    }
+
+    filter "system:Linux"
+        pic "on"
+        systemversion "latest"
+
+        defines { 
+            "AE_LINUX",
+        }
+
+    filter "system:windows"
+        systemversion "latest"
+
+        defines { 
+            "AE_WIN",
+        }
+
+    filter "toolset:msc*"
+        buildoptions {
+            "/analyze:external-",
+            "/Zc:preprocessor"
+        }
+
+    filter "configurations:Debug"
+        defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }
+        runtime "Debug"
+        symbols "on"
+
+    filter "configurations:Release"
+        defines { "AE_RELEASE", "AE_RELEASE_PROFILING" }
+        flags { "LinkTimeOptimization" }
+        runtime "Release"
+        optimize "on"
+
+    filter "configurations:Dist"
+        defines { "AE_DIST" }
+        flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
