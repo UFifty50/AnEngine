@@ -36,7 +36,7 @@ static const char mapTiles[(mapWidth * mapHeight) + 1] =
 SandBox2D::SandBox2D()
     : Layer("Sandbox2D"),
       cameraController(1280.0f / 720.0f, 75, true, true),
-      // particleSpawner({0.0f, 0.0f, 0.1f}),
+      particleSpawner({0.0f, 0.0f, 0.1f}),
       tiles({"assets/textures/RPGpack_sheet_2X.png", 128, 128}) {}
 
 void SandBox2D::onAttach() {
