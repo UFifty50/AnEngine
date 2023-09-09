@@ -7,7 +7,7 @@
 namespace AnEngine {
     class OpenGLIndexBuffer : public IndexBuffer {
     private:
-        uint32_t rendererID;
+        RenderID rendererID;
         uint32_t count;
 
     public:

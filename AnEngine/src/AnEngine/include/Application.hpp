@@ -12,7 +12,7 @@
 namespace AnEngine {
     class AE_API Application {
     public:
-        Application();
+        Application(const std::string& name = "AnEngine");
         ~Application();
 
         void onEvent(Event& e);
@@ -22,7 +22,8 @@ namespace AnEngine {
         static inline Application& get() { return *instance; }
         inline Window& getWindow() { return *window; }
 
-        void Run();
+        int Run();
+        void Shutdown(int exitCode = 0);
 
     private:
         static Application* instance;
@@ -32,6 +33,8 @@ namespace AnEngine {
         bool running = true;
         LayerStack layerStack;
         float lastFrameTime = 0;
+
+        int exitCode = 0;
 
         bool onWindowClose(WindowCloseEvent& closeEvent);
         bool onWindowResize(WindowResizeEvent& resizeEvent);

@@ -40,7 +40,7 @@ namespace AnEngine {
     private:
         std::vector<Ref<VertexBuffer>> vertexBuffers;
         Ref<IndexBuffer> indexBuffer;
-        uint32_t rendererID;
+        RenderID rendererID;
     };
 
     static const GLenum toOpenGLBaseType(ShaderDataType::T type);

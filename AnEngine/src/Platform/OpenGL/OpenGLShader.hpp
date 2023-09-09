@@ -26,7 +26,7 @@ namespace AnEngine {
         virtual const std::string& getName() const override { return name; }
 
     private:
-        uint32_t rendererID = NULL;
+        RenderID rendererID = NULL;
         std::string name;
 
         std::unordered_map<GLenum, std::string> preProcess(const std::string& source);

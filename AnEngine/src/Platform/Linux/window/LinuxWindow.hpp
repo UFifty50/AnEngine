@@ -12,8 +12,8 @@ namespace AnEngine {
     private:
         struct WindowData {
             std::string title = "";
-            unsigned int width = 0;
-            unsigned int height = 0;
+            uint32_t width = 0;
+            uint32_t height = 0;
             bool vSync = false;
             EventCallbackFn eventCallback = nullptr;
         };
@@ -31,8 +31,8 @@ namespace AnEngine {
 
         void onUpdate() override;
 
-        inline unsigned int getWidth() const override { return data.width; }
-        inline unsigned int getHeight() const override { return data.height; }
+        inline uint32_t getWidth() const override { return data.width; }
+        inline uint32_t getHeight() const override { return data.height; }
 
         inline void setEventCallback(const EventCallbackFn& callback) override {
             data.eventCallback = callback;

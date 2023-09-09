@@ -28,7 +28,7 @@ namespace AnEngine {
 
     private:
         BufferLayout layout;
-        uint32_t rendererID;
+        RenderID rendererID;
         uint32_t size;
     };
 }  // namespace AnEngine

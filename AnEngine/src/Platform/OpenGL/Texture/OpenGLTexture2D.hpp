@@ -45,7 +45,7 @@ namespace AnEngine {
         uint32_t width;
         uint32_t height;
 
-        uint32_t rendererID;
+        RenderID rendererID;
 
         ImageFormat::FileFormat fileFormat;
         ImageFormat::PixelFormat pixelFormat;

@@ -16,7 +16,7 @@
 namespace AnEngine {
     Application* Application::Application::instance = nullptr;
 
-    Application::Application() {
+    Application::Application(const std::string& name) {
         AE_PROFILE_FUNCTION()
 
         AE_CORE_ASSERT(!instance, "Application already exists!");
@@ -35,7 +35,7 @@ namespace AnEngine {
             AE_CORE_ASSERT(false, msg.str().c_str());
         }
 
-        window = Scope<Window>(Window::create());
+        window = Scope<Window>(Window::create(WindowProperties(name)));
         window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
         Renderer::init();
@@ -85,7 +85,7 @@ namespace AnEngine {
         return false;
     }
 
-    void Application::Run() {
+    int Application::Run() {
         while (running) {
             float time = Time::getTime();
             TimeStep deltaTime = time - lastFrameTime;
@@ -105,6 +105,15 @@ namespace AnEngine {
 
             window->onUpdate();
         }
+
+        return this->exitCode;
+    }
+
+    void Application::Shutdown(int exitCode) {
+        AE_PROFILE_FUNCTION()
+
+        running = false;
+        this->exitCode = exitCode;
     }
 
     int main(int argc, char** argv) {
@@ -115,7 +124,7 @@ namespace AnEngine {
         AE_PROFILE_END_SESSION()
 
         AE_PROFILE_BEGIN_SESSION("Runtime", "AnEngineProfile-Runtime.json");
-        app->Run();
+        int exitCode = app->Run();
         AE_PROFILE_END_SESSION()
 
         AE_PROFILE_BEGIN_SESSION("Shutdown", "AnEngineProfile-Shutdown.json");
@@ -124,6 +133,6 @@ namespace AnEngine {
 
         AE_PROFILE_END_SESSION()
 
-        return 0;
+        return exitCode;
     }
 }  // namespace AnEngine

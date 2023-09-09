@@ -1,38 +1,35 @@
 #include "aepch.hpp"
 
-#include "Renderer/VertexArray.hpp"
+#include "Renderer/FrameBuffer.hpp"
 
 #include "Exceptions/NotImplementedException.hpp"
-#include "Platform/OpenGL/openGLVertexArray.hpp"
+#include "Platform/OpenGL/OpenGLFrameBuffer.hpp"
 #include "Renderer/RenderAPI.hpp"
 
 
 namespace AnEngine {
-    Ref<VertexArray> VertexArray::create() {
+    Ref<FrameBuffer> FrameBuffer::create(const FrameBufferSpec& spec) {
         AE_PROFILE_FUNCTION()
 
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
-                return MakeRef<OpenGLVertexArray>();
+                return MakeRef<OpenGLFrameBuffer>(spec);
 
             case RenderAPI::DirectX11:
                 throw NotImplementedException();
-                //     return
-                //     MakeRef<DX11VertexArray>(DX11VertexArray());
+                // return MakeRef<DX11FrameBuffer>(spec);
 
             case RenderAPI::DirectX12:
                 throw NotImplementedException();
-                //      return
-                //      MakeRef<DX12VertexArray>(DX12VertexArray());
+                // return MakeRef<DX12FrameBuffer>(spec);
 
             case RenderAPI::Vulkan:
                 throw NotImplementedException();
-                //     return
-                //     MakeRef<VulkanVertexArray>(VulkanVertexArray());
+                // return MakeRef<VulkanFrameBuffer>(spec);
 
             default:
                 AE_CORE_ASSERT(false, "Unknown RendererAPI!");
                 throw NotImplementedException();
         }
     }
-};  // namespace AnEngine
+}  // namespace AnEngine

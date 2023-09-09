@@ -4,6 +4,9 @@
 #include <AnEngine.hpp>
 #include <glm/glm.hpp>
 
+#include "imgui.h"
+#include "imgui_internal.h"
+
 //#define ATTRIBUTE_ARRAY(varName, ...) \
 //    AnEngine::ShaderUniformVector varName = {__VA_ARGS__}
 
@@ -25,11 +28,12 @@ public:
 
 private:
     AnEngine::CameraController cameraController;
-    AnEngine::Ref<AnEngine::Texture2D> texture;
     AnEngine::SpriteSheet tiles;
     std::unordered_map<char, AnEngine::Sprite> tileMap;
     AnEngine::Sprite player;
     AnEngine::Sprite invalidTile;
+
+    AnEngine::Ref<AnEngine::FrameBuffer> frameBuffer;
 
     AnEngine::ParticleSpawner particleSpawner;
 

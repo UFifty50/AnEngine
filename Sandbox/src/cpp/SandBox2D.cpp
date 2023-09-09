@@ -36,17 +36,16 @@ static const char mapTiles[(mapWidth * mapHeight) + 1] =
 SandBox2D::SandBox2D()
     : Layer("Sandbox2D"),
       cameraController(1280.0f / 720.0f, 75, true, true),
-      particleSpawner({0.0f, 0.0f, 0.1f}),
+      // particleSpawner({0.0f, 0.0f, 0.1f}),
       tiles({"assets/textures/RPGpack_sheet_2X.png", 128, 128}) {}
 
 void SandBox2D::onAttach() {
-    texture = AnEngine::Texture2D::create("assets/textures/Checkerboard.png");
-
     tileMap['W'] = tiles.getSprite({11, 11});
     tileMap['D'] = tiles.getSprite({6, 11});
     player = tiles.getSprite({0, 3});
     invalidTile = tiles.getSprite({0, 0});
 
+    /*
     AnEngine::Particle2D particle1;
     AnEngine::Particle2D particle2;
 
@@ -81,6 +80,10 @@ void SandBox2D::onAttach() {
 
     particleSpawner.reset();
     particleSpawner.enable();
+    */
+
+    AnEngine::FrameBufferSpec spec = {1280, 720};
+    frameBuffer = AnEngine::FrameBuffer::create(spec);
 }
 
 void SandBox2D::onDetach() {}
@@ -127,6 +130,7 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
 
     {
         AE_PROFILE_SCOPE("Render Commands")
+        frameBuffer->bind();
         AnEngine::RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1});
         AnEngine::RenderCommandQueue::clear();
     }
@@ -191,6 +195,7 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
 
         AnEngine::Renderer2D::endScene();
 
+        frameBuffer->unBind();
 
         particleSpawner.emit(cameraController.getCamera());
     }
@@ -198,6 +203,18 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
 
 void SandBox2D::onImGuiRender() {
     AE_PROFILE_FUNCTION()
+
+    ImGui::Begin("Statistics");
+    ImGui::Text("Renderer2D Stats:");
+    ImGui::Text("Frametime: %fms", (float)AnEngine::Renderer2D::getStats().lastFrameTime);
+    ImGui::Text("FPS: %.1fms",
+                1.0f / (AnEngine::Renderer2D::getStats().lastFrameTime / 1000.0f));
+    ImGui::Text("Draw Calls: %d", AnEngine::Renderer2D::getStats().draws);
+    ImGui::Text("Quads: %d", AnEngine::Renderer2D::getStats().quadCount);
+    ImGui::Text("Vertices: %d", AnEngine::Renderer2D::getStats().getTotalVertexCount());
+    ImGui::Text("Indices: %d", AnEngine::Renderer2D::getStats().getTotalIndexCount());
+    ImGui::End();
+
     ImGui::Begin("Settings");
     ImGui::ColorEdit4("Tint", glm::value_ptr(tint));
     ImGui::DragFloat("Tiling Factor", &tilingFactor, 0.1f, 0.0f, 10.0f);
@@ -214,21 +231,12 @@ void SandBox2D::onImGuiRender() {
     if (ImGui::Button("Reset Particles")) {
         particleSpawner.reset();
     }
-
     ImGui::End();
 
-    ImGui::Begin("Statistics");
-    ImGui::Text("Renderer2D Stats:");
-    ImGui::Text("Frametime: %fms", (float)AnEngine::Renderer2D::getStats().lastFrameTime);
-    ImGui::Text("FPS: %.1fms",
-                1.0f / (AnEngine::Renderer2D::getStats().lastFrameTime / 1000.0f));
-    ImGui::Text("Draw Calls: %d", AnEngine::Renderer2D::getStats().draws);
-    ImGui::Text("Quads: %d", AnEngine::Renderer2D::getStats().quadCount);
-    ImGui::Text("Vertices: %d", AnEngine::Renderer2D::getStats().getTotalVertexCount());
-    ImGui::Text("Indices: %d", AnEngine::Renderer2D::getStats().getTotalIndexCount());
+    ImGui::Begin("Viewport");
+    uint32_t texID = frameBuffer->getColorAttachmentID();
+    ImGui::Image((void*)texID, {1280, 720}, {0, 1}, {1, 0});
     ImGui::End();
-
-    PROFILE_UI()
 }
 
 void SandBox2D::onEvent(AnEngine::Event& event) {
@@ -243,12 +251,4 @@ void SandBox2D::onEvent(AnEngine::Event& event) {
             }
             return false;
         });
-
-    /*dispatcher.dispatch<AnEngine::MouseButtonPressedEvent>(
-        [&](AnEngine::MouseButtonPressedEvent& e) -> bool {
-            if (e.getMouseButton() == AE_MOUSE_BUTTON_RIGHT)
-                particleSpawner.setSpawnRate(toggle ? 50.0f : 0.0f);
-            toggle = !toggle;
-            return false;
-        });*/
 }
