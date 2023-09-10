@@ -14,13 +14,13 @@
 
 
 namespace AnEngine {
-    Application* Application::Application::instance = nullptr;
+    Application::Data Application::applicationData;
 
-    Application::Application(const std::string& name) {
+    void Application::Init(const std::string& name) {
         AE_PROFILE_FUNCTION()
 
-        AE_CORE_ASSERT(!instance, "Application already exists!");
-        instance = this;
+        AE_CORE_ASSERT(!applicationData.initialized, "Application already exists!");
+        applicationData.initialized = true;
 
         if (RenderAPI::getAPI() == RenderAPI::NoAPI) {
             std::stringstream msg;
@@ -35,48 +35,48 @@ namespace AnEngine {
             AE_CORE_ASSERT(false, msg.str().c_str());
         }
 
-        window = Scope<Window>(Window::create(WindowProperties(name)));
-        window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
+        applicationData.window = Scope<Window>(Window::create(WindowProperties(name)));
+        applicationData.window->setEventCallback(&Application::onEvent);
 
         Renderer::init();
         Random::init();
 
-        imGuiLayer = MakeRef<ImGuiLayer>();
-        pushOverlay(imGuiLayer);
+        applicationData.imGuiLayer = MakeRef<ImGuiLayer>();
+        pushOverlay(applicationData.imGuiLayer);
     }
 
-    Application::~Application() = default;
+    // Application::~Application() = default;
 
     void Application::pushLayer(Ref<Layer> layer) {
-        layerStack.pushLayer(layer);
+        applicationData.layerStack.pushLayer(layer);
         layer->onAttach();
     }
 
     void Application::pushOverlay(Ref<Layer> overlay) {
-        layerStack.pushOverlay(overlay);
+        applicationData.layerStack.pushOverlay(overlay);
         overlay->onAttach();
     }
 
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
-        dispatcher.dispatch<WindowResizeEvent>(
-            BIND_EVENT_FN(Application::onWindowResize));
+        dispatcher.dispatch<WindowCloseEvent>(Application::onWindowClose);
+        dispatcher.dispatch<WindowResizeEvent>(Application::onWindowResize);
 
-        for (auto it = layerStack.end(); it != layerStack.begin();) {
+        for (auto it = applicationData.layerStack.end();
+             it != applicationData.layerStack.begin();) {
             (*--it)->onEvent(e);
             if (e.handled) break;
         }
     }
 
     bool Application::onWindowClose(WindowCloseEvent& closeEvent) {
-        running = false;
+        applicationData.running = false;
         return true;
     }
 
     bool Application::onWindowResize(WindowResizeEvent& resizeEvent) {
         if (resizeEvent.getWidth() == 0 || resizeEvent.getHeight() == 0) {
-            minimized = true;
+            applicationData.minimized = true;
             return false;
         }
 
@@ -86,34 +86,43 @@ namespace AnEngine {
     }
 
     int Application::Run() {
-        while (running) {
-            float time = Time::getTime();
-            TimeStep deltaTime = time - lastFrameTime;
-            lastFrameTime = time;
+        if (!applicationData.initialized) {
+            std::stringstream msg;
+            msg << "AnEngine::Application::Init() needs to be called after "
+                   "Renderer::setAPI() in CreateApplication"
+                << std::endl;
+            AE_CORE_ASSERT(false, msg.str().c_str());
+            return -200;
+        }
 
-            if (!minimized) {
-                for (Ref<Layer> layer : layerStack) {
+        while (applicationData.running) {
+            float time = Time::getTime();
+            TimeStep deltaTime = time - applicationData.lastFrameTime;
+            applicationData.lastFrameTime = time;
+
+            if (!applicationData.minimized) {
+                for (Ref<Layer> layer : applicationData.layerStack) {
                     layer->onUpdate(deltaTime);
                 }
             }
 
-            imGuiLayer->begin();
-            for (Ref<Layer> layer : layerStack) {
+            applicationData.imGuiLayer->begin();
+            for (Ref<Layer> layer : applicationData.layerStack) {
                 layer->onImGuiRender();
             }
-            imGuiLayer->end();
+            applicationData.imGuiLayer->end();
 
-            window->onUpdate();
+            applicationData.window->onUpdate();
         }
 
-        return this->exitCode;
+        return applicationData.exitCode;
     }
 
     void Application::Shutdown(int exitCode) {
         AE_PROFILE_FUNCTION()
 
-        running = false;
-        this->exitCode = exitCode;
+        applicationData.running = false;
+        applicationData.exitCode = exitCode;
     }
 
     int main(int argc, char** argv) {

@@ -10,34 +10,45 @@
 
 
 namespace AnEngine {
+
     class AE_API Application {
     public:
-        Application(const std::string& name = "AnEngine");
-        ~Application();
+        struct Data {
+            bool initialized = false;
 
-        void onEvent(Event& e);
-        void pushLayer(Ref<Layer> layer);
-        void pushOverlay(Ref<Layer> overlay);
+            Scope<Window> window;
+            Ref<ImGuiLayer> imGuiLayer;
+            bool minimized = false;
+            bool running = true;
+            LayerStack layerStack;
+            float lastFrameTime = 0;
 
-        static inline Application& get() { return *instance; }
-        inline Window& getWindow() { return *window; }
+            int exitCode = 0;
+        };
 
-        int Run();
-        void Shutdown(int exitCode = 0);
+        static Data applicationData;
+
+        //  Application(const std::string& name = "AnEngine");
+        //  ~Application();
+
+        static void Init(const std::string& name = "AnEngine");
+        static int Run();
+        static void Shutdown(int exitCode = 0);
+
+        static void onEvent(Event& e);
+        static void pushLayer(Ref<Layer> layer);
+        static void pushOverlay(Ref<Layer> overlay);
+
+        // static inline Application& get() { return *instance; }
+        static inline Window& getWindow() { return *applicationData.window; }
+
 
     private:
-        static Application* instance;
-        Scope<Window> window;
-        Ref<ImGuiLayer> imGuiLayer;
-        bool minimized = false;
-        bool running = true;
-        LayerStack layerStack;
-        float lastFrameTime = 0;
+        //   static Application* instance;
 
-        int exitCode = 0;
 
-        bool onWindowClose(WindowCloseEvent& closeEvent);
-        bool onWindowResize(WindowResizeEvent& resizeEvent);
+        static bool onWindowClose(WindowCloseEvent& closeEvent);
+        static bool onWindowResize(WindowResizeEvent& resizeEvent);
     };
 
     int main(int argc, char** argv);

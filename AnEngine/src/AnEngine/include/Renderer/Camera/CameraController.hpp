@@ -16,6 +16,7 @@ namespace AnEngine {
 
         void onUpdate(TimeStep deltaTime);
         void onEvent(Event& event);
+        void onResize(float width, float height);
 
         Ref<Camera> getCamera() { return camera; }
         const Ref<Camera> getCamera() const { return camera; }

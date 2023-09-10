@@ -14,14 +14,14 @@ namespace AnEngine {
 
     bool WinInput::isKeyPressedImpl(int keycode) {
         auto window =
-            static_cast<GLFWwindow*>(Application::get().getWindow().getNativeWindow());
+            static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
         int state = glfwGetKey(window, keycode);
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
 
     bool WinInput::isMouseButtonPressedImpl(int button) {
         auto window =
-            static_cast<GLFWwindow*>(Application::get().getWindow().getNativeWindow());
+            static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
         int state = glfwGetMouseButton(window, button);
         return state == GLFW_PRESS;
     }
@@ -29,7 +29,7 @@ namespace AnEngine {
     glm::vec2 WinInput::getMousePositionImpl() {
         double xpos, ypos;
         auto window =
-            static_cast<GLFWwindow*>(Application::get().getWindow().getNativeWindow());
+            static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
         glfwGetCursorPos(window, &xpos, &ypos);
         return {(float)xpos, (float)ypos};
     }

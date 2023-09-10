@@ -20,6 +20,7 @@ namespace AnEngine {
         virtual const FrameBufferSpec& getSpecification() const = 0;
         virtual uint32_t getColorAttachmentID() const = 0;
         virtual void reconstruct() = 0;
+        virtual void resize(uint32_t width, uint32_t height) = 0;
 
         virtual void bind() const = 0;
         virtual void unBind() const = 0;

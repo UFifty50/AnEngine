@@ -1,13 +1,15 @@
 #include "aepch.hpp"
-#include "Application.hpp"
+
 #include "ImGui/ImGuiLayer.hpp"
 
-#include "imgui.h"
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "imgui.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "Application.hpp"
 
 namespace AnEngine {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
@@ -18,7 +20,8 @@ namespace AnEngine {
         // setup context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        ImGuiIO& io = ImGui::GetIO();
+        (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -33,8 +36,8 @@ namespace AnEngine {
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        Application& app = Application::get();
-        auto window = static_cast<GLFWwindow*>(app.getWindow().getNativeWindow());
+        auto window =
+            static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
 
         // platform/renderer bindings
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -55,8 +58,8 @@ namespace AnEngine {
 
     void ImGuiLayer::end() {
         ImGuiIO& io = ImGui::GetIO();
-        Application& app = Application::get();
-        io.DisplaySize = ImVec2((float)app.getWindow().getWidth(), (float)app.getWindow().getHeight());
+        io.DisplaySize = ImVec2((float)Application::getWindow().getWidth(),
+                                (float)Application::getWindow().getHeight());
 
         // rendering
         ImGui::Render();
@@ -72,6 +75,6 @@ namespace AnEngine {
 
     void ImGuiLayer::onImGuiRender() {
         static bool show = true;
-     //   ImGui::ShowDemoWindow(&show);
+        //   ImGui::ShowDemoWindow(&show);
     }
-}
+}  // namespace AnEngine

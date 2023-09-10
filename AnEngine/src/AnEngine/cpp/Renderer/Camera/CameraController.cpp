@@ -59,6 +59,11 @@ namespace AnEngine {
             BIND_EVENT_FN(CameraController::onWindowResized));
     }
 
+    void CameraController::onResize(float width, float height) {
+        aspectRatio = width / height;
+        camera->setProjection(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+    }
+
     float zoomAlgorithm(float currentZoom, float distanceScrolled, float minZoom,
                         float maxZoom) {
         // Define the scaling factors to control the speed of zooming
@@ -90,8 +95,7 @@ namespace AnEngine {
     }
 
     bool CameraController::onWindowResized(WindowResizeEvent& resizeEvent) {
-        aspectRatio = (float)resizeEvent.getWidth() / (float)resizeEvent.getHeight();
-        camera->setProjection(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+        onResize((float)resizeEvent.getWidth(), (float)resizeEvent.getHeight());
 
         return false;
     }

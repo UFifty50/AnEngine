@@ -12,6 +12,8 @@
 #include "Core/Core.hpp"
 #include "Renderer/Camera/CameraController.hpp"
 #include "Renderer/FrameBuffer.hpp"
+#include "Texture/Sprite.hpp"
+#include "Texture/SpriteSheet.hpp"
 
 
 namespace AnEngine {
@@ -57,7 +59,7 @@ namespace AnEngine {
 
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
-                    if (ImGui::MenuItem("Exit", "ALT+F4")) Application::get().Shutdown();
+                    if (ImGui::MenuItem("Exit", "ALT+F4")) Application::Shutdown();
                     /*
                     if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
                     if (ImGui::MenuItem("Redo", "CTRL+Y")) {}
@@ -98,9 +100,14 @@ namespace AnEngine {
     private:
         CameraController cameraController;
         Ref<FrameBuffer> frameBuffer;
-
+        SpriteSheet sheet;
+        Sprite sprite1;
 
         DockSpace dockSpace;
+
+        glm::vec2 viewportSize;
+        glm::vec2 viewportPos;
+        glm::vec2 mousePosInViewport;
     };
 }  // namespace AnEngine
 

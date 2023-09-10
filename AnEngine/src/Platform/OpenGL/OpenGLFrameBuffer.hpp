@@ -9,7 +9,7 @@ namespace AnEngine {
     class OpenGLFrameBuffer : public FrameBuffer {
     public:
         OpenGLFrameBuffer(const FrameBufferSpec& spec);
-        virtual ~OpenGLFrameBuffer();
+        virtual ~OpenGLFrameBuffer() override;
 
         virtual const FrameBufferSpec& getSpecification() const override {
             return specification;
@@ -20,14 +20,16 @@ namespace AnEngine {
         }
 
         virtual void reconstruct() override;
+        virtual void resize(uint32_t width, uint32_t height) override;
 
         virtual void bind() const override;
         virtual void unBind() const override;
 
     private:
         FrameBufferSpec specification;
-        uint32_t colourAttachment, depthAttachment;
-        RenderID rendererID;
+        uint32_t colourAttachment = 0;
+        uint32_t depthAttachment = 0;
+        RenderID rendererID = 0;
     };
 }  // namespace AnEngine
 

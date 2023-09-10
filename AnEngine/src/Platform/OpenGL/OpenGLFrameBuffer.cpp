@@ -11,9 +11,19 @@ namespace AnEngine {
         reconstruct();
     }
 
-    OpenGLFrameBuffer::~OpenGLFrameBuffer() { glDeleteFramebuffers(1, &rendererID); }
+    OpenGLFrameBuffer::~OpenGLFrameBuffer() {
+        glDeleteFramebuffers(1, &rendererID);
+        glDeleteTextures(1, &colourAttachment);
+        glDeleteTextures(1, &depthAttachment);
+    }
 
     void OpenGLFrameBuffer::reconstruct() {
+        if (rendererID != 0) {
+            glDeleteFramebuffers(1, &rendererID);
+            glDeleteTextures(1, &colourAttachment);
+            glDeleteTextures(1, &depthAttachment);
+        }
+
         glCreateFramebuffers(1, &rendererID);
         glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 
@@ -29,9 +39,8 @@ namespace AnEngine {
 
         glCreateTextures(GL_TEXTURE_2D, 1, &depthAttachment);
         glBindTexture(GL_TEXTURE_2D, depthAttachment);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, specification.Width,
-                     specification.Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8,
-                     nullptr);
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, specification.Width,
+                       specification.Height);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D,
                                depthAttachment, 0);
 
@@ -40,6 +49,12 @@ namespace AnEngine {
             "Framebuffer is incomplete!")
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height) {
+        specification.Width = width;
+        specification.Height = height;
+        reconstruct();
     }
 
     void OpenGLFrameBuffer::bind() const {

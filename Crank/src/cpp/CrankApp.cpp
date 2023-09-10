@@ -7,15 +7,14 @@
 namespace AnEngine {
     class CrankApp : public Application {
     public:
-        CrankApp() : Application("AnEngine") {
-            pushLayer(std::make_shared<CrankEditor>());
-        }
+        CrankApp() { pushLayer(std::make_shared<CrankEditor>()); }
 
         ~CrankApp() {}
     };
 
     Application* CreateApplication() {
         RenderAPI::setAPI(RenderAPI::OpenGL);
+        Application::Init("AnEngine");
         return new CrankApp();
     }
 }  // namespace AnEngine
