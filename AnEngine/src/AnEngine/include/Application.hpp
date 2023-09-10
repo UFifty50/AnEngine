@@ -11,7 +11,7 @@
 
 namespace AnEngine {
 
-    class AE_API Application {
+    class Application {
     public:
         struct Data {
             bool initialized = false;
@@ -28,9 +28,6 @@ namespace AnEngine {
 
         static Data applicationData;
 
-        //  Application(const std::string& name = "AnEngine");
-        //  ~Application();
-
         static void Init(const std::string& name = "AnEngine");
         static int Run();
         static void Shutdown(int exitCode = 0);
@@ -39,14 +36,11 @@ namespace AnEngine {
         static void pushLayer(Ref<Layer> layer);
         static void pushOverlay(Ref<Layer> overlay);
 
-        // static inline Application& get() { return *instance; }
-        static inline Window& getWindow() { return *applicationData.window; }
+        static Window& getWindow() { return *applicationData.window; }
+        static Ref<ImGuiLayer> getImGuiLayer() { return applicationData.imGuiLayer; }
 
 
     private:
-        //   static Application* instance;
-
-
         static bool onWindowClose(WindowCloseEvent& closeEvent);
         static bool onWindowResize(WindowResizeEvent& resizeEvent);
     };

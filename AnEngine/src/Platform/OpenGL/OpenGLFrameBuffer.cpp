@@ -6,6 +6,8 @@
 
 
 namespace AnEngine {
+    static constexpr uint32_t MaxFrameBufferSize = 8192;  // replace with GPU capabilities
+
     OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpec& spec)
         : specification(spec) {
         reconstruct();
@@ -52,6 +54,12 @@ namespace AnEngine {
     }
 
     void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height) {
+        if ((width <= 0 || height <= 0) ||
+            (width >= MaxFrameBufferSize || height >= MaxFrameBufferSize)) {
+            AE_CORE_WARN("Attempted to resize framebuffer to {0}, {1}", width, height);
+            return;
+        }
+
         specification.Width = width;
         specification.Height = height;
         reconstruct();

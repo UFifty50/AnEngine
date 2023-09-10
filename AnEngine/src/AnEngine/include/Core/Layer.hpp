@@ -9,7 +9,7 @@
 
 
 namespace AnEngine {
-    class AE_API Layer {
+    class Layer {
     protected:
         std::string debugName;
 

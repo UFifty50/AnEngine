@@ -50,6 +50,11 @@ namespace AnEngine {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
             ImGui::Begin("Viewport");
 
+            viewportFocused = ImGui::IsWindowFocused();
+            viewportHovered = ImGui::IsWindowHovered();
+            Application::getImGuiLayer()->shouldAllowEvents(viewportFocused &&
+                                                            viewportHovered);
+
             ImVec2 vpPanelSize = ImGui::GetContentRegionAvail();
             ImVec2 mPos = ImGui::GetMousePos();
             ImVec2 wPos = ImGui::GetWindowPos();
@@ -81,7 +86,7 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         //   cameraController.setZoom(10.0f);
-        cameraController.onUpdate(deltaTime);
+        if (viewportFocused) cameraController.onUpdate(deltaTime);
 
         if (FrameBufferSpec spec = frameBuffer->getSpecification();
             viewportSize.x > 0.0f && viewportSize.y > 0.0f &&

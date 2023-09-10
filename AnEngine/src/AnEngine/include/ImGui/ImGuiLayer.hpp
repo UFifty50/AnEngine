@@ -3,25 +3,30 @@
 
 #include "Core/Layer.hpp"
 #include "Events/ApplicationEvent.hpp"
+#include "Events/Event.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
 
 
 namespace AnEngine {
     class AE_API ImGuiLayer : public Layer {
-    private:
-        float prevTime = 0.0f;
-
     public:
         ImGuiLayer();
         ~ImGuiLayer();
 
         virtual void onAttach() override;
         virtual void onDetach() override;
+        virtual void onEvent(Event& event) override;
         virtual void onImGuiRender() override;
 
         void begin();
         void end();
+
+        void shouldAllowEvents(bool allow) { allowEvents = allow; }
+
+    private:
+        bool allowEvents = false;
+        float prevTime = 0.0f;
     };
 }  // namespace AnEngine
 

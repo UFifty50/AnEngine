@@ -45,8 +45,6 @@ namespace AnEngine {
         pushOverlay(applicationData.imGuiLayer);
     }
 
-    // Application::~Application() = default;
-
     void Application::pushLayer(Ref<Layer> layer) {
         applicationData.layerStack.pushLayer(layer);
         layer->onAttach();
@@ -79,6 +77,8 @@ namespace AnEngine {
             applicationData.minimized = true;
             return false;
         }
+
+        applicationData.minimized = false;
 
         Renderer::onWindowResize(resizeEvent.getWidth(), resizeEvent.getHeight());
 

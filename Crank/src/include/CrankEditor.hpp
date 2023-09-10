@@ -105,6 +105,8 @@ namespace AnEngine {
 
         DockSpace dockSpace;
 
+        bool viewportFocused = false;
+        bool viewportHovered = false;
         glm::vec2 viewportSize;
         glm::vec2 viewportPos;
         glm::vec2 mousePosInViewport;

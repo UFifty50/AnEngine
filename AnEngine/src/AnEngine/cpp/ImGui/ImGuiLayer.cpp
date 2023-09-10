@@ -10,6 +10,8 @@
 #include "imgui.h"
 
 #include "Application.hpp"
+#include "Events/Event.hpp"
+
 
 namespace AnEngine {
     ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
@@ -48,6 +50,15 @@ namespace AnEngine {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
+    }
+
+    void ImGuiLayer::onEvent(Event& event) {
+        if (!allowEvents) {
+            ImGuiIO& io = ImGui::GetIO();
+            event.handled |= event.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+            event.handled |=
+                event.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        }
     }
 
     void ImGuiLayer::begin() {
