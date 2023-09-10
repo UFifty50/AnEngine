@@ -34,7 +34,9 @@ namespace AnEngine {
             }
         }
 
-        //    static Ref<RenderAPI> create();
+
+        virtual ~RenderAPI() = default;
+
         virtual void init() = 0;
         virtual void setViewport(uint32_t x, uint32_t y, uint32_t width,
                                  uint32_t height) = 0;

@@ -2,31 +2,30 @@
 
 #include <glm/glm.hpp>
 
-#include "Platform/Linux/input/LinuxInput.hpp"
-
 #include <GLFW/glfw3.h>
 
 #include "Application.hpp"
+#include "Core/Input.hpp"
+#include "Core/KeyCodes.hpp"
+#include "Core/MouseCodes.hpp"
 
 
 namespace AnEngine {
-    Scope<Input> Input::instance = std::make_unique<LinuxInput>();
-
-    bool LinuxInput::isKeyPressedImpl(int keycode) {
+    bool Input::isKeyPressed(KeyCode keycode) {
         auto window =
             static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
-        int state = glfwGetKey(window, keycode);
+        int state = glfwGetKey(window, keycode.asInt());
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
 
-    bool LinuxInput::isMouseButtonPressedImpl(int button) {
+    bool Input::isMouseButtonPressed(MouseCode button) {
         auto window =
             static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
-        int state = glfwGetMouseButton(window, button);
+        int state = glfwGetMouseButton(window, button.asInt());
         return state == GLFW_PRESS;
     }
 
-    glm::vec2 LinuxInput::getMousePositionImpl() {
+    glm::vec2 Input::getMousePosition() {
         double xpos, ypos;
         auto window =
             static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
@@ -34,7 +33,7 @@ namespace AnEngine {
         return {(float)xpos, (float)ypos};
     }
 
-    float LinuxInput::getMouseXImpl() { return getMousePositionImpl().x; }
+    float Input::getMouseX() { return getMousePosition().x; }
 
-    float LinuxInput::getMouseYImpl() { return getMousePositionImpl().y; }
+    float Input::getMouseY() { return getMousePosition().y; }
 }  // namespace AnEngine
