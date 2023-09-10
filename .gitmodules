@@ -15,3 +15,6 @@
 [submodule "AnEngine/vendor/fmt"]
 	path = AnEngine/vendor/fmt
 	url = https://github.com/UFifty50/fmt-premake
+[submodule "ENTT"]
+	path = AnEngine/vendor/ENTT
+	url = https://github.com/UFifty50/ENTT-premake.git

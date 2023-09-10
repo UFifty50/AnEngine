@@ -54,7 +54,7 @@
 #include "AnEngine/include/Core/GamepadCodes.hpp"
 #include "AnEngine/include/Core/JoystickButtonCodes.hpp"
 #include "AnEngine/include/Core/KeyCodes.hpp"
-#include "AnEngine/include/Core/MouseButtonCodes.hpp"
+#include "AnEngine/include/Core/MouseCodes.hpp"
 
 // ---Log---
 #include "AnEngine/include/Core/Log.hpp"

@@ -98,8 +98,8 @@ void SandBox2D::onUpdate(AnEngine::TimeStep deltaTime) {
         particleSpawner.setSizeVariation(sizeVariation);
 
         glm::vec2 mousePos = AnEngine::Input::getMousePosition();
-        float winWidth = AnEngine::Application::get().getWindow().getWidth();
-        float winHeight = AnEngine::Application::get().getWindow().getHeight();
+        float winWidth = AnEngine::Application::getWindow().getWidth();
+        float winHeight = AnEngine::Application::getWindow().getHeight();
         auto camBounds = cameraController.getOrthographicCamera()->getBounds();
         glm::vec3 pos = cameraController.getCamera()->getPosition();
 

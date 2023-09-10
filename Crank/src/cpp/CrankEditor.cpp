@@ -40,7 +40,13 @@ namespace AnEngine {
 
         dockSpace.addWindow([&]() {
             ImGui::Begin("Settings");
-            ImGui::Separator();
+            ImGui::Text("Camera Position: %f, %f, %f",
+                        cameraController.getCamera()->getPosition().x,
+                        cameraController.getCamera()->getPosition().y,
+                        cameraController.getCamera()->getPosition().z);
+            ImGui::DragInt3("Camera Position",
+                            (int*)&cameraController.getCamera()->getPosition());
+            ImGui::ColorButton("Background Colour", {0.1f, 0.1f, 0.1f, 1.0f});
             ImGui::End();
         });
 
@@ -55,23 +61,18 @@ namespace AnEngine {
             Application::getImGuiLayer()->shouldAllowEvents(viewportFocused &&
                                                             viewportHovered);
 
-            ImVec2 vpPanelSize = ImGui::GetContentRegionAvail();
-            ImVec2 mPos = ImGui::GetMousePos();
-            ImVec2 wPos = ImGui::GetWindowPos();
-            ImVec2 rootVpPos = ImGui::GetMainViewport()->Pos;
+            ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+            ImVec2 mousePos = ImGui::GetMousePos();
+            ImVec2 windowPos = ImGui::GetWindowPos();
+            ImVec2 rootViewportPos = ImGui::GetMainViewport()->Pos;
 
-            ImVec2 vpPos = ImVec2(wPos.x - rootVpPos.x, wPos.y - rootVpPos.y);
-            ImVec2 mPosInVp = ImVec2(mPos.x - wPos.x, mPos.y - wPos.y);
+            ImVec2 vpPos =
+                ImVec2(windowPos.x - rootViewportPos.x, windowPos.y - rootViewportPos.y);
+            ImVec2 mPosInVp = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
 
-            viewportSize = glm::vec2{vpPanelSize.x, vpPanelSize.y};
-
-            if (glm::vec2{mPosInVp.x, mPosInVp.y} != mousePosInViewport) {
-                mousePosInViewport = glm::vec2{mPosInVp.x, mPosInVp.y};
-            }
-
-            if (glm::vec2{vpPos.x, vpPos.y} != viewportPos) {
-                viewportPos = glm::vec2{vpPos.x, vpPos.y};
-            }
+            viewportSize = glm::vec2{viewportPanelSize.x, viewportPanelSize.y};
+            mousePosInViewport = glm::vec2{mPosInVp.x, mPosInVp.y};
+            viewportPos = glm::vec2{vpPos.x, vpPos.y};
 
             ImGui::Image((void*)texID, ImVec2{viewportSize.x, viewportSize.y}, {0, 1},
                          {1, 0});
@@ -88,9 +89,7 @@ namespace AnEngine {
         //   cameraController.setZoom(10.0f);
         if (viewportFocused) cameraController.onUpdate(deltaTime);
 
-        if (FrameBufferSpec spec = frameBuffer->getSpecification();
-            viewportSize.x > 0.0f && viewportSize.y > 0.0f &&
-            (spec.Width != viewportSize.x || spec.Height != viewportSize.y)) {
+        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f) {
             frameBuffer->resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             cameraController.onResize(viewportSize.x, viewportSize.y);
         }

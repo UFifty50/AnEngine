@@ -14,12 +14,14 @@ includeDir['ImGui'] = "AnEngine/vendor/ImGui/"
 includeDir['glm'] = "AnEngine/vendor/glm/"
 includeDir['fmt'] = "AnEngine/vendor/fmt/include/"
 includeDir['stb'] = "AnEngine/vendor/stb/"
+includeDir['entt'] = "AnEngine/vendor/ENTT/single_include/"
 
 group "Dependencies"
     include "AnEngine/vendor/GLFW"
     include "AnEngine/vendor/Glad"
     include "AnEngine/vendor/ImGui"
     include "AnEngine/vendor/fmt"
+    include "AnEngine/vendor/ENTT"
 
 group ""
 project "AnEngine"
@@ -58,6 +60,7 @@ project "AnEngine"
         "%{prj.name}/src",
         "%{includeDir.GLFW}",
         "%{includeDir.Glad}",
+        "%{includeDir.entt}",
         "%{includeDir.ImGui}",
         "%{includeDir.glm}",
         "%{includeDir.fmt}",
@@ -187,6 +190,7 @@ project "Crank"
         "AnEngine/src",
         "AnEngine/src/AnEngine/include/",
         "%{includeDir.ImGui}",
+        "%{includeDir.entt}",
         "%{includeDir.glm}",
         "%{includeDir.fmt}"
     }
@@ -264,6 +268,7 @@ project "Sandbox"
         "AnEngine/src",
         "AnEngine/src/AnEngine/include/",
         "%{includeDir.ImGui}",
+        "%{includeDir.entt}",
         "%{includeDir.glm}",
         "%{includeDir.fmt}"
     }

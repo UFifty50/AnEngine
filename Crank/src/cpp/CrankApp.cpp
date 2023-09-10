@@ -14,7 +14,7 @@ namespace AnEngine {
 
     Application* CreateApplication() {
         RenderAPI::setAPI(RenderAPI::OpenGL);
-        Application::Init("AnEngine");
+        Application::Init("Crank - AnEngine");
         return new CrankApp();
     }
 }  // namespace AnEngine

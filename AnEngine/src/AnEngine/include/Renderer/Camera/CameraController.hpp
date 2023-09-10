@@ -18,6 +18,10 @@ namespace AnEngine {
         void onEvent(Event& event);
         void onResize(float width, float height);
 
+        CameraType getCameraType() const {
+            return orthographic ? CameraType::Orthographic : CameraType::Perspective;
+        }
+
         Ref<Camera> getCamera() { return camera; }
         const Ref<Camera> getCamera() const { return camera; }
 
