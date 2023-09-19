@@ -39,6 +39,13 @@ namespace AnEngine {
         static Window& getWindow() { return *applicationData.window; }
         static Ref<ImGuiLayer> getImGuiLayer() { return applicationData.imGuiLayer; }
 
+        static void loadUILayout(const std::string& path) {
+            applicationData.imGuiLayer->loadConfig(path);
+        }
+
+        static void saveUILayout(const std::string& path) {
+            applicationData.imGuiLayer->saveConfig(path);
+        }
 
     private:
         static bool onWindowClose(WindowCloseEvent& closeEvent);

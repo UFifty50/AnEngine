@@ -62,6 +62,11 @@ namespace AnEngine {
     }
 
     void ImGuiLayer::begin() {
+        if (newConfigQueued) {
+            loadConfig(configPath);
+            newConfigQueued = false;
+        }
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -82,6 +87,16 @@ namespace AnEngine {
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backupContext);
         }
+    }
+
+    void ImGuiLayer::loadConfig(const std::string& path) {
+        ImGui::LoadIniSettingsFromDisk(path.c_str());
+        //   ImGuiIO& io = ImGui::GetIO();
+        //  io.IniFilename = path.c_str();
+    }
+
+    void ImGuiLayer::saveConfig(const std::string& path) const {
+        ImGui::SaveIniSettingsToDisk(path.c_str());
     }
 
     void ImGuiLayer::onImGuiRender() {

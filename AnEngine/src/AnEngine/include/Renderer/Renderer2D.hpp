@@ -8,6 +8,7 @@
 
 #include "Renderer/Buffers/VertexBuffer.hpp"
 #include "Renderer/Camera/Camera.hpp"
+#include "Renderer/Camera/OrthographicCamera.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/VertexArray.hpp"
 #include "Texture/Texture2D.hpp"
@@ -53,9 +54,12 @@ namespace AnEngine {
         struct Statistics {
             uint32_t draws = 0;
             uint32_t quadCount = 0;
-            TimeStep lastFrameTime;
+            float lastFrameTime = 0.0f;
 
-            void reset() { draws = quadCount = 0; }
+            void reset() {
+                draws = quadCount = 0;
+                lastFrameTime = 0.0f;
+            }
             uint32_t getTotalVertexCount() { return quadCount * 4; }
             uint32_t getTotalIndexCount() { return quadCount * 6; }
         };
@@ -67,27 +71,32 @@ namespace AnEngine {
         static void init();
         static void shutdown();
 
-        static void beginScene(const Ref<Camera>& camera);
+        static void beginScene(const Ref<OrthographicCamera>& camera);  // TODO: remove
+        static void beginScene(const ComponentCamera& camera, const glm::mat4& transform);
         static void endScene();
         static void flush();
 
         // Primitives
         static void drawQuad(const glm::vec2& position, const glm::vec2& size,
                              float rotation, const glm::vec4& colour,
-                             const AnEngine::ShaderUniformVector& attributes = {});
+                             const ShaderUniformVector& attributes = {});
         static void drawQuad(const glm::vec3& position, const glm::vec2& size,
                              float rotation, const glm::vec4& colour,
-                             const AnEngine::ShaderUniformVector& attributes = {});
+                             const ShaderUniformVector& attributes = {});
+
+        static void drawQuad(const glm::mat4& transform, const glm::vec4& colour);
+        static void drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
+                             const ShaderUniformVector& attributes = {});
 
         static void drawQuad(const glm::vec2& position, const glm::vec2& size,
                              float rotation, const Ref<Texture2D>& texture,
-                             const AnEngine::ShaderUniformVector& attributes = {});
+                             const ShaderUniformVector& attributes = {});
         static void drawQuad(const glm::vec3& position, const glm::vec2& size,
                              float rotation, const Ref<Texture2D>& texture,
-                             const AnEngine::ShaderUniformVector& attributes = {});
+                             const ShaderUniformVector& attributes = {});
 
         // Stats
-        static Statistics getStats() { return rendererStats; }
+        static Statistics& getStats() { return rendererStats; }
         static void resetStats() { rendererStats.reset(); }
 
     private:

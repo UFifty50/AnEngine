@@ -90,7 +90,35 @@ namespace AnEngine {
         rendererData.quadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
     }
 
-    void Renderer2D::beginScene(const Ref<Camera>& camera) {  // begin batch
+    void Renderer2D::beginScene(const ComponentCamera& camera,
+                                const glm::mat4& transform) {
+        AE_PROFILE_FUNCTION()
+
+        if (rendererData.activeScene) {
+            AE_CORE_ERROR(
+                "Renderer2D::beginScene() called when already rendering a scene!");
+            return;
+        }
+
+        //  AE_CORE_ASSERT(camera.getType() == CameraType::Orthographic,
+        //                  "Renderer2D only supports Orthographic Cameras!");
+
+        glm::mat4 viewProjection = camera.getProjectionMatrix() * glm::inverse(transform);
+
+        Ref<Shader> quadShader = rendererData.shaderLibrary.get("QuadShader");
+
+        quadShader->bind();
+        quadShader->uploadUniform("viewProjectionMatrix", viewProjection);
+
+        rendererData.quadIndexCount = 0;
+        rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
+
+        rendererData.textureSlotIndex = 1;
+
+        rendererData.activeScene = true;
+    }
+
+    void Renderer2D::beginScene(const Ref<OrthographicCamera>& camera) {
         AE_PROFILE_FUNCTION()
 
         if (rendererData.activeScene) {
@@ -161,15 +189,7 @@ namespace AnEngine {
     }
 
     // Primitives
-    void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
-                              float rotation, const glm::vec4& colour,
-                              const AnEngine::ShaderUniformVector& attributes) {
-        drawQuad({position.x, position.y, 0.0f}, size, rotation, colour, attributes);
-    }
-
-    void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size,
-                              float rotation, const glm::vec4& colour,
-                              const AnEngine::ShaderUniformVector& attributes) {
+    void Renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& colour) {
         AE_PROFILE_FUNCTION()
 
         if (!rendererData.activeScene) {
@@ -184,15 +204,6 @@ namespace AnEngine {
         constexpr float texIndex = 0.0f;
         constexpr float tilingFactor = 1.0f;
         constexpr glm::vec4 tint(1.0f);
-
-        glm::mat4 rotationMatrix(1.0f);
-        if ((int)rotation % 180 != 0) {
-            rotationMatrix =
-                glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
-        }
-
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
-                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
         glm::vec2 texCoords[4] = {
             glm::vec2{0.0f, 0.0f},
@@ -216,15 +227,8 @@ namespace AnEngine {
         rendererStats.quadCount++;
     }
 
-    void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
-                              float rotation, const Ref<Texture2D>& texture,
-                              const AnEngine::ShaderUniformVector& attributes) {
-        drawQuad({position.x, position.y, 0.0f}, size, rotation, texture, attributes);
-    }
-
-    void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size,
-                              float rotation, const Ref<Texture2D>& texture,
-                              const AnEngine::ShaderUniformVector& attributes) {
+    void Renderer2D::drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
+                              const ShaderUniformVector& attributes) {
         AE_PROFILE_FUNCTION()
 
         if (!rendererData.activeScene) {
@@ -257,16 +261,6 @@ namespace AnEngine {
         float tilingFactor = attributes.getOr("tilingFactor", 1.0f);
         glm::vec4 tint = attributes.getOr("tint", glm::vec4(1.0f));
 
-        glm::mat4 rotationMatrix(1.0f);
-        if ((int)rotation % 180 != 0) {
-            rotationMatrix =
-                glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
-        }
-
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
-                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-
-
         glm::mat4x2 coords = {
             glm::vec2{0.0f, 0.0f},
             glm::vec2{1.0f, 0.0f},
@@ -288,5 +282,51 @@ namespace AnEngine {
 
         rendererData.quadIndexCount += 6;
         rendererStats.quadCount++;
+    }
+
+    void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
+                              float rotation, const glm::vec4& colour,
+                              const AnEngine::ShaderUniformVector& attributes) {
+        drawQuad({position.x, position.y, 0.0f}, size, rotation, colour, attributes);
+    }
+
+    void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size,
+                              float rotation, const glm::vec4& colour,
+                              const AnEngine::ShaderUniformVector& attributes) {
+        AE_PROFILE_FUNCTION()
+
+        glm::mat4 rotationMatrix(1.0f);
+        if ((int)rotation % 180 != 0) {
+            rotationMatrix =
+                glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+        }
+
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
+                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+
+        drawQuad(transform, colour);
+    }
+
+    void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
+                              float rotation, const Ref<Texture2D>& texture,
+                              const AnEngine::ShaderUniformVector& attributes) {
+        drawQuad({position.x, position.y, 0.0f}, size, rotation, texture, attributes);
+    }
+
+    void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size,
+                              float rotation, const Ref<Texture2D>& texture,
+                              const AnEngine::ShaderUniformVector& attributes) {
+        AE_PROFILE_FUNCTION()
+
+        glm::mat4 rotationMatrix(1.0f);
+        if ((int)rotation % 180 != 0) {
+            rotationMatrix =
+                glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+        }
+
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
+                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+
+        drawQuad(transform, texture, attributes);
     }
 }  // namespace AnEngine

@@ -22,10 +22,12 @@ namespace AnEngine {
             return orthographic ? CameraType::Orthographic : CameraType::Perspective;
         }
 
-        Ref<Camera> getCamera() { return camera; }
-        const Ref<Camera> getCamera() const { return camera; }
-
         Ref<OrthographicCamera> getOrthographicCamera() {
+            AE_CORE_ASSERT(orthographic, "Camera is not orthographic!");
+            return std::dynamic_pointer_cast<OrthographicCamera>(camera);
+        }
+
+        const Ref<OrthographicCamera> getOrthographicCamera() const {
             AE_CORE_ASSERT(orthographic, "Camera is not orthographic!");
             return std::dynamic_pointer_cast<OrthographicCamera>(camera);
         }
@@ -35,9 +37,20 @@ namespace AnEngine {
             return std::dynamic_pointer_cast<PerspectiveCamera>(camera);
         }
 
+        const Ref<PerspectiveCamera> getPerspectiveCamera() const {
+            AE_CORE_ASSERT(!orthographic, "Camera is not perspective!");
+            return std::dynamic_pointer_cast<PerspectiveCamera>(camera);
+        }
+
         void setZoom(float level) {
             zoom = level;
-            camera->setProjection(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+            if (orthographic) {
+                getOrthographicCamera()->setProjection(-aspectRatio * zoom,
+                                                       aspectRatio * zoom, -zoom, zoom);
+            } else {
+                AE_CORE_ERROR("Perspective camera not implemented!");
+                // getPerspectiveCamera()->setProjection(fov, aspectRatio, 0.1f, 100.0f);
+            }
         }
         float getZoom() const { return zoom; }
 
@@ -48,7 +61,7 @@ namespace AnEngine {
         bool orthographic;
         bool rotation;
 
-        Ref<Camera> camera;
+        Ref<BaseCamera> camera;
 
         glm::vec3 cameraPosition = {0.0f, 0.0f, 0.0f};
         float cameraRotation = 0.0f;

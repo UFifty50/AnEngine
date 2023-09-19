@@ -7,9 +7,6 @@
 
 
 namespace AnEngine {
-    Instrumentor::Instrumentor() : activeSession(false), profileCount(0) {}
-    Instrumentor::~Instrumentor() { endSession(); }
-
     void Instrumentor::beginSession(const std::string& name,
                                     const std::string& filepath) {
         if (activeSession) endSession();

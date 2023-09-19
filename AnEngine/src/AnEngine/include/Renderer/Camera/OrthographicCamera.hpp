@@ -7,13 +7,12 @@
 #include "Renderer/Camera/Camera.hpp"
 
 namespace AnEngine {
-    class OrthographicCamera : public Camera {
+    class OrthographicCamera : public BaseCamera {
     public:
         OrthographicCamera(float left, float right, float bottom, float top);
 
 
-        virtual void setProjection(float left, float right, float bottom,
-                                   float top) override {
+        void setProjection(float left, float right, float bottom, float top) {
             projectionMaxtrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
             viewProjectionMatrix = projectionMaxtrix * viewMatrix;
 
@@ -38,16 +37,16 @@ namespace AnEngine {
         virtual const glm::mat4& getProjectionMatrix() const override {
             return this->projectionMaxtrix;
         }
+
         virtual const glm::mat4& getViewMatrix() const override {
             return this->viewMatrix;
         }
+
         virtual const glm::mat4& getViewProjectionMatrix() const override {
             return this->viewProjectionMatrix;
         }
 
-        static CameraType getStaticType() { return CameraType::Orthographic; }
-
-        virtual CameraType getType() const override { return getStaticType(); }
+        virtual CameraType getType() const override { return CameraType::Orthographic; }
 
         decltype(auto) getBounds() const { return bounds; }
 

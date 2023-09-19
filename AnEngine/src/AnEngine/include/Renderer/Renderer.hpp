@@ -15,7 +15,7 @@ namespace AnEngine {
     public:
         static void init();
         static void onWindowResize(uint32_t width, uint32_t height);
-        static void beginScene(Ref<Camera> camera);
+        static void beginScene(Ref<BaseCamera> camera);
         static void endScene();
 
         static void submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray,

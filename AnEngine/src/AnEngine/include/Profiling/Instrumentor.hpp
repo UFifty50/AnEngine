@@ -17,7 +17,8 @@ namespace AnEngine {
 
     class Instrumentor {
     public:
-        ~Instrumentor();
+        Instrumentor(const Instrumentor&) = delete;
+        Instrumentor(Instrumentor&&) = delete;
         void beginSession(const std::string& name,
                           const std::string& filepath = "results.json");
         void endSession();
@@ -32,7 +33,8 @@ namespace AnEngine {
         }
 
     private:
-        Instrumentor();
+        Instrumentor() : activeSession(false), profileCount(0) {}
+        ~Instrumentor() { endSession(); }
 
 
         // state

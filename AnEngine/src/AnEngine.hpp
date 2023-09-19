@@ -19,6 +19,12 @@
 #include "AnEngine/include/Renderer/ShaderUniform.hpp"
 #include "AnEngine/include/Renderer/VertexArray.hpp"
 
+// ---Scene and Entities---
+#include "AnEngine/include/Scene/Components.hpp"
+#include "AnEngine/include/Scene/Entity.hpp"
+#include "AnEngine/include/Scene/Scene.hpp"
+#include "AnEngine/include/Scene/ScriptableEntity.hpp"
+
 // ---Textures---
 #include "AnEngine/include/Texture/Sprite.hpp"
 #include "AnEngine/include/Texture/SpriteSheet.hpp"

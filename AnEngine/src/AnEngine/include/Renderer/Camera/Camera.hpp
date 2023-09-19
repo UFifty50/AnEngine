@@ -5,15 +5,11 @@
 
 
 namespace AnEngine {
-    class OrthographicCamera;
-
     enum class CameraType { Perspective = 0, Orthographic = 1 };
 
-    class Camera {
+    class BaseCamera {
     public:
-        virtual ~Camera() = default;
-
-        virtual void setProjection(float left, float right, float bottom, float top) = 0;
+        virtual ~BaseCamera() = default;
 
         virtual void setPosition(const glm::vec3& position) = 0;
         virtual const glm::vec3& getPosition() const = 0;
@@ -26,6 +22,20 @@ namespace AnEngine {
         virtual const glm::mat4& getViewProjectionMatrix() const = 0;
 
         virtual CameraType getType() const = 0;
+    };
+
+    class ComponentCamera {
+    public:
+        ComponentCamera() = default;
+        ComponentCamera(const glm::mat4& projection) : projectionMatrix(projection) {}
+        virtual ~ComponentCamera() = default;
+
+        const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
+        //      const CameraType getType() const { return type; }
+
+    protected:
+        //      CameraType type = CameraType::Orthographic;
+        glm::mat4 projectionMatrix{1.0f};
     };
 }  // namespace AnEngine
 

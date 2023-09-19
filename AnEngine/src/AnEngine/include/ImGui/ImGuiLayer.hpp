@@ -22,10 +22,15 @@ namespace AnEngine {
         void begin();
         void end();
 
+        void loadConfig(const std::string& path);
+        void saveConfig(const std::string& path) const;
+
         void shouldAllowEvents(bool allow) { allowEvents = allow; }
 
     private:
         bool allowEvents = false;
+        bool newConfigQueued = false;
+        std::string configPath;
         float prevTime = 0.0f;
     };
 }  // namespace AnEngine

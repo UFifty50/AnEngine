@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+#include "Time/TimeStep.hpp"
+
 
 struct Sampler2D;
 
@@ -49,6 +51,20 @@ template <typename T, typename Container>
 concept IndexableContainer = requires(Container c) {
     { c.size() } -> std::convertible_to<size_t>;
     { c.operator[](size_t{}) } -> std::convertible_to<T>;
+};
+
+
+// template <typename T>
+// concept Component = std::is_same_v<T, AnEngine::TransformComponent> ||
+//                     std::is_same_v<T, AnEngine::SpriteRendererComponent> ||
+//                     std::is_same_v<T, AnEngine::TagComponent>;
+
+
+template <typename Class>
+concept Scriptable = requires(Class c) {
+    { c.onCreate() };
+    { c.onDestroy() };
+    { c.onUpdate(AnEngine::TimeStep{}) };
 };
 
 #endif

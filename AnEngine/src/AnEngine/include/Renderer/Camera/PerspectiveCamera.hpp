@@ -8,7 +8,7 @@
 
 namespace AnEngine {
     // Placeholder class for now
-    class PerspectiveCamera : Camera {};
+    class PerspectiveCamera : BaseCamera {};
 };  // namespace AnEngine
 
 #endif

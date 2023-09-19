@@ -12,6 +12,9 @@
 #include "Core/Core.hpp"
 #include "Renderer/Camera/CameraController.hpp"
 #include "Renderer/FrameBuffer.hpp"
+#include "Scene/Components.hpp"
+#include "Scene/Entity.hpp"
+#include "Scene/Scene.hpp"
 #include "Texture/Sprite.hpp"
 #include "Texture/SpriteSheet.hpp"
 
@@ -46,7 +49,7 @@ namespace AnEngine {
             }
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-            ImGui::Begin("DockSpace Demo", &dockspaceOpen, windowFlags);
+            ImGui::Begin("DockSpace", &dockspaceOpen, windowFlags);
             ImGui::PopStyleVar();
 
             ImGui::PopStyleVar(2);
@@ -59,6 +62,9 @@ namespace AnEngine {
 
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
+                    if (ImGui::MenuItem("Save UI Layout", "CTRL+S"))
+                        Application::saveUILayout("assets/layouts/CrankEditorLayout.ini");
+
                     if (ImGui::MenuItem("Exit", "ALT+F4")) Application::Shutdown();
                     /*
                     if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
@@ -69,15 +75,33 @@ namespace AnEngine {
                     */
                     ImGui::EndMenu();
                 }
-
                 ImGui::EndMenuBar();
             }
+
 
             for (auto& window : windows) {
                 window();
             }
 
             ImGui::End();
+        }
+
+
+        glm::vec2 getMousePosOnRenderedViewport(CameraController cameraController) {
+            auto camBounds = cameraController.getOrthographicCamera()->getBounds();
+            glm::vec3 pos = cameraController.getOrthographicCamera()->getPosition();
+
+            ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+            ImVec2 mousePos = ImGui::GetMousePos();
+            ImVec2 windowPos = ImGui::GetWindowPos();
+            ImVec2 mPosInVp = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
+
+            float x = (mPosInVp.x / viewportPanelSize.x) * camBounds.getWidth() -
+                      camBounds.getWidth() * 0.5f;
+            float y = camBounds.getHeight() * 0.5f -
+                      (mPosInVp.y / viewportPanelSize.y) * camBounds.getHeight();
+
+            return {x, y};
         }
 
     private:
@@ -98,12 +122,18 @@ namespace AnEngine {
         virtual void onEvent(Event& event) override;
 
     private:
+        DockSpace dockSpace;
+        Ref<Scene> activeScene;
         CameraController cameraController;
         Ref<FrameBuffer> frameBuffer;
         SpriteSheet sheet;
         Sprite sprite1;
+        Entity playerEntity;
+        Entity cameraEntity;
+        Entity lockedCameraEntity;
 
-        DockSpace dockSpace;
+        bool CameraA = true;
+
 
         bool viewportFocused = false;
         bool viewportHovered = false;

@@ -61,7 +61,13 @@ namespace AnEngine {
 
     void CameraController::onResize(float width, float height) {
         aspectRatio = width / height;
-        camera->setProjection(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+        if (orthographic) {
+            getOrthographicCamera()->setProjection(-aspectRatio * zoom,
+                                                   aspectRatio * zoom, -zoom, zoom);
+        } else {
+            AE_CORE_ERROR("Perspective camera not implemented!");
+            // getPerspectiveCamera()->setProjection(fov, aspectRatio, 0.1f, 100.0f);
+        }
     }
 
     float zoomAlgorithm(float currentZoom, float distanceScrolled, float minZoom,
@@ -89,7 +95,13 @@ namespace AnEngine {
 
     bool CameraController::onMouseScrolled(MouseScrolledEvent& scrollEvent) {
         zoom = zoomAlgorithm(zoom, scrollEvent.getYOffset(), 0.1f, 15.0f);
-        camera->setProjection(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+        if (orthographic) {
+            getOrthographicCamera()->setProjection(-aspectRatio * zoom,
+                                                   aspectRatio * zoom, -zoom, zoom);
+        } else {
+            AE_CORE_ERROR("Perspective camera not implemented!");
+            // getPerspectiveCamera()->setProjection(fov, aspectRatio, 0.1f, 100.0f);
+        }
 
         return false;
     }

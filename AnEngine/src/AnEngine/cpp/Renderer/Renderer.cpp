@@ -22,7 +22,7 @@ namespace AnEngine {
         Renderer2D::init();
     }
 
-    void Renderer::beginScene(Ref<Camera> camera) {
+    void Renderer::beginScene(Ref<BaseCamera> camera) {
         sceneData->viewProjectionMatrix = camera->getViewProjectionMatrix();
     }
 
