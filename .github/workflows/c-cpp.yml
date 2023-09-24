@@ -1,9 +1,6 @@
-name: C/C++ CI with manual trigger
+name: C++ manual trigger (Dev branch)
 
 on:
-  push:
-    branches: [ "main" ]
-
   workflow_dispatch:
     inputs:
       buildType:
