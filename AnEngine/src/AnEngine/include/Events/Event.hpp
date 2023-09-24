@@ -7,6 +7,7 @@
 
 #include "Core/Core.hpp"
 
+
 namespace AnEngine {
 
     // ----- Events -----
@@ -48,7 +49,7 @@ namespace AnEngine {
     };
 
 
-    class AE_API Event {
+    class Event {
         //     friend class EventDispatcher;
     public:
         bool handled = false;

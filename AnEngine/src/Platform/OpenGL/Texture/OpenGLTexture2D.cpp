@@ -121,34 +121,35 @@ namespace AnEngine {
         glBindTextureUnit(slot, this->rendererID);
     }
 
-    Ref<Texture> OpenGLTexture2D::getSubImage(glm::vec2 coords, glm::vec2 size) const {
-        /*AE_CORE_ASSERT(coords.x >= 0 && coords.x <= 1 && coords.y >= 0 && coords.y <= 1
-           && size.x >= 0 && size.x <= 1 && size.y >= 0 && size.y <= 1, "Invalid subimage
-           coordinates!");*/
+    // Ref<Texture> OpenGLTexture2D::getSubImage(glm::vec2 coords, glm::vec2 size) const {
+    //     /*AE_CORE_ASSERT(coords.x >= 0 && coords.x <= 1 && coords.y >= 0 && coords.y <=
+    //     1
+    //        && size.x >= 0 && size.x <= 1 && size.y >= 0 && size.y <= 1, "Invalid
+    //        subimage coordinates!");*/
 
-        uint32_t x = (uint32_t)coords.x;  // * this->width;
-        uint32_t y = (uint32_t)coords.y;  // * this->height;
-        uint32_t w = (uint32_t)size.x;    // * this->width;
-        uint32_t h = (uint32_t)size.y;    // * this->height;
+    //    uint32_t x = (uint32_t)coords.x;  // * this->width;
+    //    uint32_t y = (uint32_t)coords.y;  // * this->height;
+    //    uint32_t w = (uint32_t)size.x;    // * this->width;
+    //    uint32_t h = (uint32_t)size.y;    // * this->height;
 
-        Ref<Texture2D> subImage = Texture2D::create(w, h);
-        uint8_t* subImageData = new uint8_t[w * h * ImageFormat::getBPP(pixelFormat)];
+    //    Ref<Texture2D> subImage = Texture2D::create(w, h);
+    //    uint8_t* subImageData = new uint8_t[w * h * ImageFormat::getBPP(pixelFormat)];
 
-        for (uint32_t i = 0; i < h; i++) {
-            for (uint32_t j = 0; j < w; j++) {
-                for (uint32_t k = 0; k < ImageFormat::getBPP(pixelFormat); k++) {
-                    subImageData[(i * w + j) * ImageFormat::getBPP(pixelFormat) + k] =
-                        imageData[((i + y) * this->width + j + x) *
-                                      ImageFormat::getBPP(pixelFormat) +
-                                  k];
-                }
-            }
-        }
+    //    for (uint32_t i = 0; i < h; i++) {
+    //        for (uint32_t j = 0; j < w; j++) {
+    //            for (uint32_t k = 0; k < ImageFormat::getBPP(pixelFormat); k++) {
+    //                subImageData[(i * w + j) * ImageFormat::getBPP(pixelFormat) + k] =
+    //                    imageData[((i + y) * this->width + j + x) *
+    //                                  ImageFormat::getBPP(pixelFormat) +
+    //                              k];
+    //            }
+    //        }
+    //    }
 
-        subImage->setData(subImageData, w * h * ImageFormat::getBPP(pixelFormat));
+    //    subImage->setData(subImageData, w * h * ImageFormat::getBPP(pixelFormat));
 
-        delete[] subImageData;
+    //    delete[] subImageData;
 
-        return subImage;
-    }
+    //    return subImage;
+    //}
 };  // namespace AnEngine

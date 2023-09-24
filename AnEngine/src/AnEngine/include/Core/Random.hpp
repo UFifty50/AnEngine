@@ -5,6 +5,10 @@
 
 #include "Core/Concepts.hpp"
 
+#undef min
+#undef max
+
+
 namespace AnEngine {
     class Random {
     public:

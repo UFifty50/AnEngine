@@ -11,7 +11,7 @@ namespace AnEngine {
 
     class Scene {
     public:
-        Scene();
+        Scene() = default;
         ~Scene() = default;
 
         Entity createEntity(const std::string& name = "");

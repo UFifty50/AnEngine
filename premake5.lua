@@ -115,7 +115,6 @@ project "AnEngine"
 
         defines { 
             "AE_LINUX",
-            "AE_DLL",
         }
 
     filter "system:windows"
@@ -133,7 +132,6 @@ project "AnEngine"
 
         defines { 
             "AE_WIN",
-            "AE_DLL",
             "GLFW_INCLUDE_NONE"
         }
 
@@ -149,12 +147,12 @@ project "AnEngine"
         }
 
     filter "configurations:Debug"
-        defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }
+        defines { "AE_DEBUG_FLAG", "_DEBUG" }
         runtime "Debug"
         symbols "on"
 
     filter "configurations:Release"
-        defines { "AE_RELEASE", "AE_RELEASE_PROFILING" }
+        defines { "AE_RELEASE" }
         flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
@@ -226,12 +224,12 @@ project "Crank"
         }
 
     filter "configurations:Debug"
-        defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }
+        defines { "AE_DEBUG_FLAG", "_DEBUG" }
         runtime "Debug"
         symbols "on"
 
     filter "configurations:Release"
-        defines { "AE_RELEASE", "AE_RELEASE_PROFILING" }
+        defines { "AE_RELEASE" }
         flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
@@ -304,12 +302,12 @@ project "Sandbox"
         }
 
     filter "configurations:Debug"
-        defines { "AE_DEBUG_FLAG", "_DEBUG", "AE_PROFILING" }
+        defines { "AE_DEBUG_FLAG", "_DEBUG" }
         runtime "Debug"
         symbols "on"
 
     filter "configurations:Release"
-        defines { "AE_RELEASE", "AE_RELEASE_PROFILING" }
+        defines { "AE_RELEASE" }
         flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"

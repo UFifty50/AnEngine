@@ -18,6 +18,7 @@ namespace AnEngine {
             orthoSize = size;
             recalculateProjection();
         }
+        decltype(auto) getOrthographicBounds() const { return orthoBounds; }
 
     private:
         float orthoSize = 10.0f;
@@ -25,6 +26,16 @@ namespace AnEngine {
         float orthoFar = 1.0f;
 
         float aspectRatio = 1.0f;
+
+        struct {
+            float left;
+            float right;
+            float bottom;
+            float top;
+
+            float getWidth() { return right - left; }
+            float getHeight() { return top - bottom; }
+        } orthoBounds;
 
         void recalculateProjection();
     };

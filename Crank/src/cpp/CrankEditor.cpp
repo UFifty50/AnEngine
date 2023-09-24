@@ -7,9 +7,12 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include "Application.hpp"
 #include "Core/Core.hpp"
 #include "Core/Input.hpp"
 #include "Core/Layer.hpp"
+#include "Core/Log.hpp"
+#include "Core/Random.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Renderer2D.hpp"
@@ -19,42 +22,37 @@
 #include "Scene/ScriptableEntity.hpp"
 
 
-namespace AnEngine {
+namespace AnEngine::Crank {
     class LockedCameraController : public ScriptableEntity {
     public:
-        void onCreate() {}
-        void onDestroy() {}
+        void onCreate() {
+            auto& transform = getComponent<TransformComponent>().Transform;
+            transform[3][0] = Random::getFloat() * 10.0f - 5.0f;
+        }
+
         void onUpdate(TimeStep deltaTime) {
             auto& transform = getComponent<TransformComponent>().Transform;
             float speed = 2.0f;
             float zoom = 2.0f;
 
             if (Input::isKeyPressed(KeyCode::A)) {
-                transform[3][0] += speed * (zoom / 2) * deltaTime;
-            } else if (Input::isKeyPressed(KeyCode::D)) {
                 transform[3][0] -= speed * (zoom / 2) * deltaTime;
+            } else if (Input::isKeyPressed(KeyCode::D)) {
+                transform[3][0] += speed * (zoom / 2) * deltaTime;
             }
 
             if (Input::isKeyPressed(KeyCode::W)) {
-                transform[3][1] -= speed * (zoom / 2) * deltaTime;
-            } else if (Input::isKeyPressed(KeyCode::S)) {
                 transform[3][1] += speed * (zoom / 2) * deltaTime;
+            } else if (Input::isKeyPressed(KeyCode::S)) {
+                transform[3][1] -= speed * (zoom / 2) * deltaTime;
             }
         }
     };
 
-    CrankEditor::CrankEditor()
-        : Layer("CrankEditor"),
-          cameraController(1280.0f / 720.0f, 75, true, true),
-          viewportSize(0.0f),
-          viewportPos(0.0f),
-          mousePosInViewport(0.0f),
-          sheet("assets/textures/RPGpack_sheet_2X.png", 128, 128) {}
+    CrankEditor::CrankEditor() : Layer("CrankEditor") {}
 
     void CrankEditor::onAttach() {
         Application::loadUILayout("assets/layouts/CrankEditorLayout.ini");
-
-        sprite1 = sheet.getSprite({4, 9});
 
         activeScene = MakeRef<Scene>();
         playerEntity = activeScene->createEntity("Player");
@@ -68,8 +66,13 @@ namespace AnEngine {
         auto& cc = lockedCameraEntity.addComponent<CameraComponent>();
         cc.Primary = false;
 
-        // lockedCameraEntity.addNativeScript<LockedCameraController>();
-        cameraEntity.addComponent<NativeScriptComponent>().bind<LockedCameraController>();
+        // cameraEntity.addNativeScript<LockedCameraController>("Camera Controller");
+        cameraEntity.addComponent<NativeScriptComponent>("Camera Controller")
+            .bind<LockedCameraController>();
+        lockedCameraEntity.addComponent<NativeScriptComponent>("Locked Camera Controller")
+            .bind<LockedCameraController>();
+
+        lockedCameraEntity.removeComponent<CameraComponent>();
 
 
         FrameBufferSpec spec = {1280, 720};
@@ -129,26 +132,7 @@ namespace AnEngine {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
             ImGui::Begin("Viewport");
 
-            viewportFocused = ImGui::IsWindowFocused();
-            viewportHovered = ImGui::IsWindowHovered();
-            Application::getImGuiLayer()->shouldAllowEvents(viewportFocused &&
-                                                            viewportHovered);
-
-            ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-            ImVec2 mousePos = ImGui::GetMousePos();
-            ImVec2 windowPos = ImGui::GetWindowPos();
-            ImVec2 rootViewportPos = ImGui::GetMainViewport()->Pos;
-
-            ImVec2 vpPos =
-                ImVec2(windowPos.x - rootViewportPos.x, windowPos.y - rootViewportPos.y);
-            ImVec2 mPosInVp = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
-
-            viewportSize = glm::vec2{viewportPanelSize.x, viewportPanelSize.y};
-            mousePosInViewport = glm::vec2{mPosInVp.x, mPosInVp.y};
-            viewportPos = glm::vec2{vpPos.x, vpPos.y};
-
-            ImGui::Image((void*)texID, ImVec2{viewportSize.x, viewportSize.y}, {0, 1},
-                         {1, 0});
+            ImGui::Image((void*)texID, dockSpace.getViewportSize(), {0, 1}, {1, 0});
             ImGui::End();
             ImGui::PopStyleVar();
         });
@@ -157,13 +141,18 @@ namespace AnEngine {
     void CrankEditor::onDetach() {}
 
     void CrankEditor::onUpdate(TimeStep deltaTime) {
-        if (viewportFocused) cameraController.onUpdate(deltaTime);
+        //     if (viewportFocused) cameraController.onUpdate(deltaTime);
+        AE_CORE_WARN("({0}, {1})", dockSpace.getMousePosInViewport().x,
+                     dockSpace.getMousePosInViewport().y);
 
-        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f) {
-            frameBuffer->resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-            cameraController.onResize(viewportSize.x, viewportSize.y);
+        if (dockSpace.getViewportSize().x > 0.0f &&
+            dockSpace.getViewportSize().y > 0.0f) {
+            frameBuffer->resize((uint32_t)dockSpace.getViewportSize().x,
+                                (uint32_t)dockSpace.getViewportSize().y);
+            //    cameraController.onResize(viewportSize.x, viewportSize.y);
 
-            activeScene->onResize(viewportSize.x, viewportSize.y);
+            activeScene->onResize(dockSpace.getViewportSize().x,
+                                  dockSpace.getViewportSize().y);
         }
 
         Renderer2D::resetStats();
@@ -184,5 +173,5 @@ namespace AnEngine {
 
     void CrankEditor::onImGuiRender() { dockSpace.render(); }
 
-    void CrankEditor::onEvent(Event& event) { cameraController.onEvent(event); }
-}  // namespace AnEngine
+    void CrankEditor::onEvent(Event& event) {}
+}  // namespace AnEngine::Crank

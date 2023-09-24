@@ -76,7 +76,8 @@ namespace AnEngine {
         virtual Sampler2D getSampler() const = 0;
         virtual void setData(void* data, uint32_t size) = 0;
 
-        virtual Ref<Texture> getSubImage(glm::vec2 coords, glm::vec2 size) const = 0;
+        //     virtual Ref<Texture> getSubImage(glm::vec2 coords, glm::vec2 size) const =
+        //     0;
 
         virtual void bind(uint32_t slot = 0) const = 0;
 

@@ -10,7 +10,6 @@
 
 
 namespace AnEngine {
-
     class Application {
     public:
         struct Data {
@@ -39,23 +38,32 @@ namespace AnEngine {
         static Window& getWindow() { return *applicationData.window; }
         static Ref<ImGuiLayer> getImGuiLayer() { return applicationData.imGuiLayer; }
 
+
+        /*
+         * TODO: Custom UI Layout language
+         */
+
         static void loadUILayout(const std::string& path) {
+            // TODO: ImGuiFileDialogue load custom location
             applicationData.imGuiLayer->loadConfig(path);
         }
 
         static void saveUILayout(const std::string& path) {
+            // TODO: ImGuiFileDialogue change save location
             applicationData.imGuiLayer->saveConfig(path);
         }
+
+        static int AEmain(int argc, char** argv);
 
     private:
         static bool onWindowClose(WindowCloseEvent& closeEvent);
         static bool onWindowResize(WindowResizeEvent& resizeEvent);
     };
 
-    int main(int argc, char** argv);
 
     // user defined
     Application* CreateApplication();
 }  // namespace AnEngine
+
 
 #endif

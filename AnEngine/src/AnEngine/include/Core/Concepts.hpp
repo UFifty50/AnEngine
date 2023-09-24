@@ -53,18 +53,20 @@ concept IndexableContainer = requires(Container c) {
     { c.operator[](size_t{}) } -> std::convertible_to<T>;
 };
 
+/*
+template <typename T>
+concept Component = std::is_same_v<T, AnEngine::TransformComponent> ||
+                    std::is_same_v<T, AnEngine::SpriteRendererComponent> ||
+                    std::is_same_v<T, AnEngine::TagComponent>;
+*/
 
-// template <typename T>
-// concept Component = std::is_same_v<T, AnEngine::TransformComponent> ||
-//                     std::is_same_v<T, AnEngine::SpriteRendererComponent> ||
-//                     std::is_same_v<T, AnEngine::TagComponent>;
-
-
+/*
 template <typename Class>
 concept Scriptable = requires(Class c) {
     { c.onCreate() };
     { c.onDestroy() };
     { c.onUpdate(AnEngine::TimeStep{}) };
 };
+*/
 
 #endif

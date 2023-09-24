@@ -4,7 +4,7 @@
 #include "Renderer/RenderAPI.hpp"
 
 
-namespace AnEngine {
+namespace AnEngine::Crank {
     class CrankApp : public Application {
     public:
         CrankApp() { pushLayer(std::make_shared<CrankEditor>()); }
@@ -17,4 +17,4 @@ namespace AnEngine {
         Application::Init("Crank - AnEngine");
         return new CrankApp();
     }
-}  // namespace AnEngine
+}  // namespace AnEngine::Crank

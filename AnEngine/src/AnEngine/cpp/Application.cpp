@@ -125,7 +125,7 @@ namespace AnEngine {
         applicationData.exitCode = exitCode;
     }
 
-    int main(int argc, char** argv) {
+    int Application::AEmain(int argc, char** argv) {
         Log::init();
 
         AE_PROFILE_BEGIN_SESSION("Startup", "AnEngineProfile-Startup.json");

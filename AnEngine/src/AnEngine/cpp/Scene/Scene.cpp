@@ -10,25 +10,26 @@
 
 
 namespace AnEngine {
-    Scene::Scene() {}
     Entity Scene::createEntity(const std::string& name) {
         Entity e = {entityRegistry.create(), this};
         e.addComponent<TransformComponent>();
-        auto& tag = e.addComponent<TagComponent>(name);
-        tag.Tag = name.empty() ? "Entity" : name;
+        auto& tag = e.addComponent<TagComponent>(name.empty() ? "Entity" : name);
         return e;
     }
 
     void Scene::onUpdate(TimeStep deltaTime) {
         entityRegistry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
+            // TODO: Move to onScenePlay functiom
             if (!nsc.Instance) {
+                AE_CORE_ASSERT(nsc.instantiateScriptInstance, "Script {0} not bound!",
+                               nsc.Name);
                 nsc.instantiateScriptInstance();
                 nsc.Instance->entity = Entity{entity, this};
 
-                nsc.onCreate();
+                nsc.Instance->onCreate();
             }
 
-            nsc.onUpdate(deltaTime);
+            nsc.Instance->onUpdate(deltaTime);
         });
 
         ComponentCamera* mainCamera = nullptr;
@@ -36,7 +37,7 @@ namespace AnEngine {
 
         auto cameraView = entityRegistry.view<TransformComponent, CameraComponent>();
         for (auto entity : cameraView) {
-            const auto& [transform, camera] =
+            auto [transform, camera] =
                 cameraView.get<TransformComponent, CameraComponent>(entity);
             if (camera.Primary) {
                 mainCamera = &camera.Camera;
@@ -49,13 +50,12 @@ namespace AnEngine {
             Renderer2D::beginScene(mainCamera->getProjectionMatrix(),
                                    *mainCameraTransform);
 
-            auto spriteView = entityRegistry.group<TransformComponent>(
+            auto spriteGroup = entityRegistry.group<TransformComponent>(
                 entt::get<SpriteRendererComponent>);
-            // entityRegistry.view<TransformComponent, SpriteRendererComponent>();
 
-            for (auto entity : spriteView) {
-                const auto& [transform, sprite] =
-                    spriteView.get<TransformComponent, SpriteRendererComponent>(entity);
+            for (auto entity : spriteGroup) {
+                auto [transform, sprite] =
+                    spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
                 Renderer2D::drawQuad(transform, sprite.Colour);
             }

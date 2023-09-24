@@ -27,6 +27,7 @@ namespace AnEngine {
         float right = -left;
         float top = orthoSize * 0.5;
         float bottom = -top;
+        orthoBounds = {left, right, bottom, top};
         projectionMatrix = glm::ortho(left, right, bottom, top, orthoNear, orthoFar);
     }
 }  // namespace AnEngine

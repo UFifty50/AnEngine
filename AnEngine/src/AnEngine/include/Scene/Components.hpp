@@ -4,8 +4,8 @@
 #include <glm/glm.hpp>
 
 #include <functional>
+#include <string>
 
-#include "Core/Concepts.hpp"
 #include "Scene/SceneCamera.hpp"
 #include "Scene/ScriptableEntity.hpp"
 #include "Time/TimeStep.hpp"
@@ -50,22 +50,23 @@ namespace AnEngine {
         CameraComponent(const CameraComponent&) = default;
     };
 
+
     struct NativeScriptComponent {
-        ScriptableEntity* Instance;
+        ScriptableEntity* Instance = nullptr;
+        std::string Name;
 
-        std::function<void()> instantiateScriptInstance;
-        std::function<void()> deleteScriptInstance;
+        std::function<void()> instantiateScriptInstance = nullptr;
+        std::function<void()> deleteScriptInstance = nullptr;
 
-        std::function<void()> onCreate;
-        std::function<void()> onDestroy;
-        std::function<void(TimeStep)> onUpdate;
+        NativeScriptComponent(std::string name) : Name(name) {}
 
-        template <Scriptable Script>
+        template <class Script>
         void bind() {
             instantiateScriptInstance = [&]() { Instance = new Script(); };
-            deleteScriptInstance = [&]() { delete (Script*)Instance; };
-            onCreate = [&]() { ((Script*)Instance)->onCreate(); };
-            onUpdate = [&](TimeStep dt) { ((Script*)Instance)->onUpdate(dt); };
+            deleteScriptInstance = [&]() {
+                delete (Script*)Instance;
+                Instance = nullptr;
+            };
         }
     };
 }  // namespace AnEngine

@@ -9,7 +9,7 @@
 
 
 namespace AnEngine {
-    class AE_API WindowResizeEvent : public Event {
+    class WindowResizeEvent : public Event {
     private:
         unsigned int width, height;
 
@@ -30,7 +30,7 @@ namespace AnEngine {
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
-    class AE_API WindowCloseEvent : public Event {
+    class WindowCloseEvent : public Event {
     public:
         WindowCloseEvent() {}
 
@@ -38,7 +38,7 @@ namespace AnEngine {
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
-    class AE_API AppTickEvent : public Event {
+    class AppTickEvent : public Event {
     public:
         AppTickEvent() {}
 
@@ -46,14 +46,14 @@ namespace AnEngine {
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
-    class AE_API AppUpdateEvent : public Event {
+    class AppUpdateEvent : public Event {
         AppUpdateEvent() {}
 
         EVENT_CLASS_TYPE(AppUpdate)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
-    class AE_API AppRenderEvent : public Event {
+    class AppRenderEvent : public Event {
         AppRenderEvent() {}
 
         EVENT_CLASS_TYPE(AppRender)
