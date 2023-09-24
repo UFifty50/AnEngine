@@ -1,0 +1,71 @@
+name: C++ manual trigger (dev branch)
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildType:
+        description: 'Build type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+        - debug
+        - release
+        - distribution
+
+jobs:
+  build-ubuntu:
+
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-12
+      CXX: g++-12
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: install stuff
+      run: sudo apt update && sudo apt install -y libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglew-dev gcc-12
+
+    - name: configure
+      run: vendor/premake/premake5 gmake2
+
+    - name: build
+      run: make config=debug all
+
+    - name: package
+      run: tar -a -c -f AnEngine-dbg.linux.zip bin/Debug-linux-x86_64/Sandbox
+
+    - name: upload
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: "AnEngine-dbg.linux"
+        path: "./AnEngine-dbg.linux.zip"
+
+
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: microsoft/setup-msbuild@v1.0.2
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: configure
+      run: vendor/premake/premake5.exe vs2022
+
+    - name: build
+      run: msbuild
+
+    - name: package
+      run: tar.exe -a -c -f AnEngine-dbg.windows.zip bin/Debug-windows-x86_64/Sandbox
+
+    - name: upload
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: "AnEngine-dbg.windows"
+        path: "./AnEngine-dbg.windows.zip"
