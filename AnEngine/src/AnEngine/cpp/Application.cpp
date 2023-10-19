@@ -92,7 +92,7 @@ namespace AnEngine {
                    "Renderer::setAPI() in CreateApplication"
                 << std::endl;
             AE_CORE_ASSERT(false, msg.str().c_str());
-            return -200;
+            return 1;
         }
 
         while (applicationData.running) {

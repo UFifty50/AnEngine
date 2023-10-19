@@ -5,16 +5,16 @@
 
 
 namespace AnEngine {
-    class CrankApp : public Application {
+    class SandboxApp : public Application {
     public:
-        CrankApp() { pushLayer(std::make_shared<SandBox2D>()); }
+        SandboxApp() { pushLayer(std::make_shared<SandBox2D>()); }
 
-        ~CrankApp() {}
+        ~SandboxApp() {}
     };
 
     Application* CreateApplication() {
         RenderAPI::setAPI(RenderAPI::OpenGL);
         Application::Init("SandBox - AnEngine");
-        return new CrankApp();
+        return new SandboxApp();
     }
 }  // namespace AnEngine

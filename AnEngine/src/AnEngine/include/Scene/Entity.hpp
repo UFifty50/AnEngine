@@ -24,7 +24,7 @@ namespace AnEngine {
         T& getComponent() {
             AE_CORE_ASSERT(hasComponent<T>(),
                            "Entity does not have component of type {0}!",
-                           typeid(T).raw_name());
+                           typeid(T).name());
             return scene->entityRegistry.get<T>(entityHandle);
         }
 

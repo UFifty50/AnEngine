@@ -58,25 +58,37 @@ namespace AnEngine::Crank {
 
 
         for (auto& window : windows) {
-            window();
+            for (auto& [styleVar, value] : window.styleVars) {
+                if (float* f = std::get_if<float>(&value))
+                    ImGui::PushStyleVar(styleVar, *f);
+                else if (ImVec2* v = std::get_if<ImVec2>(&value))
+                    ImGui::PushStyleVar(styleVar, *v);
+            }
+            ImGui::Begin(window.name);
+            window.fn();
+            ImGui::End();
+
+            for (auto& styleVar : window.styleVars) {
+                ImGui::PopStyleVar();
+            }
         }
 
-        updateViewportInfo();
+        windowPos = ImGui::GetWindowPos();
+        windowSize = ImGui::GetWindowSize();
+        windowFocused = ImGui::IsWindowFocused();
+        windowHovered = ImGui::IsWindowHovered();
 
         ImGui::End();
     }
 
     void DockSpace::updateViewportInfo() {
-        ImVec2 mousePos = ImGui::GetMousePos();
-        ImVec2 windowPos = ImGui::GetWindowPos();
-        ImVec2 rootViewportPos = ImGui::GetMainViewport()->Pos;
+        auto vMin = ImGui::GetWindowContentRegionMin();
+        auto vMax = ImGui::GetWindowContentRegionMax();
 
-        mousePosInViewport = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
-        viewportPos =
-            ImVec2(windowPos.x - rootViewportPos.x, windowPos.y - rootViewportPos.y);
-        viewportSize = ImGui::GetContentRegionAvail();
-        viewportFocused = ImGui::IsWindowFocused();
-        viewportHovered = ImGui::IsWindowHovered();
+        viewportSize = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y);
+        viewportPos = ImGui::GetWindowPos();
+        viewportFocused = ImGui::IsItemFocused();
+        viewportHovered = ImGui::IsItemHovered();
     }
 
     // glm::vec2 DockSpace::getMousePosOnRenderedViewport(CameraComponent cameraComponent)

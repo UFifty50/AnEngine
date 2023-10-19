@@ -4,17 +4,19 @@
 #include "Renderer/RenderAPI.hpp"
 
 
-namespace AnEngine::Crank {
-    class CrankApp : public Application {
-    public:
-        CrankApp() { pushLayer(std::make_shared<CrankEditor>()); }
+namespace AnEngine {
+    namespace Crank {
+        class CrankApp : public Application {
+        public:
+            CrankApp() { pushLayer(std::make_shared<CrankEditor>()); }
 
-        ~CrankApp() {}
-    };
+            ~CrankApp() {}
+        };
+    }  // namespace Crank
 
     Application* CreateApplication() {
         RenderAPI::setAPI(RenderAPI::OpenGL);
         Application::Init("Crank - AnEngine");
-        return new CrankApp();
+        return new Crank::CrankApp();
     }
-}  // namespace AnEngine::Crank
+}  // namespace AnEngine
