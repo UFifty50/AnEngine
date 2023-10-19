@@ -9,6 +9,8 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include "Core/Core.hpp"
+#include "Panels/Panel.hpp"
 // #include "Scene/Components.hpp"
 
 
@@ -16,18 +18,12 @@ namespace AnEngine::Crank {
     static bool dockspaceOpen = true;
     static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
 
-    struct DockedWindow {
-        const char* name;
-        std::function<void(void)> fn;
-        std::unordered_map<ImGuiStyleVar, std::variant<float, ImVec2>> styleVars = {};
-    };
-
     class DockSpace {
     public:
-        DockSpace() {}
+        DockSpace() : panels({}) {}
         ~DockSpace() = default;
 
-        void addWindow(DockedWindow window) { windows.push_back(window); }
+        void addPanel(Ref<Panel> panel) { panels.push_back(panel); }
         void render();
 
         //    glm::vec2 getMousePosOnRenderedViewport(CameraComponent cameraComponent);
@@ -45,7 +41,7 @@ namespace AnEngine::Crank {
         bool isWindowHovered() { return windowHovered; }
 
     private:
-        std::vector<DockedWindow> windows;
+        std::vector<Ref<Panel>> panels;
 
         bool viewportFocused = false;
         bool viewportHovered = false;

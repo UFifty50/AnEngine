@@ -7,6 +7,7 @@
 #include "Core/Layer.hpp"
 #include "Dockspace.hpp"
 #include "Events/Event.hpp"
+#include "Panels/Panel.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Scene/Entity.hpp"
 #include "Scene/Scene.hpp"
@@ -24,6 +25,8 @@ namespace AnEngine::Crank {
         virtual void onUpdate(TimeStep deltaTime) override;
         virtual void onImGuiRender() override;
         virtual void onEvent(Event& event) override;
+
+        friend class Panel;
 
     private:
         DockSpace dockSpace;

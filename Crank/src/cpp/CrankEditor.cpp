@@ -13,6 +13,10 @@
 #include "Core/Layer.hpp"
 #include "Core/Log.hpp"
 #include "Core/Random.hpp"
+#include "Panels/ScenesPanel.hpp"
+#include "Panels/SettingsPanel.hpp"
+#include "Panels/StatisticsPanel.hpp"
+#include "Panels/ViewportPanel.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Renderer2D.hpp"
@@ -79,60 +83,11 @@ namespace AnEngine::Crank {
         frameBuffer = FrameBuffer::create(spec);
 
 
-        dockSpace.addWindow(DockedWindow{
-            "Statistics", [&]() {
-                ImGui::Text("Renderer2D Stats:");
-                ImGui::Text("FrameTime: %.2fms", Renderer2D::getStats().lastFrameTime);
-                ImGui::Text("FPS: %.1f", 1000.0f / Renderer2D::getStats().lastFrameTime);
-                ImGui::Text("Draw Calls: %d", Renderer2D::getStats().draws);
-                ImGui::Text("Quads: %d", Renderer2D::getStats().quadCount);
-                ImGui::Text("Vertices: %d", Renderer2D::getStats().getTotalVertexCount());
-                ImGui::Text("Indices: %d", Renderer2D::getStats().getTotalIndexCount());
-            }});
-
-        dockSpace.addWindow(DockedWindow{
-            "Settings", [&]() {
-                glm::vec4& colour =
-                    playerEntity.getComponent<SpriteRendererComponent>().Colour;
-                std::string name = playerEntity.getComponent<TagComponent>().Tag;
-
-                ImGui::Text("%s Colour: {%.0f, %.0f, %.0f, %.0f}", name.c_str(),
-                            colour.x * 255.0f, colour.y * 255.0f, colour.z * 255.0f,
-                            colour.w * 255.0f);
-
-                ImGui::ColorEdit4("", glm::value_ptr(colour));
-
-                ImGui::Separator();
-
-                ImGui::Text("Camera Settings");
-                ImGui::DragFloat2(
-                    "Position",
-                    glm::value_ptr(
-                        cameraEntity.getComponent<TransformComponent>().Transform[3]),
-                    0.1f);
-
-                if (ImGui::Checkbox("Camera A", &CameraA)) {
-                    cameraEntity.getComponent<CameraComponent>().Primary = CameraA;
-                    lockedCameraEntity.getComponent<CameraComponent>().Primary = !CameraA;
-                }
-
-                auto& camera = lockedCameraEntity.getComponent<CameraComponent>().Camera;
-                float orthoSize = camera.getOrthographicSize();
-                if (ImGui::DragFloat("LockedCamera ortho size", &orthoSize)) {
-                    camera.setOrthographicSize(orthoSize);
-                }
-            }});
-
-        dockSpace.addWindow(DockedWindow{
-            "Viewport",
-            [&]() {
-                uint32_t texID = frameBuffer->getColorAttachmentID();
-
-                ImGui::Image((void*)texID, dockSpace.getViewportSize(), {0, 1}, {1, 0});
-
-                dockSpace.updateViewportInfo();
-            },
-            {{ImGuiStyleVar_WindowPadding, ImVec2{0, 0}}}});
+        dockSpace.addPanel(MakeRef<ViewportPanel>("viewport", frameBuffer, dockSpace));
+        dockSpace.addPanel(MakeRef<ScenesPanel>("Scene Heirarchy"));
+        dockSpace.addPanel(MakeRef<SettingsPanel>("Settings", playerEntity, cameraEntity,
+                                                  lockedCameraEntity, CameraA));
+        dockSpace.addPanel(MakeRef<StatisticsPanel>("Statistics"));
     }
 
     void CrankEditor::onDetach() {}

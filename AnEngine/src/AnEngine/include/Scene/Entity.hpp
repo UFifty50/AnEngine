@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 
 // #include "Scene/Components.hpp"
+#include "Core/Log.hpp"
 #include "Scene/Scene.hpp"
 
 
@@ -11,7 +12,7 @@ namespace AnEngine {
 
     class Entity {
     public:
-        Entity() = default;
+        Entity() : entityHandle(entt::null), scene(new Scene()) {}
         Entity(entt::entity handle, Scene* scene) : entityHandle(handle), scene(scene) {}
         Entity(const Entity& other) = default;
 

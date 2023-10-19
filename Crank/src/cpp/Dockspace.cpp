@@ -57,20 +57,10 @@ namespace AnEngine::Crank {
         }
 
 
-        for (auto& window : windows) {
-            for (auto& [styleVar, value] : window.styleVars) {
-                if (float* f = std::get_if<float>(&value))
-                    ImGui::PushStyleVar(styleVar, *f);
-                else if (ImVec2* v = std::get_if<ImVec2>(&value))
-                    ImGui::PushStyleVar(styleVar, *v);
-            }
-            ImGui::Begin(window.name);
-            window.fn();
-            ImGui::End();
-
-            for (auto& styleVar : window.styleVars) {
-                ImGui::PopStyleVar();
-            }
+        for (auto& panel : panels) {
+            panel->begin();
+            panel->render();
+            panel->end();
         }
 
         windowPos = ImGui::GetWindowPos();
