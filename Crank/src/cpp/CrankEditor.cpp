@@ -13,8 +13,8 @@
 #include "Core/Layer.hpp"
 #include "Core/Log.hpp"
 #include "Core/Random.hpp"
+#include "Panels/PropertiesPanel.hpp"
 #include "Panels/ScenesPanel.hpp"
-#include "Panels/SettingsPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
 #include "Panels/ViewportPanel.hpp"
 #include "Renderer/FrameBuffer.hpp"
@@ -58,13 +58,16 @@ namespace AnEngine::Crank {
     void CrankEditor::onAttach() {
         Application::loadUILayout("assets/layouts/CrankEditorLayout.ini");
 
-        activeScene = MakeRef<Scene>();
+        activeScene = MakeRef<Scene>("Test Scene");
         playerEntity = activeScene->createEntity("Player");
+        bgEntity = activeScene->createEntity("Background");
         cameraEntity = activeScene->createEntity("Camera");
         lockedCameraEntity = activeScene->createEntity("LockedCamera");
 
         playerEntity.addComponent<SpriteRendererComponent>(
             glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+
+        bgEntity.addComponent<SpriteRendererComponent>(glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
 
         cameraEntity.addComponent<CameraComponent>();
         auto& cc = lockedCameraEntity.addComponent<CameraComponent>();
@@ -76,30 +79,24 @@ namespace AnEngine::Crank {
         lockedCameraEntity.addComponent<NativeScriptComponent>("Locked Camera Controller")
             .bind<CameraController>();
 
-        //   lockedCameraEntity.removeComponent<CameraComponent>();
-
 
         FrameBufferSpec spec = {1280, 720};
         frameBuffer = FrameBuffer::create(spec);
 
-
+        auto sp = MakeRef<ScenesPanel>("Scene Heirarchy", activeScene);
+        dockSpace.addPanel(sp);
+        dockSpace.addPanel(MakeRef<PropertiesPanel>("Properties", sp));
         dockSpace.addPanel(MakeRef<ViewportPanel>("viewport", frameBuffer, dockSpace));
-        dockSpace.addPanel(MakeRef<ScenesPanel>("Scene Heirarchy"));
-        dockSpace.addPanel(MakeRef<SettingsPanel>("Settings", playerEntity, cameraEntity,
-                                                  lockedCameraEntity, CameraA));
         dockSpace.addPanel(MakeRef<StatisticsPanel>("Statistics"));
     }
 
     void CrankEditor::onDetach() {}
 
     void CrankEditor::onUpdate(TimeStep deltaTime) {
-        //     if (viewportFocused) cameraController.onUpdate(deltaTime);
-
         if (dockSpace.getViewportSize().x > 0.0f &&
             dockSpace.getViewportSize().y > 0.0f) {
             frameBuffer->resize((uint32_t)dockSpace.getViewportSize().x,
                                 (uint32_t)dockSpace.getViewportSize().y);
-            //    cameraController.onResize(viewportSize.x, viewportSize.y);
 
             activeScene->onResize(dockSpace.getViewportSize().x,
                                   dockSpace.getViewportSize().y);

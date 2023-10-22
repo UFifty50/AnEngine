@@ -25,6 +25,8 @@ namespace AnEngine {
 
     struct SpriteRendererComponent {
         glm::vec4 Colour{1.0f};
+        // TODO: Ref<Material>
+        // Ref<Texture2D> Texture = {};
 
         SpriteRendererComponent() = default;
         SpriteRendererComponent(const SpriteRendererComponent&) = default;

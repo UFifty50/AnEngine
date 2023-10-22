@@ -14,9 +14,9 @@ namespace AnEngine::Crank {
     public:
         StatisticsPanel(std::string name);
 
-        virtual void begin() override;
+        virtual void beforeRender() override {}
         virtual void render() override;
-        virtual void end() override;
+        virtual void afterRender() override {}
 
         virtual std::string getName() override { return name; }
 

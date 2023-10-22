@@ -11,9 +11,9 @@ namespace AnEngine::Crank {
     public:
         virtual ~Panel() = default;
 
-        virtual void begin() = 0;
+        virtual void beforeRender() = 0;
         virtual void render() = 0;
-        virtual void end() = 0;
+        virtual void afterRender() = 0;
 
         virtual std::string getName() = 0;
     };

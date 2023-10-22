@@ -6,8 +6,6 @@
 namespace AnEngine::Crank {
     StatisticsPanel::StatisticsPanel(std::string name) : name(name) {}
 
-    void StatisticsPanel::begin() { ImGui::Begin(name.c_str()); }
-
     void StatisticsPanel::render() {
         ImGui::Text("Renderer2D Stats:");
         ImGui::Text("FrameTime: %.2fms", Renderer2D::getStats().lastFrameTime);
@@ -17,6 +15,4 @@ namespace AnEngine::Crank {
         ImGui::Text("Vertices: %d", Renderer2D::getStats().getTotalVertexCount());
         ImGui::Text("Indices: %d", Renderer2D::getStats().getTotalIndexCount());
     }
-
-    void StatisticsPanel::end() { ImGui::End(); }
 }  // namespace AnEngine::Crank

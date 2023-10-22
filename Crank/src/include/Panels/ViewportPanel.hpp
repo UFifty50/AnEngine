@@ -12,9 +12,9 @@ namespace AnEngine::Crank {
     public:
         ViewportPanel(std::string name, const Ref<FrameBuffer>& fbuf, DockSpace& dspace);
 
-        virtual void begin() override;
+        virtual void beforeRender() override;
         virtual void render() override;
-        virtual void end() override;
+        virtual void afterRender() override;
 
         virtual std::string getName() override { return name; }
 

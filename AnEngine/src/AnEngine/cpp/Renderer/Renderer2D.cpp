@@ -100,7 +100,7 @@ namespace AnEngine {
             return;
         }
 
-        //  AE_CORE_ASSERT(camera.getType() == CameraType::Orthographic,
+        //  AE_CORE_ASSERT(camera.getType() == ProjectionType::Orthographic,
         //                  "Renderer2D only supports Orthographic Cameras!");
 
         glm::mat4 viewProjection = camera.getProjectionMatrix() * glm::inverse(transform);
@@ -127,7 +127,7 @@ namespace AnEngine {
             return;
         }
 
-        AE_CORE_ASSERT(camera->getType() == CameraType::Orthographic,
+        AE_CORE_ASSERT(camera->getType() == ProjectionType::Orthographic,
                        "Renderer2D only supports Orthographic Cameras!");
 
         Ref<Shader> quadShader = rendererData.shaderLibrary.get("QuadShader");

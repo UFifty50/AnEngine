@@ -8,9 +8,8 @@ namespace AnEngine::Crank {
                                  DockSpace& dspace)
         : name(name), frameBuffer(fbuf), dockSpace(dspace) {}
 
-    void ViewportPanel::begin() {
+    void ViewportPanel::beforeRender() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-        ImGui::Begin(name.c_str());
     }
 
     void ViewportPanel::render() {
@@ -21,8 +20,5 @@ namespace AnEngine::Crank {
         dockSpace.updateViewportInfo();
     }
 
-    void ViewportPanel::end() {
-        ImGui::End();
-        ImGui::PopStyleVar();
-    }
+    void ViewportPanel::afterRender() { ImGui::PopStyleVar(); }
 }  // namespace AnEngine::Crank

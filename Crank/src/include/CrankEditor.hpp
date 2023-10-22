@@ -33,6 +33,7 @@ namespace AnEngine::Crank {
         Ref<Scene> activeScene;
         Ref<FrameBuffer> frameBuffer;
         Entity playerEntity;
+        Entity bgEntity;
         Entity cameraEntity;
         Entity lockedCameraEntity;
 

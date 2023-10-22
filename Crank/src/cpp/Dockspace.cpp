@@ -58,9 +58,13 @@ namespace AnEngine::Crank {
 
 
         for (auto& panel : panels) {
-            panel->begin();
+            panel->beforeRender();
+
+            ImGui::Begin(panel->getName().c_str());
             panel->render();
-            panel->end();
+            ImGui::End();
+
+            panel->afterRender();
         }
 
         windowPos = ImGui::GetWindowPos();
