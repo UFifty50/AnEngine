@@ -35,7 +35,9 @@ namespace AnEngine::Crank {
         }
 
         drawComponent<TransformComponent>("Transform", entity, [](auto& component) {
-            ImGui::DragFloat3("Position", glm::value_ptr(component.Transform[3]), 0.1f);
+            ImGui::DragFloat3("Position", glm::value_ptr(component.Position), 0.1f);
+            ImGui::DragFloat3("Rotation", glm::value_ptr(component.Rotation), 0.1f);
+            ImGui::DragFloat3("Scale", glm::value_ptr(component.Scale), 0.1f);
         });
 
         drawComponent<CameraComponent>("Camera", entity, [](auto& component) {

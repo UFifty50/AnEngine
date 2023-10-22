@@ -33,7 +33,7 @@ namespace AnEngine {
         });
 
         ComponentCamera* mainCamera = nullptr;
-        glm::mat4* mainCameraTransform = nullptr;
+        glm::mat4 mainCameraTransform;
 
         auto cameraView = entityRegistry.view<TransformComponent, CameraComponent>();
         for (auto entity : cameraView) {
@@ -41,14 +41,14 @@ namespace AnEngine {
                 cameraView.get<TransformComponent, CameraComponent>(entity);
             if (camera.Primary) {
                 mainCamera = &camera.Camera;
-                mainCameraTransform = &transform.Transform;
+                mainCameraTransform = (glm::mat4)transform;
                 break;
             }
         }
 
         if (mainCamera) {
             Renderer2D::beginScene(mainCamera->getProjectionMatrix(),
-                                   *mainCameraTransform);
+                                   mainCameraTransform);
 
             auto spriteGroup = entityRegistry.group<TransformComponent>(
                 entt::get<SpriteRendererComponent>);
@@ -57,7 +57,7 @@ namespace AnEngine {
                 auto [transform, sprite] =
                     spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
-                Renderer2D::drawQuad(transform, sprite.Colour);
+                Renderer2D::drawQuad((glm::mat4)transform, sprite.Colour);
             }
 
             Renderer2D::endScene();

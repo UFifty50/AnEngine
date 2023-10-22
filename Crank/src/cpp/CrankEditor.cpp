@@ -30,25 +30,26 @@ namespace AnEngine::Crank {
     class CameraController : public ScriptableEntity {
     public:
         void onCreate() {
-            auto& transform = getComponent<TransformComponent>().Transform;
-            transform[3][0] = Random::getFloat() * 10.0f - 5.0f;
+            auto& pos = getComponent<TransformComponent>().Position;
+            pos.x = Random::getFloat() * 10.0f - 5.0f;
+            pos.y = Random::getFloat() * 10.0f - 5.0f;
         }
 
         void onUpdate(TimeStep deltaTime) {
-            auto& transform = getComponent<TransformComponent>().Transform;
+            auto& pos = getComponent<TransformComponent>().Position;
             float speed = 2.0f;
             float zoom = 2.0f;
 
             if (Input::isKeyPressed(KeyCode::A)) {
-                transform[3][0] -= speed * (zoom / 2) * deltaTime;
+                pos -= speed * (zoom / 2) * deltaTime;
             } else if (Input::isKeyPressed(KeyCode::D)) {
-                transform[3][0] += speed * (zoom / 2) * deltaTime;
+                pos += speed * (zoom / 2) * deltaTime;
             }
 
             if (Input::isKeyPressed(KeyCode::W)) {
-                transform[3][1] += speed * (zoom / 2) * deltaTime;
+                pos += speed * (zoom / 2) * deltaTime;
             } else if (Input::isKeyPressed(KeyCode::S)) {
-                transform[3][1] -= speed * (zoom / 2) * deltaTime;
+                pos -= speed * (zoom / 2) * deltaTime;
             }
         }
     };
