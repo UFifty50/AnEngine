@@ -13,7 +13,7 @@ namespace AnEngine {
     class Application {
     public:
         struct Data {
-            bool initialized = false;
+            bool irawnitialized = false;
 
             Scope<Window> window;
             Ref<ImGuiLayer> imGuiLayer;

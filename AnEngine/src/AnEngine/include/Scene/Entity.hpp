@@ -32,8 +32,7 @@ namespace AnEngine {
         template <typename T, typename... Args>
         T& addComponent(Args&&... args) {
             AE_CORE_ASSERT(!hasComponent<T>(),
-                           "Entity already has component of type {0}!",
-                           typeid(T).raw_name());
+                           "Entity already has component of type {0}!", typeid(T).name());
             T& component = scene->entityRegistry.emplace<T>(entityHandle,
                                                             std::forward<Args>(args)...);
             scene->onComponentAdded(*this, component);
@@ -48,7 +47,7 @@ namespace AnEngine {
                 [&]() {
                     if (!hasComponent<Ts>()) {
                         AE_CORE_CRITICAL("Entity does not have components of type {0}!",
-                                         typeid(Ts).raw_name());
+                                         typeid(Ts).name());
                         errorOccurred = true;
                     }
                 }(),
@@ -63,7 +62,7 @@ namespace AnEngine {
          void addNativeScript(std::string name) {
              AE_CORE_ASSERT(!hasComponent<Script>(),
                             "Entity already has script class {0}!",
-                            typeid(Script).raw_name());
+                            typeid(Script).name());
 
              scene->entityRegistry.view<NativeScriptComponent>().each([&](auto e,
                                                                           auto& nsc) {
