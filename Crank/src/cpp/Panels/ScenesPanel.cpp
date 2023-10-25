@@ -43,6 +43,7 @@ namespace AnEngine::Crank {
 
         bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.c_str());
         if (ImGui::IsItemClicked()) selectedEntity = entity;
+        // if (ImGui::IsMouseDoubleClicked()) {) Modify name
         if (opened) ImGui::TreePop();
     }
 };  // namespace AnEngine::Crank

@@ -4,6 +4,7 @@
 #include "Panels/PropertiesPanel.hpp"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Components.hpp"
@@ -15,14 +16,87 @@
 
 namespace AnEngine::Crank {
     PropertiesPanel::PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel)
-        : name(name), scenesPanel(scenesPanel) {
-        AE_CORE_INFO("");
-    }
+        : name(name), scenesPanel(scenesPanel) {}
 
     void PropertiesPanel::render() {
         Entity selectedEntity = scenesPanel->getSelectedEntity();
 
         if (selectedEntity) drawComponents(selectedEntity);
+    }
+
+    void PropertiesPanel::drawVec3Controller(const std::string& label, glm::vec3& values,
+                                             float resetValue) {
+        ImGui::PushID(label.c_str());
+
+        if (ImGui::BeginTable("##Vec3Table", 7,
+                              ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX |
+                                  ImGuiTableFlags_SizingFixedFit |
+                                  ImGuiTableFlags_NoHostExtendX)) {
+            ImGui::TableSetupColumn(label.c_str(), ImGuiTableColumnFlags_WidthFixed,
+                                    75.0f);
+            ImGui::TableSetupColumn("##Xb", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##X", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("##Yb", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##Y", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("##Zb", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##Z", ImGuiTableColumnFlags_WidthStretch);
+
+            ImGui::TableNextRow();
+
+            for (int i = 0; i < 7; i++) {
+                ImGui::TableSetColumnIndex(i);
+                ImGui::PushItemWidth(-FLT_MIN);
+            }
+
+            float lineHeight =
+                GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+            ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text(label.c_str());
+
+            ImGui::PushStyleColor(ImGuiCol_Button, {0.8f, 0.1f, 0.15f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.9f, 0.2f, 0.2f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.8f, 0.1f, 0.15f, 1.0f});
+
+            ImGui::TableSetColumnIndex(1);
+            if (ImGui::Button("X", buttonSize)) values.x = resetValue;
+
+            ImGui::PopStyleColor(3);
+
+            ImGui::TableSetColumnIndex(2);
+            ImGui::DragFloat("##X", &values.x, 0.05f, 0.0f, 0.0f, "%.2f");
+
+            ImGui::PushStyleColor(ImGuiCol_Button, {0.2f, 0.7f, 0.2f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.3f, 0.8f, 0.3f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.2f, 0.7f, 0.2f, 1.0f});
+
+            ImGui::TableSetColumnIndex(3);
+            if (ImGui::Button("Y", buttonSize)) values.y = resetValue;
+
+            ImGui::PopStyleColor(3);
+
+            ImGui::TableSetColumnIndex(4);
+            ImGui::DragFloat("##Y", &values.y, 0.05f, 0.0f, 0.0f, "%.2f");
+
+            ImGui::PushStyleColor(ImGuiCol_Button, {0.1f, 0.25f, 0.8f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.2f, 0.35f, 0.9f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.1f, 0.25f, 0.8f, 1.0f});
+
+            ImGui::TableSetColumnIndex(5);
+            if (ImGui::Button("Z", buttonSize)) values.z = resetValue;
+
+            ImGui::PopStyleColor(3);
+
+            ImGui::TableSetColumnIndex(6);
+            ImGui::DragFloat("##Z", &values.z, 0.05f, 0.0f, 0.0f, "%.2f");
+
+            // End the table
+            ImGui::EndTable();
+        }
+
+
+        ImGui::PopID();
     }
 
     void PropertiesPanel::drawComponents(Entity entity) {
@@ -34,10 +108,14 @@ namespace AnEngine::Crank {
             }
         }
 
-        drawComponent<TransformComponent>("Transform", entity, [](auto& component) {
-            ImGui::DragFloat3("Position", glm::value_ptr(component.Position), 0.1f);
-            ImGui::DragFloat3("Rotation", glm::value_ptr(component.Rotation), 0.1f);
-            ImGui::DragFloat3("Scale", glm::value_ptr(component.Scale), 0.1f);
+        drawComponent<TransformComponent>("Transform", entity, [&](auto& component) {
+            drawVec3Controller("Position", component.Position, 0.0f);
+
+            glm::vec3 rotation = glm::degrees(component.Rotation);
+            drawVec3Controller("Rotation", rotation, 0.0f);
+            component.Rotation = glm::radians(rotation);
+
+            drawVec3Controller("Scale", component.Scale, 1.0f);
         });
 
         drawComponent<CameraComponent>("Camera", entity, [](auto& component) {

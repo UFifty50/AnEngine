@@ -39,6 +39,9 @@ namespace AnEngine::Crank {
             }
         }
 
+        void drawVec3Controller(const std::string& label, glm::vec3& toDraw,
+                                float defaultValue = 0.0f);
+
         std::string name;
         Ref<ScenesPanel> scenesPanel;
     };
