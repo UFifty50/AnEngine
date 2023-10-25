@@ -21,26 +21,47 @@ namespace AnEngine::Crank {
 
         virtual std::string getName() override { return name; }
 
+        static void drawVec3Controller(const std::string& label, glm::vec3& toDraw,
+                                       float defaultValue = 0.0f);
+
     private:
         void drawComponents(Entity entity);
 
         template <typename T>
-        void drawComponent(std::string name, Entity entity,
-                           std::function<void(T&)> func) {
+        void drawComponent(std::string name, Entity entity, bool removable,
+                           std::function<void(T&)> func, ImGuiTreeNodeFlags flags = 0) {
             if (!entity.hasComponent<T>()) {
                 return;
             }
 
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {4, 4});
+            bool open =
+                ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str());
+            if (removable) ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
+
+            bool buttonClicked = removable && ImGui::Button("...", {20, 20});
+            if (removable && ImGui::IsItemHovered())
+                ImGui::SetTooltip("Component Settings");
+            if (removable && buttonClicked) {
+                ImGui::OpenPopup("##ComponentSettings");
+            }
+
+            ImGui::PopStyleVar();
+
+            bool removeComponent = false;
+            if (ImGui::BeginPopup("##ComponentSettings")) {
+                if (ImGui::MenuItem("Remove Component")) removeComponent = true;
+                ImGui::EndPopup();
+            }
+
             auto& component = entity.getComponent<T>();
-            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen;
-            if (ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str())) {
+            if (open) {
                 func(component);
                 ImGui::TreePop();
             }
-        }
 
-        void drawVec3Controller(const std::string& label, glm::vec3& toDraw,
-                                float defaultValue = 0.0f);
+            if (removable && removeComponent) entity.removeComponent<T>();
+        }
 
         std::string name;
         Ref<ScenesPanel> scenesPanel;

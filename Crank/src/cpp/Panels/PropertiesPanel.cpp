@@ -21,7 +21,36 @@ namespace AnEngine::Crank {
     void PropertiesPanel::render() {
         Entity selectedEntity = scenesPanel->getSelectedEntity();
 
-        if (selectedEntity) drawComponents(selectedEntity);
+        if (selectedEntity) {
+            drawComponents(selectedEntity);
+
+            if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
+        }
+
+
+        if (ImGui::BeginPopup("AddComponent")) {
+            if (ImGui::MenuItem("Camera")) {
+                if (!selectedEntity.hasComponent<CameraComponent>()) {
+                    selectedEntity.addComponent<CameraComponent>();
+                    ImGui::CloseCurrentPopup();
+                } else {
+                    ImGui::SetTooltip("This entity already has a camera component.");
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (ImGui::MenuItem("Sprite Renderer")) {
+                if (!selectedEntity.hasComponent<SpriteRendererComponent>()) {
+                    selectedEntity.addComponent<SpriteRendererComponent>();
+                    ImGui::CloseCurrentPopup();
+                } else {
+                    ImGui::SetTooltip("This entity already has a sprite component.");
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            ImGui::EndPopup();
+        }
     }
 
     void PropertiesPanel::drawVec3Controller(const std::string& label, glm::vec3& values,
@@ -108,80 +137,91 @@ namespace AnEngine::Crank {
             }
         }
 
-        drawComponent<TransformComponent>("Transform", entity, [&](auto& component) {
-            drawVec3Controller("Position", component.Position, 0.0f);
+        const ImGuiTreeNodeFlags treeNodeFlags =
+            ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
 
-            glm::vec3 rotation = glm::degrees(component.Rotation);
-            drawVec3Controller("Rotation", rotation, 0.0f);
-            component.Rotation = glm::radians(rotation);
+        drawComponent<TransformComponent>(
+            "Transform", entity, false,
+            [&](auto& component) {
+                drawVec3Controller("Position", component.Position, 0.0f);
 
-            drawVec3Controller("Scale", component.Scale, 1.0f);
-        });
+                glm::vec3 rotation = glm::degrees(component.Rotation);
+                drawVec3Controller("Rotation", rotation, 0.0f);
+                component.Rotation = glm::radians(rotation);
 
-        drawComponent<CameraComponent>("Camera", entity, [](auto& component) {
-            auto& cam = component.Camera;
+                drawVec3Controller("Scale", component.Scale, 1.0f);
+            },
+            treeNodeFlags);
 
-            ImGui::Checkbox("Primary", &component.Primary);
+        drawComponent<CameraComponent>(
+            "Camera", entity, true,
+            [](auto& component) {
+                auto& cam = component.Camera;
 
-            const char* projectionTypes[] = {"perspective", "orthographic"};
-            const char* currentProjectionType = projectionTypes[(int)cam.getType()];
+                ImGui::Checkbox("Primary", &component.Primary);
 
-            if (ImGui::BeginCombo("Projection Type",
-                                  projectionTypes[(int)cam.getType()])) {
-                bool isPerspective = currentProjectionType == projectionTypes[0];
-                bool isOrthographic = !isPerspective;
+                const char* projectionTypes[] = {"perspective", "orthographic"};
+                const char* currentProjectionType = projectionTypes[(int)cam.getType()];
 
-                if (ImGui::Selectable(projectionTypes[0], isPerspective)) {
-                    currentProjectionType = projectionTypes[0];
-                    cam.setType(ProjectionType::Perspective);
+                if (ImGui::BeginCombo("Projection Type",
+                                      projectionTypes[(int)cam.getType()])) {
+                    bool isPerspective = currentProjectionType == projectionTypes[0];
+                    bool isOrthographic = !isPerspective;
+
+                    if (ImGui::Selectable(projectionTypes[0], isPerspective)) {
+                        currentProjectionType = projectionTypes[0];
+                        cam.setType(ProjectionType::Perspective);
+                    }
+
+                    if (ImGui::Selectable(projectionTypes[1], isOrthographic)) {
+                        currentProjectionType = projectionTypes[1];
+                        cam.setType(ProjectionType::Orthographic);
+                    }
+
+                    ImGui::SetItemDefaultFocus();
+
+                    ImGui::EndCombo();
                 }
 
-                if (ImGui::Selectable(projectionTypes[1], isOrthographic)) {
-                    currentProjectionType = projectionTypes[1];
-                    cam.setType(ProjectionType::Orthographic);
+                if (cam.getType() == ProjectionType::Perspective) {
+                    float fov = glm::degrees(cam.getPerspectiveFOV());
+                    float near = cam.getPerspectiveNear();
+                    float far = cam.getPerspectiveFar();
+
+                    if (ImGui::DragFloat("Field Of View", &fov, 1.0f, 10.0f, 150.0f))
+                        cam.setPerspectiveFOV(glm::radians(fov));
+
+                    if (ImGui::DragFloat("Near", &near, 0.5f, -far, far - 0.01f))
+                        cam.setPerspectiveNear(near);
+
+                    if (ImGui::DragFloat("Far", &far, 0.5f, near + 0.01f, 1000.0f))
+                        cam.setPerspectiveFar(far);
                 }
 
-                ImGui::SetItemDefaultFocus();
+                if (cam.getType() == ProjectionType::Orthographic) {
+                    float size = cam.getOrthographicSize();
+                    float near = cam.getOrthographicNear();
+                    float far = cam.getOrthographicFar();
 
-                ImGui::EndCombo();
-            }
+                    if (ImGui::DragFloat("Size", &size, 1.0f, 1.0f, 200.0f))
+                        cam.setOrthographicSize(size);
 
-            if (cam.getType() == ProjectionType::Perspective) {
-                float fov = glm::degrees(cam.getPerspectiveFOV());
-                float near = cam.getPerspectiveNear();
-                float far = cam.getPerspectiveFar();
+                    if (ImGui::DragFloat("Near", &near, 0.5f, -far, far - 0.01f))
+                        cam.setOrthographicNear(near);
 
-                if (ImGui::DragFloat("Field Of View", &fov, 1.0f, 10.0f, 150.0f))
-                    cam.setPerspectiveFOV(glm::radians(fov));
+                    if (ImGui::DragFloat("Far", &far, 0.5f, near + 0.01f, 1000.0f))
+                        cam.setOrthographicFar(far);
 
-                if (ImGui::DragFloat("Near", &near, 0.5f, -far, far - 0.01f))
-                    cam.setPerspectiveNear(near);
-
-                if (ImGui::DragFloat("Far", &far, 0.5f, near + 0.01f, 1000.0f))
-                    cam.setPerspectiveFar(far);
-            }
-
-            if (cam.getType() == ProjectionType::Orthographic) {
-                float size = cam.getOrthographicSize();
-                float near = cam.getOrthographicNear();
-                float far = cam.getOrthographicFar();
-
-                if (ImGui::DragFloat("Size", &size, 1.0f, 1.0f, 200.0f))
-                    cam.setOrthographicSize(size);
-
-                if (ImGui::DragFloat("Near", &near, 0.5f, -far, far - 0.01f))
-                    cam.setOrthographicNear(near);
-
-                if (ImGui::DragFloat("Far", &far, 0.5f, near + 0.01f, 1000.0f))
-                    cam.setOrthographicFar(far);
-
-                ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
-            }
-        });
+                    ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+                }
+            },
+            treeNodeFlags);
 
         drawComponent<SpriteRendererComponent>(
-            "Sprite Renderer", entity, [](auto& component) {
+            "Sprite Renderer", entity, true,
+            [](auto& component) {
                 ImGui::ColorEdit4("Colour", glm::value_ptr(component.Colour));
-            });
+            },
+            treeNodeFlags);
     }
 }  // namespace AnEngine::Crank

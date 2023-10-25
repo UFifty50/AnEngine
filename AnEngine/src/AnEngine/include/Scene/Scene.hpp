@@ -8,6 +8,7 @@
 
 namespace AnEngine {
     class Entity;
+    struct Component;
     namespace Crank {
         class ScenesPanel;
     };
@@ -19,6 +20,7 @@ namespace AnEngine {
         ~Scene() = default;
 
         Entity createEntity(const std::string& name = "");
+        void destroyEntity(Entity entity);
 
         void onUpdate(TimeStep deltaTime);
         void onResize(uint32_t width, uint32_t height);
@@ -26,6 +28,8 @@ namespace AnEngine {
         std::string getName() { return name; }
 
     private:
+        void onComponentAdded(Entity e, Component& component);
+
         std::string name = "Unnamed Scene";
         entt::registry entityRegistry;
         uint32_t viewportWidth = 0;
