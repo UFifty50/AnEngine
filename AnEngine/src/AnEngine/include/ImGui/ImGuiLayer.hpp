@@ -22,6 +22,8 @@ namespace AnEngine {
         void begin();
         void end();
 
+        void useDarkThemeColours();
+
         void loadConfig(const std::string& path);
         void saveConfig(const std::string& path) const;
 

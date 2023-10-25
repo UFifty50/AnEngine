@@ -17,9 +17,13 @@ namespace AnEngine::Crank {
         void setCurrentScene(const Ref<Scene>& scene);
         Entity getSelectedEntity() { return selectedEntity; }
 
-        virtual void beforeRender() override {}
+        virtual void beforeRender() override {
+            ImGui::SetNextWindowSizeConstraints({200.0f, -1}, {INFINITY, -1});
+        }
         virtual void render() override;
         virtual void afterRender() override {}
+
+        virtual void onClose() override {}
 
         virtual std::string getName() override { return name; }
 

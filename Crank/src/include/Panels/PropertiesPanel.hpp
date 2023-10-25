@@ -5,6 +5,8 @@
 
 #include <functional>
 
+#include "imgui_internal.h"
+
 #include "Panels/Panel.hpp"
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Entity.hpp"
@@ -15,9 +17,13 @@ namespace AnEngine::Crank {
     public:
         PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel);
 
-        virtual void beforeRender() override {}
+        virtual void beforeRender() override {
+            ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, -1});
+        }
         virtual void render() override;
         virtual void afterRender() override {}
+
+        virtual void onClose() override {}
 
         virtual std::string getName() override { return name; }
 
@@ -28,18 +34,27 @@ namespace AnEngine::Crank {
         void drawComponents(Entity entity);
 
         template <typename T>
-        void drawComponent(std::string name, Entity entity, bool removable,
+        void drawComponent(const std::string& name, Entity entity, bool removable,
                            std::function<void(T&)> func, ImGuiTreeNodeFlags flags = 0) {
             if (!entity.hasComponent<T>()) {
                 return;
             }
 
+            ImVec2 availableRegion = ImGui::GetContentRegionAvail();
+
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {4, 4});
+
+            float lineHeight =
+                GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+
+            // ImGui::Separator();
+
             bool open =
                 ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str());
-            if (removable) ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
+            if (removable) ImGui::SameLine(availableRegion.x - lineHeight * 1.5f);
 
-            bool buttonClicked = removable && ImGui::Button("...", {20, 20});
+            bool buttonClicked =
+                removable && ImGui::Button("...", {lineHeight * 1.5f, lineHeight});
             if (removable && ImGui::IsItemHovered())
                 ImGui::SetTooltip("Component Settings");
             if (removable && buttonClicked) {

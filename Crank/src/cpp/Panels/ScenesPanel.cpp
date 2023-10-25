@@ -19,6 +19,8 @@ namespace AnEngine::Crank {
     void ScenesPanel::setCurrentScene(const Ref<Scene>& scene) { currentScene = scene; }
 
     void ScenesPanel::render() {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {200.0f, 10.0f});
+
         const float ItemSpacing = ImGui::GetStyle().ItemSpacing.x;
 
         static float addSceneButtonWidth = 100.0f;
@@ -65,12 +67,15 @@ namespace AnEngine::Crank {
         if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
             selectedEntity = {};
         }
+
+        ImGui::PopStyleVar();
     }
 
     void ScenesPanel::drawEntityNode(Entity entity) {
         auto& tag = entity.getComponent<TagComponent>().Tag;
 
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+        ImGuiTreeNodeFlags flags =
+            ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
         flags |= (selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0;
 
         bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.c_str());

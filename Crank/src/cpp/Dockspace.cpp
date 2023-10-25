@@ -36,6 +36,8 @@ namespace AnEngine::Crank {
         ImGui::PopStyleVar(2);
 
         ImGuiIO& io = ImGui::GetIO();
+        ImGuiStyle& style = ImGui::GetStyle();
+
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
             ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
             ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
@@ -53,18 +55,36 @@ namespace AnEngine::Crank {
                 */
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Window")) {
+                for (auto& panel : usablePanels) {
+                    if (ImGui::MenuItem(panel->getName().c_str())) {
+                        if (std::ranges::find(panels, panel) == panels.end())
+                            panels.push_back(panel);
+                    }
+                }
+                ImGui::EndMenu();
+            }
             ImGui::EndMenuBar();
         }
 
-
+        bool open;
         for (auto& panel : panels) {
+            open = true;
+
             panel->beforeRender();
 
-            ImGui::Begin(panel->getName().c_str());
+            ImGui::Begin(panel->getName().c_str(), &open);
             panel->render();
             ImGui::End();
 
             panel->afterRender();
+
+            if (!open) {
+                panel->onClose();
+                panels.erase(std::remove(panels.begin(), panels.end(), panel));
+                break;
+            }
         }
 
         windowPos = ImGui::GetWindowPos();

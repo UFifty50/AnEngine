@@ -11,8 +11,8 @@ namespace AnEngine {
         uint32_t width;
         uint32_t height;
 
-        WindowProperties(const std::string& title = "AnEngine", uint32_t width = 1280,
-                         uint32_t height = 720)
+        WindowProperties(const std::string& title = "AnEngine", uint32_t width = 1600,
+                         uint32_t height = 900)
             : title(title), width(width), height(height) {}
     };
 
@@ -36,6 +36,8 @@ namespace AnEngine {
 
         // platform specific
         static Window* create(const WindowProperties& props = WindowProperties());
+
+        static float HighDPIScaleFactor;
     };
 }  // namespace AnEngine
 

@@ -9,6 +9,7 @@
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
+#include "Scene/ScriptableEntity.hpp"
 
 
 #define HASH(type) (void*)typeid(type).hash_code()
@@ -19,12 +20,28 @@ namespace AnEngine::Crank {
         : name(name), scenesPanel(scenesPanel) {}
 
     void PropertiesPanel::render() {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {370.0f, 10.0f});
+
         Entity selectedEntity = scenesPanel->getSelectedEntity();
 
         if (selectedEntity) {
-            drawComponents(selectedEntity);
+            if (selectedEntity.hasComponent<TagComponent>()) {
+                auto& tag = selectedEntity.getComponent<TagComponent>().Tag;
+                char buffer[256];
+                strcpy(buffer, tag.c_str());
+                if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
+                    tag = std::string(buffer);
+                }
+            }
+
+            ImGui::SameLine();
+            ImGui::PushItemWidth(-1);
 
             if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponent");
+
+            ImGui::PopItemWidth();
+
+            drawComponents(selectedEntity);
         }
 
 
@@ -34,7 +51,7 @@ namespace AnEngine::Crank {
                     selectedEntity.addComponent<CameraComponent>();
                     ImGui::CloseCurrentPopup();
                 } else {
-                    ImGui::SetTooltip("This entity already has a camera component.");
+                    ImGui::OpenPopup("alcamerr");
                     ImGui::CloseCurrentPopup();
                 }
             }
@@ -44,17 +61,52 @@ namespace AnEngine::Crank {
                     selectedEntity.addComponent<SpriteRendererComponent>();
                     ImGui::CloseCurrentPopup();
                 } else {
-                    ImGui::SetTooltip("This entity already has a sprite component.");
+                    ImGui::OpenPopup("alsprrerr");
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (ImGui::MenuItem("Script")) {
+                if (!selectedEntity.hasComponent<NativeScriptComponent>()) {
+                    char name[256] = "Temporary Empty Script";
+                    class temp : public ScriptableEntity {};
+                    selectedEntity.addComponent<NativeScriptComponent>(name).bind<temp>();
+                    ImGui::CloseCurrentPopup();
+                } else {
+                    ImGui::OpenPopup("alscrerr");
                     ImGui::CloseCurrentPopup();
                 }
             }
 
             ImGui::EndPopup();
         }
+
+        if (ImGui::BeginPopup("alcamerr")) {
+            ImGui::Text("This entity already has a camera component.");
+            ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+
+        if (ImGui::BeginPopup("alsprrerr")) {
+            ImGui::Text("This entity already has a sprite component.");
+            ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+
+        if (ImGui::BeginPopup("alscrerr")) {
+            ImGui::Text("This entity already has a script component.");
+            ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+
+        ImGui::PopStyleVar();
     }
 
     void PropertiesPanel::drawVec3Controller(const std::string& label, glm::vec3& values,
                                              float resetValue) {
+        ImGuiIO& io = ImGui::GetIO();
+        auto& boldFont = io.Fonts->Fonts[1];
+
         ImGui::PushID(label.c_str());
 
         if (ImGui::BeginTable("##Vec3Table", 7,
@@ -79,7 +131,7 @@ namespace AnEngine::Crank {
 
             float lineHeight =
                 GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-            ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+            ImVec2 buttonSize = {lineHeight, lineHeight};
 
             ImGui::TableSetColumnIndex(0);
             ImGui::Text(label.c_str());
@@ -87,10 +139,12 @@ namespace AnEngine::Crank {
             ImGui::PushStyleColor(ImGuiCol_Button, {0.8f, 0.1f, 0.15f, 1.0f});
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.9f, 0.2f, 0.2f, 1.0f});
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.8f, 0.1f, 0.15f, 1.0f});
+            ImGui::PushFont(boldFont);
 
             ImGui::TableSetColumnIndex(1);
             if (ImGui::Button("X", buttonSize)) values.x = resetValue;
 
+            ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::TableSetColumnIndex(2);
@@ -99,10 +153,12 @@ namespace AnEngine::Crank {
             ImGui::PushStyleColor(ImGuiCol_Button, {0.2f, 0.7f, 0.2f, 1.0f});
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.3f, 0.8f, 0.3f, 1.0f});
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.2f, 0.7f, 0.2f, 1.0f});
+            ImGui::PushFont(boldFont);
 
             ImGui::TableSetColumnIndex(3);
             if (ImGui::Button("Y", buttonSize)) values.y = resetValue;
 
+            ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::TableSetColumnIndex(4);
@@ -111,10 +167,12 @@ namespace AnEngine::Crank {
             ImGui::PushStyleColor(ImGuiCol_Button, {0.1f, 0.25f, 0.8f, 1.0f});
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.2f, 0.35f, 0.9f, 1.0f});
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.1f, 0.25f, 0.8f, 1.0f});
+            ImGui::PushFont(boldFont);
 
             ImGui::TableSetColumnIndex(5);
             if (ImGui::Button("Z", buttonSize)) values.z = resetValue;
 
+            ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::TableSetColumnIndex(6);
@@ -129,16 +187,10 @@ namespace AnEngine::Crank {
     }
 
     void PropertiesPanel::drawComponents(Entity entity) {
-        if (entity.hasComponent<TagComponent>()) {
-            auto& tag = entity.getComponent<TagComponent>().Tag;
-            char buffer[256] = {0};
-            if (ImGui::InputText("Tag", buffer, sizeof(buffer))) {
-                tag = std::string(buffer);
-            }
-        }
-
         const ImGuiTreeNodeFlags treeNodeFlags =
-            ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
+            ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap |
+            ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Framed |
+            ImGuiTreeNodeFlags_FramePadding;
 
         drawComponent<TransformComponent>(
             "Transform", entity, false,
@@ -223,5 +275,9 @@ namespace AnEngine::Crank {
                 ImGui::ColorEdit4("Colour", glm::value_ptr(component.Colour));
             },
             treeNodeFlags);
+
+        drawComponent<NativeScriptComponent>(
+            "Script", entity, true,
+            [&](auto& component) { ImGui::Text(component.Name.c_str()); }, treeNodeFlags);
     }
 }  // namespace AnEngine::Crank

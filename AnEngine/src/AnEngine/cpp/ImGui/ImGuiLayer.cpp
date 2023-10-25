@@ -31,14 +31,24 @@ namespace AnEngine {
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
+        io.FontDefault = io.Fonts->AddFontFromFileTTF(
+            "assets/fonts/SometypeMono/SometypeMono-Medium.ttf",
+            Window::HighDPIScaleFactor * 16.0f);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/SometypeMono/SometypeMono-Bold.ttf",
+                                     Window::HighDPIScaleFactor * 20.0f);
+
         // set style
         ImGui::StyleColorsDark();
 
         ImGuiStyle& style = ImGui::GetStyle();
+        style.ScaleAllSizes(Window::HighDPIScaleFactor);
+
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             style.WindowRounding = 0.0f;
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
+
+        useDarkThemeColours();
 
         auto window =
             static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
@@ -91,10 +101,40 @@ namespace AnEngine {
         }
     }
 
+    void ImGuiLayer::useDarkThemeColours() {
+        auto& colours = ImGui::GetStyle().Colors;
+        colours[ImGuiCol_WindowBg] = ImVec4{0.137f, 0.149f, 0.157f, 1.0f};
+
+        // Headers
+        colours[ImGuiCol_Header] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        colours[ImGuiCol_HeaderHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        colours[ImGuiCol_HeaderActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+
+        // Buttons
+        colours[ImGuiCol_Button] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        colours[ImGuiCol_ButtonHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        colours[ImGuiCol_ButtonActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+
+        // Frame BG
+        colours[ImGuiCol_FrameBg] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        colours[ImGuiCol_FrameBgHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        colours[ImGuiCol_FrameBgActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+
+        // Tabs
+        colours[ImGuiCol_Tab] = ImVec4{0.102f, 0.396f, 0.604f, 1.0f};
+        colours[ImGuiCol_TabHovered] = ImVec4{0.05f, 0.556f, 0.909f, 1.0f};
+        colours[ImGuiCol_TabActive] = ImVec4{0.195f, 0.528f, 0.764f, 1.0f};
+        colours[ImGuiCol_TabUnfocused] = ImVec4{0.152f, 0.396f, 0.604f, 1.0f};
+        colours[ImGuiCol_TabUnfocusedActive] = ImVec4{0.202f, 0.446f, 0.654f, 1.0f};
+
+        // Title
+        colours[ImGuiCol_TitleBg] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        colours[ImGuiCol_TitleBgActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        colours[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+    }
+
     void ImGuiLayer::loadConfig(const std::string& path) {
         ImGui::LoadIniSettingsFromDisk(path.c_str());
-        //   ImGuiIO& io = ImGui::GetIO();
-        //  io.IniFilename = path.c_str();
     }
 
     void ImGuiLayer::saveConfig(const std::string& path) const {
