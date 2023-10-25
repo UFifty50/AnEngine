@@ -32,7 +32,7 @@ namespace AnEngine {
         TransformComponent() = default;
         TransformComponent(const TransformComponent&) = default;
         TransformComponent(const glm::vec3& position) : Position(position) {}
-
+      
         constexpr virtual uint32_t getID() override { return TRANSFORM_COMPONENT_ID; }
 
         operator const glm::mat4&() const {
@@ -81,7 +81,6 @@ namespace AnEngine {
 
         constexpr virtual uint32_t getID() override { return CAMERA_COMPONENT_ID; }
     };
-
 
     struct NativeScriptComponent : Component {
         ScriptableEntity* Instance = nullptr;
