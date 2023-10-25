@@ -46,7 +46,9 @@ namespace AnEngine {
             return this->viewProjectionMatrix;
         }
 
-        virtual CameraType getType() const override { return CameraType::Orthographic; }
+        virtual ProjectionType getType() const override {
+            return ProjectionType::Orthographic;
+        }
 
         decltype(auto) getBounds() const { return bounds; }
 

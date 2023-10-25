@@ -3,15 +3,16 @@
 
 #include <entt/entt.hpp>
 
-#include "Core/Concepts.hpp"
 // #include "Scene/Components.hpp"
+#include "Core/Log.hpp"
 #include "Scene/Scene.hpp"
 
 
 namespace AnEngine {
+
     class Entity {
     public:
-        Entity() = default;
+        Entity() : entityHandle(entt::null), scene(new Scene()) {}
         Entity(entt::entity handle, Scene* scene) : entityHandle(handle), scene(scene) {}
         Entity(const Entity& other) = default;
 
@@ -24,7 +25,7 @@ namespace AnEngine {
         T& getComponent() {
             AE_CORE_ASSERT(hasComponent<T>(),
                            "Entity does not have component of type {0}!",
-                           typeid(T).raw_name());
+                           typeid(T).name());
             return scene->entityRegistry.get<T>(entityHandle);
         }
 
@@ -40,6 +41,7 @@ namespace AnEngine {
         template <typename... Ts>
         void removeComponent() {
             bool errorOccurred = false;
+
             (
                 [&]() {
                     if (!hasComponent<Ts>()) {
@@ -55,14 +57,28 @@ namespace AnEngine {
             scene->entityRegistry.remove<Ts...>(entityHandle);
         }
 
-        /*template <Scriptable Script>
-        void addNativeScript() {
-            AE_CORE_ASSERT(!hasComponent<Script>(), "Entity already has script {0}!",
-                           typeid(Script).raw_name());
-            addComponent<NativeScriptComponent>().bind<Script>();
-        }*/
+        /* template <class Script>
+         void addNativeScript(std::string name) {
+             AE_CORE_ASSERT(!hasComponent<Script>(),
+                            "Entity already has script class {0}!",
+                            typeid(Script).raw_name());
+
+             scene->entityRegistry.view<NativeScriptComponent>().each([&](auto e,
+                                                                          auto& nsc) {
+                 if (nsc.Name == name) {
+                     AE_CORE_ASSERT(false, "Entity already has script name {0}!", name);
+                 }
+             });
+
+             addComponent<NativeScriptComponent>(name).bind<Script>();
+         }*/
 
         operator bool() const { return entityHandle != entt::null; }
+        operator uint32_t() const { return (uint32_t)entityHandle; }
+
+        bool operator==(const Entity& other) const {
+            return entityHandle == other.entityHandle && scene == other.scene;
+        }
 
     private:
         entt::entity entityHandle{entt::null};

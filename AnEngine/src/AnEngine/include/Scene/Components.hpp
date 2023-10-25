@@ -2,10 +2,11 @@
 #define COMPONENTS_HPP
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <functional>
+#include <string>
 
-#include "Core/Concepts.hpp"
 #include "Scene/SceneCamera.hpp"
 #include "Scene/ScriptableEntity.hpp"
 #include "Time/TimeStep.hpp"
@@ -13,18 +14,28 @@
 
 namespace AnEngine {
     struct TransformComponent {
-        glm::mat4 Transform{1.0f};
+        glm::vec3 Position{0.0f};
+        glm::vec3 Rotation{0.0f};
+        glm::vec3 Scale{1.0f};
 
         TransformComponent() = default;
         TransformComponent(const TransformComponent&) = default;
-        TransformComponent(const glm::mat4& transform) : Transform(transform) {}
+        TransformComponent(const glm::vec3& position) : Position(position) {}
 
-        operator glm::mat4&() { return Transform; }
-        operator const glm::mat4&() const { return Transform; }
+        operator const glm::mat4&() const {
+            glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), Rotation.x, {1, 0, 0}) *
+                                 glm::rotate(glm::mat4(1.0f), Rotation.y, {0, 1, 0}) *
+                                 glm::rotate(glm::mat4(1.0f), Rotation.z, {0, 0, 1});
+
+            return glm::translate(glm::mat4(1.0f), Position) * rotation *
+                   glm::scale(glm::mat4(1.0f), Scale);
+        }
     };
 
     struct SpriteRendererComponent {
         glm::vec4 Colour{1.0f};
+        // TODO: Ref<Material>
+        // Ref<Texture2D> Texture = {};
 
         SpriteRendererComponent() = default;
         SpriteRendererComponent(const SpriteRendererComponent&) = default;
@@ -50,22 +61,23 @@ namespace AnEngine {
         CameraComponent(const CameraComponent&) = default;
     };
 
+
     struct NativeScriptComponent {
-        ScriptableEntity* Instance;
+        ScriptableEntity* Instance = nullptr;
+        std::string Name;
 
-        std::function<void()> instantiateScriptInstance;
-        std::function<void()> deleteScriptInstance;
+        std::function<void()> instantiateScriptInstance = nullptr;
+        std::function<void()> deleteScriptInstance = nullptr;
 
-        std::function<void()> onCreate;
-        std::function<void()> onDestroy;
-        std::function<void(TimeStep)> onUpdate;
+        NativeScriptComponent(std::string name) : Name(name) {}
 
-        template <Scriptable Script>
+        template <class Script>
         void bind() {
             instantiateScriptInstance = [&]() { Instance = new Script(); };
-            deleteScriptInstance = [&]() { delete (Script*)Instance; };
-            onCreate = [&]() { ((Script*)Instance)->onCreate(); };
-            onUpdate = [&](TimeStep dt) { ((Script*)Instance)->onUpdate(dt); };
+            deleteScriptInstance = [&]() {
+                delete (Script*)Instance;
+                Instance = nullptr;
+            };
         }
     };
 }  // namespace AnEngine

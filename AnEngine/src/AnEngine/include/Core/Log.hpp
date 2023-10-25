@@ -1,16 +1,12 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
-#include "aepch.hpp"
-
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
 
-#include "Core/Core.hpp"
-
 
 namespace AnEngine {
-    class AE_API Log {
+    class Log {
     private:
         static std::shared_ptr<spdlog::logger> coreLogger;
         static std::shared_ptr<spdlog::logger> clientLogger;

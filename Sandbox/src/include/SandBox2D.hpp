@@ -1,53 +1,45 @@
 #ifndef SANDBOX2D_HPP
 #define SANDBOX2D_HPP
 
-#include <AnEngine.hpp>
 #include <glm/glm.hpp>
 
-#include "imgui.h"
-#include "imgui_internal.h"
+#include "../../Crank/src/include/Dockspace.hpp"
+#include "Core/Core.hpp"
+#include "Core/Layer.hpp"
+#include "Events/Event.hpp"
+#include "Renderer/FrameBuffer.hpp"
+#include "Scene/Entity.hpp"
+#include "Scene/Scene.hpp"
+#include "Texture/Sprite.hpp"
+#include "Texture/SpriteSheet.hpp"
 
-//#define ATTRIBUTE_ARRAY(varName, ...) \
-//    AnEngine::ShaderUniformVector varName = {__VA_ARGS__}
 
-#define ATTRIBUTE_ARRAY(...) \
-    AnEngine::ShaderUniformVector { __VA_ARGS__ }
+namespace AnEngine {
+    class SandBox2D : public Layer {
+    public:
+        SandBox2D();
+        virtual ~SandBox2D() = default;
 
+        virtual void onAttach() override;
+        virtual void onDetach() override;
 
-class SandBox2D : public AnEngine::Layer {
-public:
-    SandBox2D();
-    virtual ~SandBox2D() = default;
+        virtual void onUpdate(TimeStep deltaTime) override;
+        virtual void onImGuiRender() override;
+        virtual void onEvent(Event& event) override;
 
-    virtual void onAttach() override;
-    virtual void onDetach() override;
+    private:
+        Crank::DockSpace dockSpace;
+        Ref<Scene> activeScene;
+        Ref<FrameBuffer> frameBuffer;
+        SpriteSheet sheet;
+        Sprite sprite1;
+        Entity playerEntity;
+        Entity cameraEntity;
+        Entity lockedCameraEntity;
 
-    virtual void onUpdate(AnEngine::TimeStep deltaTime) override;
-    virtual void onImGuiRender() override;
-    virtual void onEvent(AnEngine::Event& event) override;
-
-private:
-    AnEngine::CameraController cameraController;
-    AnEngine::SpriteSheet tiles;
-    std::unordered_map<char, AnEngine::Sprite> tileMap;
-    AnEngine::Sprite player;
-    AnEngine::Sprite invalidTile;
-
-    AnEngine::Ref<AnEngine::FrameBuffer> frameBuffer;
-
-    AnEngine::ParticleSpawner particleSpawner;
-
-    float playerX = 0.0f;
-    float playerY = 0.0f;
-
-    float tilingFactor = 1.0f;
-    glm::vec4 tint = {1.0f, 1.0f, 1.0f, 1.0f};
-
-    float sizeVariation = 0.0f;
-    float spawnRate = 10.0f;
-
-    bool toggle = false;
-};
+        bool CameraA = true;
+    };
+}  // namespace AnEngine
 
 /*
 class TiledWorld2D {

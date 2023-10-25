@@ -1,11 +1,9 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-
-#include "aepch.hpp"
-
 #include "Core/Core.hpp"
 #include "Events/Event.hpp"
+
 
 namespace AnEngine {
     struct WindowProperties {
@@ -19,7 +17,7 @@ namespace AnEngine {
     };
 
     // desktop only; platform independant
-    class AE_API Window {
+    class Window {
     public:
         using EventCallbackFn = std::function<void(Event&)>;
 

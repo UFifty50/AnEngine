@@ -7,6 +7,7 @@
 #include <string>
 
 #include "Core/Concepts.hpp"
+#include "Core/Core.hpp"
 
 
 namespace AnEngine {

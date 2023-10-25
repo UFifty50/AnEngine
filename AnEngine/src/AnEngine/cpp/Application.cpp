@@ -92,7 +92,7 @@ namespace AnEngine {
                    "Renderer::setAPI() in CreateApplication"
                 << std::endl;
             AE_CORE_ASSERT(false, msg.str().c_str());
-            return -200;
+            return 1;
         }
 
         while (applicationData.running) {
@@ -125,7 +125,7 @@ namespace AnEngine {
         applicationData.exitCode = exitCode;
     }
 
-    int main(int argc, char** argv) {
+    int Application::AEmain(int argc, char** argv) {
         Log::init();
 
         AE_PROFILE_BEGIN_SESSION("Startup", "AnEngineProfile-Startup.json");

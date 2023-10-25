@@ -7,9 +7,16 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include "Application.hpp"
 #include "Core/Core.hpp"
 #include "Core/Input.hpp"
 #include "Core/Layer.hpp"
+#include "Core/Log.hpp"
+#include "Core/Random.hpp"
+#include "Panels/PropertiesPanel.hpp"
+#include "Panels/ScenesPanel.hpp"
+#include "Panels/StatisticsPanel.hpp"
+#include "Panels/ViewportPanel.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Renderer2D.hpp"
@@ -19,151 +26,81 @@
 #include "Scene/ScriptableEntity.hpp"
 
 
-namespace AnEngine {
-    class LockedCameraController : public ScriptableEntity {
+namespace AnEngine::Crank {
+    class CameraController : public ScriptableEntity {
     public:
-        void onCreate() {}
-        void onDestroy() {}
+        void onCreate() {
+            auto& pos = getComponent<TransformComponent>().Position;
+            pos.x = Random::getFloat() * 10.0f - 5.0f;
+            pos.y = Random::getFloat() * 10.0f - 5.0f;
+        }
+
         void onUpdate(TimeStep deltaTime) {
-            auto& transform = getComponent<TransformComponent>().Transform;
+            auto& pos = getComponent<TransformComponent>().Position;
             float speed = 2.0f;
             float zoom = 2.0f;
 
             if (Input::isKeyPressed(KeyCode::A)) {
-                transform[3][0] += speed * (zoom / 2) * deltaTime;
+                pos -= speed * (zoom / 2) * deltaTime;
             } else if (Input::isKeyPressed(KeyCode::D)) {
-                transform[3][0] -= speed * (zoom / 2) * deltaTime;
+                pos += speed * (zoom / 2) * deltaTime;
             }
 
             if (Input::isKeyPressed(KeyCode::W)) {
-                transform[3][1] -= speed * (zoom / 2) * deltaTime;
+                pos += speed * (zoom / 2) * deltaTime;
             } else if (Input::isKeyPressed(KeyCode::S)) {
-                transform[3][1] += speed * (zoom / 2) * deltaTime;
+                pos -= speed * (zoom / 2) * deltaTime;
             }
         }
     };
 
-    CrankEditor::CrankEditor()
-        : Layer("CrankEditor"),
-          cameraController(1280.0f / 720.0f, 75, true, true),
-          viewportSize(0.0f),
-          viewportPos(0.0f),
-          mousePosInViewport(0.0f),
-          sheet("assets/textures/RPGpack_sheet_2X.png", 128, 128) {}
+    CrankEditor::CrankEditor() : Layer("CrankEditor") {}
 
     void CrankEditor::onAttach() {
         Application::loadUILayout("assets/layouts/CrankEditorLayout.ini");
 
-        sprite1 = sheet.getSprite({4, 9});
-
-        activeScene = MakeRef<Scene>();
+        activeScene = MakeRef<Scene>("Test Scene");
         playerEntity = activeScene->createEntity("Player");
+        bgEntity = activeScene->createEntity("Background");
         cameraEntity = activeScene->createEntity("Camera");
         lockedCameraEntity = activeScene->createEntity("LockedCamera");
 
         playerEntity.addComponent<SpriteRendererComponent>(
             glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
 
+        bgEntity.addComponent<SpriteRendererComponent>(glm::vec4{1.0f, 0.0f, 0.0f, 1.0f});
+
         cameraEntity.addComponent<CameraComponent>();
         auto& cc = lockedCameraEntity.addComponent<CameraComponent>();
         cc.Primary = false;
 
-        // lockedCameraEntity.addNativeScript<LockedCameraController>();
-        cameraEntity.addComponent<NativeScriptComponent>().bind<LockedCameraController>();
+        // cameraEntity.addNativeScript<LockedCameraController>("Camera Controller");
+        cameraEntity.addComponent<NativeScriptComponent>("Camera Controller")
+            .bind<CameraController>();
+        lockedCameraEntity.addComponent<NativeScriptComponent>("Locked Camera Controller")
+            .bind<CameraController>();
 
 
         FrameBufferSpec spec = {1280, 720};
         frameBuffer = FrameBuffer::create(spec);
 
-
-        dockSpace.addWindow([&]() {
-            ImGui::Begin("Statistics");
-            ImGui::Text("Renderer2D Stats:");
-            ImGui::Text("FrameTime: %.2fms", Renderer2D::getStats().lastFrameTime);
-            ImGui::Text("FPS: %.1f", 1000.0f / Renderer2D::getStats().lastFrameTime);
-            ImGui::Text("Draw Calls: %d", Renderer2D::getStats().draws);
-            ImGui::Text("Quads: %d", Renderer2D::getStats().quadCount);
-            ImGui::Text("Vertices: %d", Renderer2D::getStats().getTotalVertexCount());
-            ImGui::Text("Indices: %d", Renderer2D::getStats().getTotalIndexCount());
-            ImGui::End();
-        });
-
-        dockSpace.addWindow([&]() {
-            glm::vec4& colour =
-                playerEntity.getComponent<SpriteRendererComponent>().Colour;
-            std::string name = playerEntity.getComponent<TagComponent>().Tag;
-
-            ImGui::Begin("Settings");
-            ImGui::Text("%s Colour: {%.0f, %.0f, %.0f, %.0f}", name.c_str(),
-                        colour.x * 255.0f, colour.y * 255.0f, colour.z * 255.0f,
-                        colour.w * 255.0f);
-
-            ImGui::ColorEdit4("", glm::value_ptr(colour));
-
-            ImGui::Separator();
-
-            ImGui::Text("Camera Settings");
-            ImGui::DragFloat2(
-                "Position",
-                glm::value_ptr(
-                    cameraEntity.getComponent<TransformComponent>().Transform[3]),
-                0.1f);
-
-            if (ImGui::Checkbox("Camera A", &CameraA)) {
-                cameraEntity.getComponent<CameraComponent>().Primary = CameraA;
-                lockedCameraEntity.getComponent<CameraComponent>().Primary = !CameraA;
-            }
-
-            auto& camera = lockedCameraEntity.getComponent<CameraComponent>().Camera;
-            float orthoSize = camera.getOrthographicSize();
-            if (ImGui::DragFloat("LockedCamera ortho size", &orthoSize)) {
-                camera.setOrthographicSize(orthoSize);
-            }
-
-            ImGui::End();
-        });
-
-        dockSpace.addWindow([&]() {
-            uint32_t texID = frameBuffer->getColorAttachmentID();
-
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-            ImGui::Begin("Viewport");
-
-            viewportFocused = ImGui::IsWindowFocused();
-            viewportHovered = ImGui::IsWindowHovered();
-            Application::getImGuiLayer()->shouldAllowEvents(viewportFocused &&
-                                                            viewportHovered);
-
-            ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-            ImVec2 mousePos = ImGui::GetMousePos();
-            ImVec2 windowPos = ImGui::GetWindowPos();
-            ImVec2 rootViewportPos = ImGui::GetMainViewport()->Pos;
-
-            ImVec2 vpPos =
-                ImVec2(windowPos.x - rootViewportPos.x, windowPos.y - rootViewportPos.y);
-            ImVec2 mPosInVp = ImVec2(mousePos.x - windowPos.x, mousePos.y - windowPos.y);
-
-            viewportSize = glm::vec2{viewportPanelSize.x, viewportPanelSize.y};
-            mousePosInViewport = glm::vec2{mPosInVp.x, mPosInVp.y};
-            viewportPos = glm::vec2{vpPos.x, vpPos.y};
-
-            ImGui::Image((void*)texID, ImVec2{viewportSize.x, viewportSize.y}, {0, 1},
-                         {1, 0});
-            ImGui::End();
-            ImGui::PopStyleVar();
-        });
+        auto sp = MakeRef<ScenesPanel>("Scene Heirarchy", activeScene);
+        dockSpace.addPanel(sp);
+        dockSpace.addPanel(MakeRef<PropertiesPanel>("Properties", sp));
+        dockSpace.addPanel(MakeRef<ViewportPanel>("viewport", frameBuffer, dockSpace));
+        dockSpace.addPanel(MakeRef<StatisticsPanel>("Statistics"));
     }
 
     void CrankEditor::onDetach() {}
 
     void CrankEditor::onUpdate(TimeStep deltaTime) {
-        if (viewportFocused) cameraController.onUpdate(deltaTime);
+        if (dockSpace.getViewportSize().x > 0.0f &&
+            dockSpace.getViewportSize().y > 0.0f) {
+            frameBuffer->resize((uint32_t)dockSpace.getViewportSize().x,
+                                (uint32_t)dockSpace.getViewportSize().y);
 
-        if (viewportSize.x > 0.0f && viewportSize.y > 0.0f) {
-            frameBuffer->resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-            cameraController.onResize(viewportSize.x, viewportSize.y);
-
-            activeScene->onResize(viewportSize.x, viewportSize.y);
+            activeScene->onResize(dockSpace.getViewportSize().x,
+                                  dockSpace.getViewportSize().y);
         }
 
         Renderer2D::resetStats();
@@ -177,12 +114,11 @@ namespace AnEngine {
 
         {
             activeScene->onUpdate(deltaTime);
-
             frameBuffer->unBind();
         }
     }
 
     void CrankEditor::onImGuiRender() { dockSpace.render(); }
 
-    void CrankEditor::onEvent(Event& event) { cameraController.onEvent(event); }
-}  // namespace AnEngine
+    void CrankEditor::onEvent(Event& event) {}
+}  // namespace AnEngine::Crank

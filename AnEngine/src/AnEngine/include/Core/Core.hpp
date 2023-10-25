@@ -3,8 +3,8 @@
 
 #include <memory>
 
+#include "Core/Log.hpp"
 #include "CoreConfig.hpp"
-
 
 #undef near
 #undef far
@@ -16,6 +16,7 @@
 #if defined(AE_WIN)
     #define DEBUG_BREAK() __debugbreak()
     #if defined(AE_DYN_LINK)
+        #error Dynamic linking not currently supported
         #if defined(AE_DLL)
             #define AE_API __declspec(dllexport)
         #else
@@ -28,6 +29,7 @@
     #include <signal.h>
     #define DEBUG_BREAK() raise(SIGTRAP)
     #if defined(AE_DYN_LINK)
+        #error Dynamic linking not currently supported
         #if defined(AE_DLL)
             #define AE_API __attribute__((visibility("default")))
         #else

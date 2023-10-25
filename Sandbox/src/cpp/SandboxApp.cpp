@@ -1,18 +1,20 @@
-#include <AnEngine.hpp>
-#include <AnEngine/include/EntryPoint.hpp>
-
+#include "Application.hpp"
+#include "EntryPoint.hpp"
+#include "Renderer/RenderAPI.hpp"
 #include "SandBox2D.hpp"
 
 
-class Sandbox : public AnEngine::Application {
-public:
-    Sandbox() { pushLayer(std::make_shared<SandBox2D>()); }
+namespace AnEngine {
+    class SandboxApp : public Application {
+    public:
+        SandboxApp() { pushLayer(std::make_shared<SandBox2D>()); }
 
-    ~Sandbox() {}
-};
+        ~SandboxApp() {}
+    };
 
-AnEngine::Application* AnEngine::CreateApplication() {
-    RenderAPI::setAPI(RenderAPI::OpenGL);
-    Application::Init("SandBox - AnEngine");
-    return new Sandbox();
-}
+    Application* CreateApplication() {
+        RenderAPI::setAPI(RenderAPI::OpenGL);
+        Application::Init("SandBox - AnEngine");
+        return new SandboxApp();
+    }
+}  // namespace AnEngine

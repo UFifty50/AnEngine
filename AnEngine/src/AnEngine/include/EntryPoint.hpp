@@ -10,10 +10,10 @@ extern AnEngine::Application* AnEngine::CreateApplication();
     #include <Windows.h>
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    return AnEngine::main(__argc, __argv);
+    return AnEngine::Application::AEmain(__argc, __argv);
 }
 #endif
 
-int main(int argc, char** argv) { return AnEngine::main(argc, argv); }
+int main(int argc, char** argv) { return AnEngine::Application::AEmain(argc, argv); }
 
 #endif

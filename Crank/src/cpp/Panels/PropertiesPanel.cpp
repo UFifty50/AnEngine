@@ -1,0 +1,187 @@
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Panels/PropertiesPanel.hpp"
+
+#include "imgui.h"
+#include "imgui_internal.h"
+
+#include "Panels/ScenesPanel.hpp"
+#include "Scene/Components.hpp"
+#include "Scene/Entity.hpp"
+
+
+#define HASH(type) (void*)typeid(type).hash_code()
+
+
+namespace AnEngine::Crank {
+    PropertiesPanel::PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel)
+        : name(name), scenesPanel(scenesPanel) {}
+
+    void PropertiesPanel::render() {
+        Entity selectedEntity = scenesPanel->getSelectedEntity();
+
+        if (selectedEntity) drawComponents(selectedEntity);
+    }
+
+    void PropertiesPanel::drawVec3Controller(const std::string& label, glm::vec3& values,
+                                             float resetValue) {
+        ImGui::PushID(label.c_str());
+
+        if (ImGui::BeginTable("##Vec3Table", 7,
+                              ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX |
+                                  ImGuiTableFlags_SizingFixedFit |
+                                  ImGuiTableFlags_NoHostExtendX)) {
+            ImGui::TableSetupColumn(label.c_str(), ImGuiTableColumnFlags_WidthFixed,
+                                    75.0f);
+            ImGui::TableSetupColumn("##Xb", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##X", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("##Yb", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##Y", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("##Zb", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##Z", ImGuiTableColumnFlags_WidthStretch);
+
+            ImGui::TableNextRow();
+
+            for (int i = 0; i < 7; i++) {
+                ImGui::TableSetColumnIndex(i);
+                ImGui::PushItemWidth(-FLT_MIN);
+            }
+
+            float lineHeight =
+                GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+            ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text(label.c_str());
+
+            ImGui::PushStyleColor(ImGuiCol_Button, {0.8f, 0.1f, 0.15f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.9f, 0.2f, 0.2f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.8f, 0.1f, 0.15f, 1.0f});
+
+            ImGui::TableSetColumnIndex(1);
+            if (ImGui::Button("X", buttonSize)) values.x = resetValue;
+
+            ImGui::PopStyleColor(3);
+
+            ImGui::TableSetColumnIndex(2);
+            ImGui::DragFloat("##X", &values.x, 0.05f, 0.0f, 0.0f, "%.2f");
+
+            ImGui::PushStyleColor(ImGuiCol_Button, {0.2f, 0.7f, 0.2f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.3f, 0.8f, 0.3f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.2f, 0.7f, 0.2f, 1.0f});
+
+            ImGui::TableSetColumnIndex(3);
+            if (ImGui::Button("Y", buttonSize)) values.y = resetValue;
+
+            ImGui::PopStyleColor(3);
+
+            ImGui::TableSetColumnIndex(4);
+            ImGui::DragFloat("##Y", &values.y, 0.05f, 0.0f, 0.0f, "%.2f");
+
+            ImGui::PushStyleColor(ImGuiCol_Button, {0.1f, 0.25f, 0.8f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.2f, 0.35f, 0.9f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0.1f, 0.25f, 0.8f, 1.0f});
+
+            ImGui::TableSetColumnIndex(5);
+            if (ImGui::Button("Z", buttonSize)) values.z = resetValue;
+
+            ImGui::PopStyleColor(3);
+
+            ImGui::TableSetColumnIndex(6);
+            ImGui::DragFloat("##Z", &values.z, 0.05f, 0.0f, 0.0f, "%.2f");
+
+            // End the table
+            ImGui::EndTable();
+        }
+
+
+        ImGui::PopID();
+    }
+
+    void PropertiesPanel::drawComponents(Entity entity) {
+        if (entity.hasComponent<TagComponent>()) {
+            auto& tag = entity.getComponent<TagComponent>().Tag;
+            char buffer[256] = {0};
+            if (ImGui::InputText("Tag", buffer, sizeof(buffer))) {
+                tag = std::string(buffer);
+            }
+        }
+
+        drawComponent<TransformComponent>("Transform", entity, [&](auto& component) {
+            drawVec3Controller("Position", component.Position, 0.0f);
+
+            glm::vec3 rotation = glm::degrees(component.Rotation);
+            drawVec3Controller("Rotation", rotation, 0.0f);
+            component.Rotation = glm::radians(rotation);
+
+            drawVec3Controller("Scale", component.Scale, 1.0f);
+        });
+
+        drawComponent<CameraComponent>("Camera", entity, [](auto& component) {
+            auto& cam = component.Camera;
+
+            ImGui::Checkbox("Primary", &component.Primary);
+
+            const char* projectionTypes[] = {"perspective", "orthographic"};
+            const char* currentProjectionType = projectionTypes[(int)cam.getType()];
+
+            if (ImGui::BeginCombo("Projection Type",
+                                  projectionTypes[(int)cam.getType()])) {
+                bool isPerspective = currentProjectionType == projectionTypes[0];
+                bool isOrthographic = !isPerspective;
+
+                if (ImGui::Selectable(projectionTypes[0], isPerspective)) {
+                    currentProjectionType = projectionTypes[0];
+                    cam.setType(ProjectionType::Perspective);
+                }
+
+                if (ImGui::Selectable(projectionTypes[1], isOrthographic)) {
+                    currentProjectionType = projectionTypes[1];
+                    cam.setType(ProjectionType::Orthographic);
+                }
+
+                ImGui::SetItemDefaultFocus();
+
+                ImGui::EndCombo();
+            }
+
+            if (cam.getType() == ProjectionType::Perspective) {
+                float fov = glm::degrees(cam.getPerspectiveFOV());
+                float near = cam.getPerspectiveNear();
+                float far = cam.getPerspectiveFar();
+
+                if (ImGui::DragFloat("Field Of View", &fov, 1.0f, 10.0f, 150.0f))
+                    cam.setPerspectiveFOV(glm::radians(fov));
+
+                if (ImGui::DragFloat("Near", &near, 0.5f, -far, far - 0.01f))
+                    cam.setPerspectiveNear(near);
+
+                if (ImGui::DragFloat("Far", &far, 0.5f, near + 0.01f, 1000.0f))
+                    cam.setPerspectiveFar(far);
+            }
+
+            if (cam.getType() == ProjectionType::Orthographic) {
+                float size = cam.getOrthographicSize();
+                float near = cam.getOrthographicNear();
+                float far = cam.getOrthographicFar();
+
+                if (ImGui::DragFloat("Size", &size, 1.0f, 1.0f, 200.0f))
+                    cam.setOrthographicSize(size);
+
+                if (ImGui::DragFloat("Near", &near, 0.5f, -far, far - 0.01f))
+                    cam.setOrthographicNear(near);
+
+                if (ImGui::DragFloat("Far", &far, 0.5f, near + 0.01f, 1000.0f))
+                    cam.setOrthographicFar(far);
+
+                ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+            }
+        });
+
+        drawComponent<SpriteRendererComponent>(
+            "Sprite Renderer", entity, [](auto& component) {
+                ImGui::ColorEdit4("Colour", glm::value_ptr(component.Colour));
+            });
+    }
+}  // namespace AnEngine::Crank

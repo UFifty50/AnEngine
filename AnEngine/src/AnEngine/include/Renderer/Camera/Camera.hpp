@@ -5,7 +5,7 @@
 
 
 namespace AnEngine {
-    enum class CameraType { Perspective = 0, Orthographic = 1 };
+    enum class ProjectionType { Perspective = 0, Orthographic = 1 };
 
     class BaseCamera {
     public:
@@ -21,7 +21,7 @@ namespace AnEngine {
         virtual const glm::mat4& getViewMatrix() const = 0;
         virtual const glm::mat4& getViewProjectionMatrix() const = 0;
 
-        virtual CameraType getType() const = 0;
+        virtual ProjectionType getType() const = 0;
     };
 
     class ComponentCamera {
@@ -31,10 +31,10 @@ namespace AnEngine {
         virtual ~ComponentCamera() = default;
 
         const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
-        //      const CameraType getType() const { return type; }
+        const ProjectionType getType() const { return type; }
 
     protected:
-        //      CameraType type = CameraType::Orthographic;
+        ProjectionType type = ProjectionType::Orthographic;
         glm::mat4 projectionMatrix{1.0f};
     };
 }  // namespace AnEngine

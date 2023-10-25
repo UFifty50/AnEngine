@@ -10,9 +10,21 @@ namespace AnEngine {
     SceneCamera::SceneCamera() { recalculateProjection(); }
 
     void SceneCamera::setOrthographic(float size, float nearPlane, float farPlane) {
-        orthoSize = size;
-        orthoNear = nearPlane;
-        orthoFar = farPlane;
+        projectionType = ProjectionType::Orthographic;
+
+        orthoSettings.size = size;
+        orthoSettings.near = nearPlane;
+        orthoSettings.far = farPlane;
+
+        recalculateProjection();
+    }
+
+    void SceneCamera::setPerspective(float FOV, float nearPlane, float farPlane) {
+        projectionType = ProjectionType::Perspective;
+
+        perspectiveSettings.FOV = FOV;
+        perspectiveSettings.near = nearPlane;
+        perspectiveSettings.far = farPlane;
 
         recalculateProjection();
     }
@@ -23,10 +35,25 @@ namespace AnEngine {
     }
 
     void SceneCamera::recalculateProjection() {
-        float left = -orthoSize * aspectRatio * 0.5;
-        float right = -left;
-        float top = orthoSize * 0.5;
-        float bottom = -top;
-        projectionMatrix = glm::ortho(left, right, bottom, top, orthoNear, orthoFar);
+        if (projectionType == ProjectionType::Orthographic) {
+            float left = -orthoSettings.size * aspectRatio * 0.5;
+            float right = -left;
+            float top = orthoSettings.size * 0.5;
+            float bottom = -top;
+            orthoSettings.bounds = {left, right, bottom, top};
+            projectionMatrix = glm::ortho(left, right, bottom, top, orthoSettings.near,
+                                          orthoSettings.far);
+        } else {
+            float top =
+                glm::tan(perspectiveSettings.FOV * 0.5f) * perspectiveSettings.near;
+            float bottom = -top;
+            float right = top * aspectRatio;
+            float left = -right;
+
+            perspectiveSettings.bounds = {left, right, bottom, top};
+            projectionMatrix =
+                glm::perspective(perspectiveSettings.FOV, aspectRatio,
+                                 perspectiveSettings.near, perspectiveSettings.far);
+        }
     }
 }  // namespace AnEngine
