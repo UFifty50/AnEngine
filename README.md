@@ -43,4 +43,3 @@ AnEngine can then be configured and compiled with:
 premake5 gmake2
 make
 ```
-
