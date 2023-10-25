@@ -17,6 +17,8 @@ namespace AnEngine {
         return e;
     }
 
+    void Scene::destroyEntity(Entity entity) { entityRegistry.destroy(entity); }
+
     void Scene::onUpdate(TimeStep deltaTime) {
         entityRegistry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
             // TODO: Move to onScenePlay functiom
@@ -76,6 +78,19 @@ namespace AnEngine {
             if (!cameraComponent.FixedAspectRatio) {
                 cameraComponent.Camera.setViewportSize(width, height);
             }
+        }
+    }
+
+    void Scene::onComponentAdded(Entity e, Component& component) {
+        switch (component.getID()) {
+            case CAMERA_COMPONENT_ID: {
+                auto& cameraComponent = (CameraComponent&)component;
+                cameraComponent.Camera.setViewportSize(viewportWidth, viewportHeight);
+                break;
+            }
+
+            default:
+                break;
         }
     }
 }  // namespace AnEngine

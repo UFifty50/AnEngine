@@ -1,5 +1,6 @@
 [![wakatime](https://wakatime.com/badge/github/UFifty50/AnEngine.svg)](https://wakatime.com/badge/github/UFifty50/AnEngine)
-# AnEngine
+# This branch is for transferring developing code between my PCs, and will likely never compile. Please go to [the main branch](https://github.com/UFifty50/AnEngine/tree/main) for (hopefully) working code.
+## AnEngine
 Learning gameEngine-dev using [TheCherno's Game Engine series](https://youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT)
 
 - [AnEngine](#AnEngine)

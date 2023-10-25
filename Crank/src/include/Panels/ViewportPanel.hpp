@@ -16,6 +16,8 @@ namespace AnEngine::Crank {
         virtual void render() override;
         virtual void afterRender() override;
 
+        virtual void onClose() override {}
+
         virtual std::string getName() override { return name; }
 
     private:

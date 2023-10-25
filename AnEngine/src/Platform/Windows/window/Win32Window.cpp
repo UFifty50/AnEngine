@@ -12,6 +12,7 @@
 
 namespace AnEngine {
     static bool GLFWinitialised = false;
+    float Window::HighDPIScaleFactor = 1.0f;
 
     static void GLFWerrorCallback(int error, const char* description) {
         AE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
@@ -41,6 +42,15 @@ namespace AnEngine {
             AE_CORE_ASSERT(success, "Could not initialise GLFW!");
             glfwSetErrorCallback(GLFWerrorCallback);
             GLFWinitialised = true;
+        }
+
+        GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+        float xscale, yscale;
+        glfwGetMonitorContentScale(primaryMonitor, &xscale, &yscale);
+
+        if (xscale > 1.0f || yscale > 1.0f) {
+            HighDPIScaleFactor = xscale;
+            glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
         }
 
         window = glfwCreateWindow((int)props.width, (int)props.height,

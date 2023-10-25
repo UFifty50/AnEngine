@@ -41,15 +41,15 @@ namespace AnEngine::Crank {
             float zoom = 2.0f;
 
             if (Input::isKeyPressed(KeyCode::A)) {
-                pos -= speed * (zoom / 2) * deltaTime;
+                pos.x -= speed * (zoom / 2) * deltaTime;
             } else if (Input::isKeyPressed(KeyCode::D)) {
-                pos += speed * (zoom / 2) * deltaTime;
+                pos.x += speed * (zoom / 2) * deltaTime;
             }
 
             if (Input::isKeyPressed(KeyCode::W)) {
-                pos += speed * (zoom / 2) * deltaTime;
+                pos.y += speed * (zoom / 2) * deltaTime;
             } else if (Input::isKeyPressed(KeyCode::S)) {
-                pos -= speed * (zoom / 2) * deltaTime;
+                pos.y -= speed * (zoom / 2) * deltaTime;
             }
         }
     };

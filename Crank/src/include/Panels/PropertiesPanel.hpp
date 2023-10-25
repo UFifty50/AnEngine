@@ -5,6 +5,8 @@
 
 #include <functional>
 
+#include "imgui_internal.h"
+
 #include "Panels/Panel.hpp"
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Entity.hpp"
@@ -15,32 +17,66 @@ namespace AnEngine::Crank {
     public:
         PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel);
 
-        virtual void beforeRender() override {}
+        virtual void beforeRender() override {
+            ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, -1});
+        }
         virtual void render() override;
         virtual void afterRender() override {}
 
+        virtual void onClose() override {}
+
         virtual std::string getName() override { return name; }
+
+        static void drawVec3Controller(const std::string& label, glm::vec3& toDraw,
+                                       float defaultValue = 0.0f);
 
     private:
         void drawComponents(Entity entity);
 
         template <typename T>
-        void drawComponent(std::string name, Entity entity,
-                           std::function<void(T&)> func) {
+        void drawComponent(const std::string& name, Entity entity, bool removable,
+                           std::function<void(T&)> func, ImGuiTreeNodeFlags flags = 0) {
             if (!entity.hasComponent<T>()) {
                 return;
             }
 
+            ImVec2 availableRegion = ImGui::GetContentRegionAvail();
+
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {4, 4});
+
+            float lineHeight =
+                GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+
+            // ImGui::Separator();
+
+            bool open =
+                ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str());
+            if (removable) ImGui::SameLine(availableRegion.x - lineHeight * 1.5f);
+
+            bool buttonClicked =
+                removable && ImGui::Button("...", {lineHeight * 1.5f, lineHeight});
+            if (removable && ImGui::IsItemHovered())
+                ImGui::SetTooltip("Component Settings");
+            if (removable && buttonClicked) {
+                ImGui::OpenPopup("##ComponentSettings");
+            }
+
+            ImGui::PopStyleVar();
+
+            bool removeComponent = false;
+            if (ImGui::BeginPopup("##ComponentSettings")) {
+                if (ImGui::MenuItem("Remove Component")) removeComponent = true;
+                ImGui::EndPopup();
+            }
+
             auto& component = entity.getComponent<T>();
-            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen;
-            if (ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str())) {
+            if (open) {
                 func(component);
                 ImGui::TreePop();
             }
-        }
 
-        void drawVec3Controller(const std::string& label, glm::vec3& toDraw,
-                                float defaultValue = 0.0f);
+            if (removable && removeComponent) entity.removeComponent<T>();
+        }
 
         std::string name;
         Ref<ScenesPanel> scenesPanel;

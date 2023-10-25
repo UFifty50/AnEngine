@@ -15,6 +15,8 @@ namespace AnEngine::Crank {
         virtual void render() = 0;
         virtual void afterRender() = 0;
 
+        virtual void onClose() = 0;
+
         virtual std::string getName() = 0;
     };
 }  // namespace AnEngine::Crank

@@ -23,7 +23,10 @@ namespace AnEngine::Crank {
         DockSpace() : panels({}) {}
         ~DockSpace() = default;
 
-        void addPanel(Ref<Panel> panel) { panels.push_back(panel); }
+        void addPanel(Ref<Panel> panel) {
+            panels.push_back(panel);
+            usablePanels.push_back(panel);
+        }
         void render();
 
         //    glm::vec2 getMousePosOnRenderedViewport(CameraComponent cameraComponent);
@@ -42,6 +45,7 @@ namespace AnEngine::Crank {
 
     private:
         std::vector<Ref<Panel>> panels;
+        std::vector<Ref<Panel>> usablePanels;
 
         bool viewportFocused = false;
         bool viewportHovered = false;
