@@ -240,8 +240,8 @@ project "Crank"
         runtime "Release"
         optimize "on"
 
-
-project "Sandbox"
+--[[
+project "Sandbox" 
     location "Sandbox"
     kind "ConsoleApp"
     staticruntime "on"
@@ -317,3 +317,4 @@ project "Sandbox"
         flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
+]]--
