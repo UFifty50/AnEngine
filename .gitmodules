@@ -18,3 +18,6 @@
 [submodule "ENTT"]
 	path = AnEngine/vendor/ENTT
 	url = https://github.com/UFifty50/ENTT-premake.git
+[submodule "yaml-cpp"]
+	path = AnEngine/vendor/yaml-cpp
+	url = https://github.com/UFifty50/yaml-cpp-premake.git

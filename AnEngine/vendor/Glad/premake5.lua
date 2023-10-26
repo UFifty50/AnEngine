@@ -6,15 +6,13 @@ project "Glad"
 	targetdir ("bin/" .. outputDir .. "/%{prj.name}")
 	objdir ("bin/intermediate/" .. outputDir .. "/%{prj.name}")
 
-	files
-	{
+	files {
 		"include/glad/glad.h",
         "include/KHR/khrplatform.h",
 		"src/glad.c",
 	}
 
-    includedirs
-    {
+    includedirs {
         'include'
     }
 
