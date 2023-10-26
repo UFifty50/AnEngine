@@ -85,6 +85,7 @@ project "AnEngine"
     postbuildcommands {
 --            "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
             "{MKDIR} ../bin/" .. outputDir .. "/Crank",
+            "{MKDIR} ../bin/" .. outputDir .. "/Crank/builtins",
 --            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox",
             "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Crank",
  --           "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets",
@@ -198,6 +199,7 @@ project "Crank"
     }
 
     postbuildcommands {
+            "{MKDIR} ../bin/" .. outputDir .. "/Crank/builtins",
             "{COPYDIR} ../Crank/assets ../bin/" .. outputDir .. "/Crank/assets",
             "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Crank/builtins/assets"
     }

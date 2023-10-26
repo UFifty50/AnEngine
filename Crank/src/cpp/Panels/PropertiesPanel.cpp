@@ -134,7 +134,7 @@ namespace AnEngine::Crank {
             ImVec2 buttonSize = {lineHeight, lineHeight};
 
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text(label.c_str());
+            ImGui::Text("%s", label.c_str());
 
             ImGui::PushStyleColor(ImGuiCol_Button, {0.8f, 0.1f, 0.15f, 1.0f});
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.9f, 0.2f, 0.2f, 1.0f});
@@ -278,6 +278,7 @@ namespace AnEngine::Crank {
 
         drawComponent<NativeScriptComponent>(
             "Script", entity, true,
-            [&](auto& component) { ImGui::Text(component.Name.c_str()); }, treeNodeFlags);
+            [&](auto& component) { ImGui::Text("%s", component.Name.c_str()); },
+            treeNodeFlags);
     }
 }  // namespace AnEngine::Crank

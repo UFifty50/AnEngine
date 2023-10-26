@@ -27,7 +27,7 @@ namespace AnEngine::Crank {
         static float addEntityButtonWidth = 100.0f;
 
         if (currentScene) {
-            ImGui::Text(currentScene->getName().c_str());
+            ImGui::Text("%s", currentScene->getName().c_str());
 
             float pos = addSceneButtonWidth + ItemSpacing;
             ImGui::SameLine(ImGui::GetWindowWidth() - pos);
@@ -78,7 +78,8 @@ namespace AnEngine::Crank {
             ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
         flags |= (selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0;
 
-        bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.c_str());
+        bool opened =
+            ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, "%s", tag.c_str());
         if (ImGui::IsItemClicked()) selectedEntity = entity;
 
         bool entityDeleted = false;
