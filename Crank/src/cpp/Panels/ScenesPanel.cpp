@@ -28,7 +28,7 @@ namespace AnEngine::Crank {
 
         static float sceneSettingsButtonWidth = 100.0f;
         static float addEntityButtonWidth = 100.0f;
-        static bool editingName = false;
+        // static bool editingName = false;
 
         if (currentScene) {
             /*if (editingName) {

@@ -21,6 +21,7 @@ namespace AnEngine::Crank {
         virtual void beforeRender() override {
             //    ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, INFINITY});
         }
+      
         virtual void render() override;
         virtual void afterRender() override {}
 

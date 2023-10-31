@@ -33,6 +33,7 @@ namespace AnEngine {
         T& addComponent(Args&&... args) {
             AE_CORE_ASSERT(!hasComponent<T>(),
                            "Entity already has component of type {0}!", typeid(T).name());
+          
             T& component = scene->entityRegistry.emplace<T>(entityHandle,
                                                             std::forward<Args>(args)...);
             scene->onComponentAdded(*this, component);

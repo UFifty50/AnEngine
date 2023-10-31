@@ -65,6 +65,16 @@ namespace AnEngine::Crank {
                 }
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Window")) {
+                for (auto& panel : usablePanels) {
+                    if (ImGui::MenuItem(panel->getName().c_str())) {
+                        if (std::ranges::find(panels, panel) == panels.end())
+                            panels.push_back(panel);
+                    }
+                }
+                ImGui::EndMenu();
+            }
             ImGui::EndMenuBar();
         }
 
