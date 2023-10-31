@@ -3,14 +3,17 @@
 
 #include <string>
 
-#include "CrankEditor.hpp"
 #include "Dockspace.hpp"
 #include "Panels/Panel.hpp"
+#include "Renderer/FrameBuffer.hpp"
+
 
 namespace AnEngine::Crank {
     class ViewportPanel : public Panel {
     public:
-        ViewportPanel(std::string name, const Ref<FrameBuffer>& fbuf, DockSpace& dspace);
+        ViewportPanel() = default;
+        ViewportPanel(std::string name, const Ref<FrameBuffer>& fbuf,
+                      Ref<DockSpace>& dspace);
 
         virtual void beforeRender() override;
         virtual void render() override;
@@ -23,7 +26,7 @@ namespace AnEngine::Crank {
     private:
         std::string name;
         const Ref<FrameBuffer>& frameBuffer;
-        DockSpace& dockSpace;
+        Ref<DockSpace>& dockSpace;
     };
 }  // namespace AnEngine::Crank
 

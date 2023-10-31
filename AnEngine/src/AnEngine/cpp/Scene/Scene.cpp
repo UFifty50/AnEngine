@@ -63,8 +63,6 @@ namespace AnEngine {
             }
 
             Renderer2D::endScene();
-        } else {
-            AE_CORE_WARN("No primary camera entity found!");
         }
     }
 

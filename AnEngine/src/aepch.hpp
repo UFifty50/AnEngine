@@ -1,7 +1,7 @@
 #ifndef AEPCH_HPP
 #define AEPCH_HPP
 
-
+#define NOMINMAX
 #define _CRT_SECURE_NO_WARNINGS
 #include <algorithm>
 #include <fstream>
@@ -19,10 +19,12 @@
 #if defined(AE_WIN)
     #include <Shlwapi.h>
     #include <Windows.h>
+    #include <commdlg.h>
     #include <io.h>
 #elif defined(AE_LINUX)
     #include <libgen.h>
     #include <limits.h>
+    #include <signal.h>
     #include <unistd.h>
 #endif
 

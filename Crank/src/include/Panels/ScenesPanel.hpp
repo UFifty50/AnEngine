@@ -31,9 +31,9 @@ namespace AnEngine::Crank {
         void drawEntityNode(Entity entity);
         void drawAddEntityUI();
 
-        std::string name;
-        Ref<Scene> currentScene;
-        Entity selectedEntity;
+        std::string name{};
+        Ref<Scene> currentScene{};
+        Entity selectedEntity{};
 
         // AddEntityUI stuff
         bool isCamera = false;

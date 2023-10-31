@@ -3,7 +3,6 @@
 
 #include <string>
 
-#include "CrankEditor.hpp"
 #include "Dockspace.hpp"
 #include "Panels/Panel.hpp"
 #include "Renderer/Renderer2D.hpp"
@@ -12,12 +11,13 @@
 namespace AnEngine::Crank {
     class StatisticsPanel : public Panel {
     public:
+        StatisticsPanel() = default;
         StatisticsPanel(std::string name);
 
         virtual void beforeRender() override {}
         virtual void render() override;
         virtual void afterRender() override {}
-      
+
         virtual void onClose() override {}
 
         virtual std::string getName() override { return name; }

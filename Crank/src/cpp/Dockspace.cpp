@@ -37,23 +37,23 @@ namespace AnEngine::Crank {
 
         ImGuiIO& io = ImGui::GetIO();
         ImGuiStyle& style = ImGui::GetStyle();
-      
+
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
             ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
             ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
         }
 
         if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Save UI Layout", "CTRL+S"))
-                    Application::saveUILayout("assets/layouts/CrankEditorLayout.ini");
+            for (auto& menu : menus) {
+                std::string name = menu->getMenuName();
+                if (name == "Window") continue;
 
-                if (ImGui::MenuItem("Exit", "ALT+F4")) Application::Shutdown();
-                /*
-                if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-                if (ImGui::MenuItem("Redo", "CTRL+Y")) {}
-                */
-                ImGui::EndMenu();
+                if (ImGui::BeginMenu(name.c_str())) {
+                    menu->renderMenu();
+                    ImGui::EndMenu();
+                }
+
+                menu->renderMenuPopups();
             }
 
             if (ImGui::BeginMenu("Window")) {

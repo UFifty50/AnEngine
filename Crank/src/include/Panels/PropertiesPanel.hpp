@@ -15,6 +15,7 @@
 namespace AnEngine::Crank {
     class PropertiesPanel : public Panel {
     public:
+        PropertiesPanel() = default;
         PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel);
 
         virtual void beforeRender() override {

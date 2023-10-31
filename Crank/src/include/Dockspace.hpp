@@ -10,6 +10,7 @@
 #include "imgui_internal.h"
 
 #include "Core/Core.hpp"
+#include "Menus/Menu.hpp"
 #include "Panels/Panel.hpp"
 // #include "Scene/Components.hpp"
 
@@ -20,13 +21,16 @@ namespace AnEngine::Crank {
 
     class DockSpace {
     public:
-        DockSpace() : panels({}) {}
+        DockSpace() = default;
         ~DockSpace() = default;
 
         void addPanel(Ref<Panel> panel) {
             panels.push_back(panel);
             usablePanels.push_back(panel);
         }
+
+        void addMenubarMenu(Ref<Menu> menu) { menus.push_back(menu); }
+
         void render();
 
         //    glm::vec2 getMousePosOnRenderedViewport(CameraComponent cameraComponent);
@@ -44,6 +48,7 @@ namespace AnEngine::Crank {
         bool isWindowHovered() { return windowHovered; }
 
     private:
+        std::vector<Ref<Menu>> menus;
         std::vector<Ref<Panel>> panels;
         std::vector<Ref<Panel>> usablePanels;
 

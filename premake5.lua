@@ -74,6 +74,10 @@ project "AnEngine"
         "%{prj.name}/vendor/spdlog/include/"
     }
 
+    defines {
+        "YAML_CPP_STATIC_DEFINE"
+    }
+
     links {
         "GLFW",
         "Glad",
@@ -193,10 +197,15 @@ project "Crank"
         "%{includeDir.entt}",
         "%{includeDir.glm}",
         "%{includeDir.fmt}",
+        "%{includeDir.yaml_cpp}"
     }
 
     externalincludedirs {
         "AnEngine/vendor/spdlog/include/"
+    }
+
+    defines {
+        "YAML_CPP_STATIC_DEFINE"
     }
 
     postbuildcommands {

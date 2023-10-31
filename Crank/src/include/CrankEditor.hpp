@@ -7,7 +7,13 @@
 #include "Core/Layer.hpp"
 #include "Dockspace.hpp"
 #include "Events/Event.hpp"
+#include "Events/KeyEvent.hpp"
+#include "Menus/Filemenu.hpp"
 #include "Panels/Panel.hpp"
+#include "Panels/PropertiesPanel.hpp"
+#include "Panels/ScenesPanel.hpp"
+#include "Panels/StatisticsPanel.hpp"
+#include "Panels/ViewportPanel.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Scene/Entity.hpp"
 #include "Scene/Scene.hpp"
@@ -26,16 +32,22 @@ namespace AnEngine::Crank {
         virtual void onImGuiRender() override;
         virtual void onEvent(Event& event) override;
 
+        bool onKeyPressed(KeyPressedEvent& kpEvent);
+
         friend class Panel;
 
     private:
-        DockSpace dockSpace;
         Ref<Scene> activeScene;
         Ref<FrameBuffer> frameBuffer;
-        Entity playerEntity;
-        Entity bgEntity;
-        Entity cameraEntity;
-        Entity lockedCameraEntity;
+
+        Ref<DockSpace> dockSpace;
+
+        Ref<ScenesPanel> sceneHierarchy;
+        Ref<PropertiesPanel> properties;
+        Ref<ViewportPanel> viewport;
+        Ref<StatisticsPanel> statistics;
+
+        Ref<FileMenu> fileMenu;
 
         bool CameraA = true;
     };

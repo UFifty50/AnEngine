@@ -31,10 +31,10 @@ namespace AnEngine {
         virtual ~ComponentCamera() = default;
 
         const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
-        const ProjectionType getType() const { return type; }
+        const ProjectionType getProjectionType() const { return projectionType; }
 
     protected:
-        ProjectionType type = ProjectionType::Orthographic;
+        ProjectionType projectionType = ProjectionType::Orthographic;
         glm::mat4 projectionMatrix{1.0f};
     };
 }  // namespace AnEngine
