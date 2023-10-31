@@ -18,7 +18,7 @@ namespace AnEngine::Crank {
         Entity getSelectedEntity() { return selectedEntity; }
 
         virtual void beforeRender() override {
-            ImGui::SetNextWindowSizeConstraints({200.0f, -1}, {INFINITY, -1});
+            //   ImGui::SetNextWindowSizeConstraints({200.0f, 0}, {INFINITY, INFINITY});
         }
         virtual void render() override;
         virtual void afterRender() override {}

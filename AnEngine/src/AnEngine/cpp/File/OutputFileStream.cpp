@@ -12,8 +12,8 @@ namespace AnEngine {
         char exePathName[MAX_PATH];
         GetModuleFileNameA(NULL, exePathName, sizeof(exePathName));
 
-        char* exePath = new char[std::string(exePathName).length() + 1];
-        strcpy(exePath, exePathName);
+        char* exePath = new char[std::strlen(exePathName) + 1];
+        std::strncpy(exePath, exePathName, sizeof(exePath));
 
         PathRemoveFileSpecA(exePath);
         auto directory = std::string(exePath);
@@ -28,8 +28,8 @@ namespace AnEngine {
         char exePathName[PATH_MAX];
         realpath("/proc/self/exe", exePathName);
 
-        char* exePath = new char[std::string(exePathName).length() + 1];
-        strcpy(exePath, exePathName);
+        char* exePath = new char[std::strlen(exePathName) + 1];
+        std::strncpy(exePath, exePathName, sizeof(exePath));
 
         auto directory = std::string(dirname(exePath));
 

@@ -112,8 +112,8 @@ namespace AnEngine::Crank {
         if (auto fbSpec = frameBuffer->getSpecification();
             dockSpace->getViewportSize().x > 0.0f &&
             dockSpace->getViewportSize().y > 0.0f &&
-            (fbSpec.Width != dockSpace->getViewportSize().x) &&
-            (fbSpec.Height != dockSpace->getViewportSize().y)) {
+            (fbSpec.Width != dockSpace->getViewportSize().x ||
+             fbSpec.Height != dockSpace->getViewportSize().y)) {
             frameBuffer->resize((uint32_t)dockSpace->getViewportSize().x,
                                 (uint32_t)dockSpace->getViewportSize().y);
 

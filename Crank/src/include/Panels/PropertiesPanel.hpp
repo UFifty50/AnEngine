@@ -19,7 +19,7 @@ namespace AnEngine::Crank {
         PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel);
 
         virtual void beforeRender() override {
-            ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, -1});
+            //    ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, INFINITY});
         }
         virtual void render() override;
         virtual void afterRender() override {}

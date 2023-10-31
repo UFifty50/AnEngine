@@ -96,10 +96,7 @@ namespace AnEngine::Crank {
     }
 
     void DockSpace::updateViewportInfo() {
-        auto vMin = ImGui::GetWindowContentRegionMin();
-        auto vMax = ImGui::GetWindowContentRegionMax();
-
-        viewportSize = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y);
+        viewportSize = ImGui::GetWindowSize();
         viewportPos = ImGui::GetWindowPos();
         viewportFocused = ImGui::IsItemFocused();
         viewportHovered = ImGui::IsItemHovered();
