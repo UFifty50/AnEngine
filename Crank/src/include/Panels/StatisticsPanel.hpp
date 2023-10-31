@@ -17,8 +17,6 @@ namespace AnEngine::Crank {
         virtual void beforeRender() override {}
         virtual void render() override;
         virtual void afterRender() override {}
-      
-        virtual void onClose() override {}
 
         virtual void onClose() override {}
 

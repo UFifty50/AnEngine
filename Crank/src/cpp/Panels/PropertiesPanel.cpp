@@ -60,7 +60,7 @@ namespace AnEngine::Crank {
                 if (!selectedEntity.hasComponent<SpriteRendererComponent>()) {
                     selectedEntity.addComponent<SpriteRendererComponent>();
                 } else {
-                    ImGui::OpenPopup("This entity already has a sprite component!");
+                    AE_CORE_WARN("This entity already has a sprite component!");
                 }
 
                 ImGui::CloseCurrentPopup();
@@ -80,7 +80,7 @@ namespace AnEngine::Crank {
 
             ImGui::EndPopup();
         }
-      
+
         ImGui::PopStyleVar();
     }
 
