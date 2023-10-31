@@ -18,8 +18,9 @@ namespace AnEngine::Crank {
         Entity getSelectedEntity() { return selectedEntity; }
 
         virtual void beforeRender() override {
-            ImGui::SetNextWindowSizeConstraints({200.0f, -1}, {INFINITY, -1});
+            //   ImGui::SetNextWindowSizeConstraints({200.0f, 0}, {INFINITY, INFINITY});
         }
+      
         virtual void render() override;
         virtual void afterRender() override {}
 
@@ -41,11 +42,11 @@ namespace AnEngine::Crank {
         bool isScripted = false;
         std::string script;
         std::string tagName;
-        glm::vec3 transformPos{0.0f};
-        glm::vec3 transformRot{0.0f};
-        glm::vec3 transformScale{1.0f};
-        CameraComponent cc{};
-        SpriteRendererComponent sRC{};
+        glm::vec3 transformPos;
+        glm::vec3 transformRot;
+        glm::vec3 transformScale;
+        CameraComponent cc;
+        SpriteRendererComponent sRC;
         bool entityUIOpen = false;
     };
 };  // namespace AnEngine::Crank

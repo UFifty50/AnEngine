@@ -57,8 +57,9 @@ namespace AnEngine {
 
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.dispatch<WindowCloseEvent>(Application::onWindowClose);
-        dispatcher.dispatch<WindowResizeEvent>(Application::onWindowResize);
+        dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.dispatch<WindowResizeEvent>(
+            BIND_EVENT_FN(Application::onWindowResize));
 
         for (auto it = applicationData.layerStack.end();
              it != applicationData.layerStack.begin();) {

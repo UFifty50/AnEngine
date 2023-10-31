@@ -15,6 +15,7 @@ includeDir['glm'] = "AnEngine/vendor/glm/"
 includeDir['fmt'] = "AnEngine/vendor/fmt/include/"
 includeDir['stb'] = "AnEngine/vendor/stb/"
 includeDir['entt'] = "AnEngine/vendor/ENTT/single_include/"
+includeDir['yaml_cpp'] = "AnEngine/vendor/yaml-cpp/include/"
 
 group "Dependencies"
     include "AnEngine/vendor/GLFW"
@@ -22,6 +23,7 @@ group "Dependencies"
     include "AnEngine/vendor/ImGui"
     include "AnEngine/vendor/fmt"
     include "AnEngine/vendor/ENTT"
+    include "AnEngine/vendor/yaml-cpp"
 
 group ""
 project "AnEngine"
@@ -58,17 +60,22 @@ project "AnEngine"
         "%{prj.name}/src/AnEngine/include/",
         "%{prj.name}/src/Platform/",
         "%{prj.name}/src",
+        "%{includeDir.fmt}",
         "%{includeDir.GLFW}",
         "%{includeDir.Glad}",
-        "%{includeDir.entt}",
         "%{includeDir.ImGui}",
         "%{includeDir.glm}",
-        "%{includeDir.fmt}",
-        "%{includeDir.stb}"
+        "%{includeDir.stb}",
+        "%{includeDir.entt}",
+        "%{includeDir.yaml_cpp}"
     }
 
     externalincludedirs {
         "%{prj.name}/vendor/spdlog/include/"
+    }
+
+    defines {
+        "YAML_CPP_STATIC_DEFINE"
     }
 
     links {
@@ -76,6 +83,7 @@ project "AnEngine"
         "Glad",
         "ImGui",
         "fmt",
+        "yaml-cpp"
     }
 
     prebuildcommands {
@@ -83,13 +91,10 @@ project "AnEngine"
     }
 
     postbuildcommands {
-            "{MKDIR} ../bin/" .. outputDir .. "/Sandbox",
             "{MKDIR} ../bin/" .. outputDir .. "/Crank",
-            "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox",
+            "{MKDIR} ../bin/" .. outputDir .. "/Crank/builtins",
             "{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Crank",
-            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets",
             "{COPYDIR} ../Crank/assets ../bin/" .. outputDir .. "/Crank/assets",
-            "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Sandbox/builtins/assets",
             "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Crank/builtins/assets"
     }
 
@@ -172,10 +177,11 @@ project "Crank"
 
     links {
         "AnEngine",
-        "GLFW",
-        "Glad",
-        "ImGui",
-        "fmt"
+    --    "GLFW",
+    --    "Glad",
+    --    "ImGui",
+    --    "fmt",
+    --    "yaml-cpp"
     }
 
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
@@ -190,94 +196,22 @@ project "Crank"
         "%{includeDir.ImGui}",
         "%{includeDir.entt}",
         "%{includeDir.glm}",
-        "%{includeDir.fmt}"
+        "%{includeDir.fmt}",
+        "%{includeDir.yaml_cpp}"
     }
 
     externalincludedirs {
         "AnEngine/vendor/spdlog/include/"
     }
 
+    defines {
+        "YAML_CPP_STATIC_DEFINE"
+    }
+
     postbuildcommands {
+            "{MKDIR} ../bin/" .. outputDir .. "/Crank/builtins",
             "{COPYDIR} ../Crank/assets ../bin/" .. outputDir .. "/Crank/assets",
             "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Crank/builtins/assets"
-    }
-
-    filter "system:Linux"
-        pic "on"
-        systemversion "latest"
-
-        defines { 
-            "AE_LINUX",
-        }
-
-    filter "system:windows"
-        systemversion "latest"
-
-        defines { 
-            "AE_WIN",
-        }
-
-    filter "toolset:msc*"
-        buildoptions {
-            "/analyze:external-",
-            "/Zc:preprocessor"
-        }
-
-    filter "configurations:Debug"
-        defines { "AE_DEBUG_FLAG", "_DEBUG" }
-        runtime "Debug"
-        symbols "on"
-
-    filter "configurations:Release"
-        defines { "AE_RELEASE" }
-        flags { "LinkTimeOptimization" }
-        runtime "Release"
-        optimize "on"
-
-    filter "configurations:Dist"
-        defines { "AE_DIST" }
-        flags { "LinkTimeOptimization" }
-        runtime "Release"
-        optimize "on"
-
-
-project "Sandbox"
-    location "Sandbox"
-    kind "ConsoleApp"
-    staticruntime "on"
-    language "C++"
-    cppdialect "C++20"
-
-    links {
-        "AnEngine",
-        "GLFW",
-        "Glad",
-        "ImGui",
-        "fmt"
-    }
-
-    targetdir ("bin/" .. outputDir .. "/%{prj.name}")
-    objdir ("bin/intermediate/" .. outputDir .. "/%{prj.name}")
-
-    files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
-
-    includedirs { 
-        "%{prj.name}/src/include/",
-        "AnEngine/src",
-        "AnEngine/src/AnEngine/include/",
-        "%{includeDir.ImGui}",
-        "%{includeDir.entt}",
-        "%{includeDir.glm}",
-        "%{includeDir.fmt}"
-    }
-
-    externalincludedirs {
-        "AnEngine/vendor/spdlog/include/"
-    }
-
-    postbuildcommands {
-            "{COPYDIR} ../Sandbox/assets ../bin/" .. outputDir .. "/Sandbox/assets",
-            "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Sandbox/builtins/assets"
     }
 
     filter "system:Linux"

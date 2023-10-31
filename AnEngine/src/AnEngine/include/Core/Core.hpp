@@ -26,7 +26,6 @@
         #define AE_API
     #endif
 #elif defined(AE_LINUX)
-    #include <signal.h>
     #define DEBUG_BREAK() raise(SIGTRAP)
     #if defined(AE_DYN_LINK)
         #error Dynamic linking not currently supported
@@ -108,7 +107,11 @@
 
 #define BIT(x) (1 << x)
 
-#define BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+// std::bind(&fn, this, std::placeholders::_1)
+#define BIND_EVENT_FN(fn)                                 \
+    [&](auto&&... args) -> decltype(auto) {               \
+        return fn(std::forward<decltype(args)>(args)...); \
+    }
 
 namespace AnEngine {
     typedef uint32_t RenderID;

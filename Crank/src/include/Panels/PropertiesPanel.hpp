@@ -15,11 +15,13 @@
 namespace AnEngine::Crank {
     class PropertiesPanel : public Panel {
     public:
+        PropertiesPanel() = default;
         PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel);
 
         virtual void beforeRender() override {
-            ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, -1});
+            //    ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, INFINITY});
         }
+      
         virtual void render() override;
         virtual void afterRender() override {}
 
@@ -49,8 +51,8 @@ namespace AnEngine::Crank {
 
             // ImGui::Separator();
 
-            bool open =
-                ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str());
+            bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s",
+                                          name.c_str());
             if (removable) ImGui::SameLine(availableRegion.x - lineHeight * 1.5f);
 
             bool buttonClicked =

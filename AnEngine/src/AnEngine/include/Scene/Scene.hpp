@@ -19,6 +19,11 @@ namespace AnEngine {
         Scene(std::string name) : name(name) {}
         ~Scene() = default;
 
+        void clear() {
+            name = "";
+            entityRegistry.clear();
+        }
+
         Entity createEntity(const std::string& name = "");
         void destroyEntity(Entity entity);
 
@@ -36,6 +41,7 @@ namespace AnEngine {
         uint32_t viewportHeight = 0;
 
         friend class Entity;
+        friend class SceneSerialiser;
         friend class Crank::ScenesPanel;
     };
 }  // namespace AnEngine

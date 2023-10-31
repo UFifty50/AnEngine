@@ -16,24 +16,58 @@ namespace AnEngine::Crank {
         setCurrentScene(scene);
     }
 
-    void ScenesPanel::setCurrentScene(const Ref<Scene>& scene) { currentScene = scene; }
+    void ScenesPanel::setCurrentScene(const Ref<Scene>& scene) {
+        currentScene = scene;
+        selectedEntity = {};  // TODO: set to uuid from file
+    }
 
     void ScenesPanel::render() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {200.0f, 10.0f});
 
         const float ItemSpacing = ImGui::GetStyle().ItemSpacing.x;
 
-        static float addSceneButtonWidth = 100.0f;
+        static float sceneSettingsButtonWidth = 100.0f;
         static float addEntityButtonWidth = 100.0f;
+        // static bool editingName = false;
 
         if (currentScene) {
-            ImGui::Text(currentScene->getName().c_str());
+            /*if (editingName) {
+                std::string ogName = currentScene->name;
 
-            float pos = addSceneButtonWidth + ItemSpacing;
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {4.0f, 4.0f});
+                ImGui::InputTextEx("##SceneName", currentScene->name.c_str(),
+                                   currentScene->name.data(), 256, {0.0f, 0.0f}, 0);
+                ImGui::PopStyleVar();
+
+                if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)) ||
+                    ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_KeyPadEnter))) {
+                    editingName = false;
+                }
+
+                ImGui::SameLine();
+                bool shouldClose = ImGui::Button("X");
+                if (ImGui::IsItemHovered()) ImGui::SetTooltip("Close");
+                if (shouldClose) {
+                    currentScene->name = ogName;
+                    editingName = false;
+                }
+            } else {
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {4.0f, 4.0f});
+                ImGui::PushStyleColor(ImGuiCol_Text, {0.8f, 0.8f, 0.8f, 1.0f});
+                ImGui::Button(currentScene->name.c_str());
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+
+                if (ImGui::IsItemClicked()) editingName = true;
+            }*/
+
+            ImGui::Text("%s", currentScene->name.c_str());
+
+            float pos = sceneSettingsButtonWidth + ItemSpacing;
             ImGui::SameLine(ImGui::GetWindowWidth() - pos);
             ImGui::Button("V");
             if (ImGui::IsItemHovered()) ImGui::SetTooltip("Scene Settings");
-            addSceneButtonWidth = ImGui::GetItemRectSize().x;
+            sceneSettingsButtonWidth = ImGui::GetItemRectSize().x;
 
             ImGui::Separator();
 
@@ -78,7 +112,8 @@ namespace AnEngine::Crank {
             ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
         flags |= (selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0;
 
-        bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.c_str());
+        bool opened =
+            ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, "%s", tag.c_str());
         if (ImGui::IsItemClicked()) selectedEntity = entity;
 
         bool entityDeleted = false;
@@ -99,7 +134,7 @@ namespace AnEngine::Crank {
     }
 
     void ScenesPanel::drawAddEntityUI() {
-        ImGui::Begin("Add Entity");
+        ImGui::Begin("Add Entity", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize);
 
         char buffer[256] = "";
         if (ImGui::InputText("Tag", buffer, sizeof(buffer))) {

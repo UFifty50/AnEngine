@@ -28,7 +28,7 @@ namespace AnEngine::Crank {
             if (selectedEntity.hasComponent<TagComponent>()) {
                 auto& tag = selectedEntity.getComponent<TagComponent>().Tag;
                 char buffer[256];
-                strcpy(buffer, tag.c_str());
+                std::strncpy(buffer, tag.c_str(), sizeof(buffer));
                 if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
                     tag = std::string(buffer);
                 }
@@ -49,21 +49,21 @@ namespace AnEngine::Crank {
             if (ImGui::MenuItem("Camera")) {
                 if (!selectedEntity.hasComponent<CameraComponent>()) {
                     selectedEntity.addComponent<CameraComponent>();
-                    ImGui::CloseCurrentPopup();
                 } else {
-                    ImGui::OpenPopup("alcamerr");
-                    ImGui::CloseCurrentPopup();
+                    AE_CORE_WARN("This entity already has a camera component!");
                 }
+
+                ImGui::CloseCurrentPopup();
             }
 
             if (ImGui::MenuItem("Sprite Renderer")) {
                 if (!selectedEntity.hasComponent<SpriteRendererComponent>()) {
                     selectedEntity.addComponent<SpriteRendererComponent>();
-                    ImGui::CloseCurrentPopup();
                 } else {
-                    ImGui::OpenPopup("alsprrerr");
-                    ImGui::CloseCurrentPopup();
+                    ImGui::OpenPopup("This entity already has a sprite component!");
                 }
+
+                ImGui::CloseCurrentPopup();
             }
 
             if (ImGui::MenuItem("Script")) {
@@ -71,34 +71,16 @@ namespace AnEngine::Crank {
                     char name[256] = "Temporary Empty Script";
                     class temp : public ScriptableEntity {};
                     selectedEntity.addComponent<NativeScriptComponent>(name).bind<temp>();
-                    ImGui::CloseCurrentPopup();
                 } else {
-                    ImGui::OpenPopup("alscrerr");
-                    ImGui::CloseCurrentPopup();
+                    AE_CORE_WARN("This entity already has a script component!");
                 }
+
+                ImGui::CloseCurrentPopup();
             }
 
             ImGui::EndPopup();
         }
-
-        if (ImGui::BeginPopup("alcamerr")) {
-            ImGui::Text("This entity already has a camera component.");
-            ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
-        }
-
-        if (ImGui::BeginPopup("alsprrerr")) {
-            ImGui::Text("This entity already has a sprite component.");
-            ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
-        }
-
-        if (ImGui::BeginPopup("alscrerr")) {
-            ImGui::Text("This entity already has a script component.");
-            ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
-        }
-
+      
         ImGui::PopStyleVar();
     }
 
@@ -134,7 +116,7 @@ namespace AnEngine::Crank {
             ImVec2 buttonSize = {lineHeight, lineHeight};
 
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text(label.c_str());
+            ImGui::Text("%s", label.c_str());
 
             ImGui::PushStyleColor(ImGuiCol_Button, {0.8f, 0.1f, 0.15f, 1.0f});
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.9f, 0.2f, 0.2f, 1.0f});
@@ -278,6 +260,7 @@ namespace AnEngine::Crank {
 
         drawComponent<NativeScriptComponent>(
             "Script", entity, true,
-            [&](auto& component) { ImGui::Text(component.Name.c_str()); }, treeNodeFlags);
+            [&](auto& component) { ImGui::Text("%s", component.Name.c_str()); },
+            treeNodeFlags);
     }
 }  // namespace AnEngine::Crank

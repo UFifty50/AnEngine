@@ -6,7 +6,7 @@
 
 extern AnEngine::Application* AnEngine::CreateApplication();
 
-#if defined(AE_PLATFORM_WINDOWS) && defined(AE_DIST)
+#if defined(AE_WIN) && defined(AE_DIST)
     #include <Windows.h>
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {

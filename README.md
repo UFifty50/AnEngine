@@ -9,7 +9,6 @@ Learning gameEngine-dev using [TheCherno's Game Engine series](https://youtube.c
 
 - **AnEngine/**: The core engine.
 - **Crank/**: The engine UI.
-- **Sandbox/**: Used for in-place testing.
 
 ## Setup
 First clone the repository with `git clone --recursive <URL>`.

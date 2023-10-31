@@ -62,13 +62,16 @@ namespace AnEngine {
         ProjectionType getType() const { return projectionType; }
         void setType(ProjectionType type) {
             projectionType = type;
+            isPerspective = projectionType == ProjectionType::Perspective;
+            isOrthographic = !isPerspective;
             recalculateProjection();
         }
 
     private:
         void recalculateProjection();
 
-        ProjectionType projectionType = ProjectionType::Orthographic;
+        bool isPerspective = projectionType == ProjectionType::Perspective;
+        bool isOrthographic = !isPerspective;
 
         float aspectRatio = 1.0f;
 
@@ -76,7 +79,6 @@ namespace AnEngine {
             float size = 10.0f;
             float near = -1.0f;
             float far = 1.0f;
-
 
             struct {
                 float left;
@@ -104,6 +106,8 @@ namespace AnEngine {
                 float getHeight() { return top - bottom; }
             } bounds;
         } perspectiveSettings;
+
+        friend class SceneSerialiser;
     };
 }  // namespace AnEngine
 

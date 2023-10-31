@@ -37,22 +37,32 @@ namespace AnEngine::Crank {
 
         ImGuiIO& io = ImGui::GetIO();
         ImGuiStyle& style = ImGui::GetStyle();
-      
+
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
             ImGuiID dockspaceID = ImGui::GetID("MyDockSpace");
             ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
         }
 
         if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Save UI Layout", "CTRL+S"))
-                    Application::saveUILayout("assets/layouts/CrankEditorLayout.ini");
+            for (auto& menu : menus) {
+                std::string name = menu->getMenuName();
+                if (name == "Window") continue;
 
-                if (ImGui::MenuItem("Exit", "ALT+F4")) Application::Shutdown();
-                /*
-                if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-                if (ImGui::MenuItem("Redo", "CTRL+Y")) {}
-                */
+                if (ImGui::BeginMenu(name.c_str())) {
+                    menu->renderMenu();
+                    ImGui::EndMenu();
+                }
+
+                menu->renderMenuPopups();
+            }
+
+            if (ImGui::BeginMenu("Window")) {
+                for (auto& panel : usablePanels) {
+                    if (ImGui::MenuItem(panel->getName().c_str())) {
+                        if (std::ranges::find(panels, panel) == panels.end())
+                            panels.push_back(panel);
+                    }
+                }
                 ImGui::EndMenu();
             }
 
@@ -96,10 +106,7 @@ namespace AnEngine::Crank {
     }
 
     void DockSpace::updateViewportInfo() {
-        auto vMin = ImGui::GetWindowContentRegionMin();
-        auto vMax = ImGui::GetWindowContentRegionMax();
-
-        viewportSize = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y);
+        viewportSize = ImGui::GetWindowSize();
         viewportPos = ImGui::GetWindowPos();
         viewportFocused = ImGui::IsItemFocused();
         viewportHovered = ImGui::IsItemHovered();
