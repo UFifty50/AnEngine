@@ -8,14 +8,15 @@ workspace "AnEngine"
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 includeDir = {}
-includeDir['GLFW'] = "AnEngine/vendor/GLFW/include"
-includeDir['Glad'] = "AnEngine/vendor/Glad/include"
-includeDir['ImGui'] = "AnEngine/vendor/ImGui/"
-includeDir['glm'] = "AnEngine/vendor/glm/"
-includeDir['fmt'] = "AnEngine/vendor/fmt/include/"
-includeDir['stb'] = "AnEngine/vendor/stb/"
-includeDir['entt'] = "AnEngine/vendor/ENTT/single_include/"
-includeDir['yaml_cpp'] = "AnEngine/vendor/yaml-cpp/include/"
+includeDir['GLFW'] = "%{wks.location}/AnEngine/vendor/GLFW/include"
+includeDir['Glad'] = "%{wks.location}/AnEngine/vendor/Glad/include"
+includeDir['ImGui'] = "%{wks.location}/AnEngine/vendor/ImGui/"
+includeDir['glm'] = "%{wks.location}/AnEngine/vendor/glm/"
+includeDir['fmt'] = "%{wks.location}/AnEngine/vendor/fmt/include/"
+includeDir['stb'] = "%{wks.location}/AnEngine/vendor/stb/"
+includeDir['entt'] = "%{wks.location}/AnEngine/vendor/ENTT/single_include/"
+includeDir['yaml_cpp'] = "%{wks.location}/AnEngine/vendor/yaml-cpp/include/"
+includeDir['ImGuizmo'] = "%{wks.location}/AnEngine/vendor/ImGuizmo-CE/"
 
 group "Dependencies"
     include "AnEngine/vendor/GLFW"
@@ -48,7 +49,9 @@ project "AnEngine"
         "%{prj.name}/vendor/stb/**.cpp",
         "%{prj.name}/vendor/stb/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl"
+        "%{prj.name}/vendor/glm/glm/**.inl",
+        "%{prj.name}/vendor/ImGuizmo-CE/ImGuizmo.h",
+        "%{prj.name}/vendor/ImGuizmo-CE/ImGuizmo.cpp"
     }
     removefiles { "%{prj.name}/src/Platform/**" }
     files {
@@ -67,7 +70,8 @@ project "AnEngine"
         "%{includeDir.glm}",
         "%{includeDir.stb}",
         "%{includeDir.entt}",
-        "%{includeDir.yaml_cpp}"
+        "%{includeDir.yaml_cpp}",
+        "%{includeDir.ImGuizmo}"
     }
 
     externalincludedirs {
@@ -97,6 +101,9 @@ project "AnEngine"
             "{COPYDIR} ../Crank/assets ../bin/" .. outputDir .. "/Crank/assets",
             "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Crank/builtins/assets"
     }
+
+    filter "files:AnEngine/vendor/ImGuizmo-CE/**.cpp"
+        flags { "NoPCH" }
 
     filter "system:linux"
         pic "on"
@@ -146,6 +153,10 @@ project "AnEngine"
             "/Zc:preprocessor"
         }
 
+        defines {
+            "_CRT_SECURE_NO_WARNINGS"
+        }
+
     filter "toolset:gcc"
         buildoptions {
             "-msse2"
@@ -177,11 +188,6 @@ project "Crank"
 
     links {
         "AnEngine",
-    --    "GLFW",
-    --    "Glad",
-    --    "ImGui",
-    --    "fmt",
-    --    "yaml-cpp"
     }
 
     targetdir ("bin/" .. outputDir .. "/%{prj.name}")
@@ -197,7 +203,8 @@ project "Crank"
         "%{includeDir.entt}",
         "%{includeDir.glm}",
         "%{includeDir.fmt}",
-        "%{includeDir.yaml_cpp}"
+        "%{includeDir.yaml_cpp}",
+        "%{includeDir.ImGuizmo}"
     }
 
     externalincludedirs {
@@ -233,6 +240,10 @@ project "Crank"
         buildoptions {
             "/analyze:external-",
             "/Zc:preprocessor"
+        }
+
+        defines {
+            "_CRT_SECURE_NO_WARNINGS"
         }
 
     filter "configurations:Debug"

@@ -8,6 +8,7 @@
 #include <any>
 #include <string>
 
+#include "Core/Core.hpp"
 #include "File/InputFileStream.hpp"
 #include "Renderer/Shader.hpp"
 

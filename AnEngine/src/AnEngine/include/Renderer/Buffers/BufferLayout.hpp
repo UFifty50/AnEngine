@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "Core/Core.hpp"
+
+
 // clang-format off
 namespace AnEngine {
     class ShaderDataType {

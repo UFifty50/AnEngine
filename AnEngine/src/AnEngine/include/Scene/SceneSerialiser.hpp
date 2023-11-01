@@ -5,6 +5,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "Core/Core.hpp"
 #include "Scene/Entity.hpp"
 #include "Scene/Scene.hpp"
 

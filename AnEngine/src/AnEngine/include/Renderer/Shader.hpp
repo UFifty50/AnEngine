@@ -4,8 +4,10 @@
 #include <glm/glm.hpp>
 
 #include <any>
+#include <string>
 #include <unordered_map>
 
+#include "Core/Core.hpp"
 #include "File/InputFileStream.hpp"
 
 

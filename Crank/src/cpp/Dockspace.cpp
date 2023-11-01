@@ -82,9 +82,9 @@ namespace AnEngine::Crank {
         for (auto& panel : panels) {
             open = true;
 
-            panel->beforeRender();
+            auto flags = panel->beforeRender();
 
-            ImGui::Begin(panel->getName().c_str(), &open);
+            ImGui::Begin(panel->getName().c_str(), &open, flags);
             panel->render();
             ImGui::End();
 
@@ -97,8 +97,8 @@ namespace AnEngine::Crank {
             }
         }
 
-        windowPos = ImGui::GetWindowPos();
         windowSize = ImGui::GetWindowSize();
+        windowPos = ImGui::GetWindowPos();
         windowFocused = ImGui::IsWindowFocused();
         windowHovered = ImGui::IsWindowHovered();
 
@@ -106,11 +106,13 @@ namespace AnEngine::Crank {
     }
 
     void DockSpace::updateViewportInfo() {
-        viewportSize = ImGui::GetWindowSize();
+        viewportSize = {ImGui::GetContentRegionAvail().x,
+                        ImGui::GetContentRegionAvail().y -
+                            ImGui::GetCurrentWindow()->MenuBarHeight()};
         viewportPos = ImGui::GetWindowPos();
         viewportFocused = ImGui::IsItemFocused();
         viewportHovered = ImGui::IsItemHovered();
-    }
+    }  // namespace AnEngine::Crank
 
     // glm::vec2 DockSpace::getMousePosOnRenderedViewport(CameraComponent cameraComponent)
     // {

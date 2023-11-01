@@ -2,6 +2,9 @@
 
 #include "File/InputFileStream.hpp"
 
+#include "Core/Core.hpp"
+
+
 namespace AnEngine {
     InputFileStream::InputFileStream(const std::string& path,
                                      std::ios_base::openmode type) {
@@ -9,13 +12,8 @@ namespace AnEngine {
         char exePathName[MAX_PATH];
         GetModuleFileNameA(NULL, exePathName, sizeof(exePathName));
 
-        char* exePath = new char[std::strlen(exePathName) + 1];
-        std::strncpy(exePath, exePathName, sizeof(exePath));
-
-        PathRemoveFileSpecA(exePath);
-        auto directory = std::string(exePath);
-
-        delete[] exePath;
+        PathRemoveFileSpecA(exePathName);
+        auto directory = std::string(exePathName);
 
         char combined[MAX_PATH];
         PathCombineA(combined, directory.c_str(), path.c_str());

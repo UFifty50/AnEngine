@@ -79,6 +79,17 @@ namespace AnEngine {
         }
     }
 
+    Entity Scene::getPrimaryCamera() {
+        auto view = entityRegistry.view<CameraComponent>();
+        for (auto entity : view) {
+            const auto& cameraComponent = view.get<CameraComponent>(entity);
+            if (cameraComponent.Primary) {
+                return Entity{entity, this};
+            }
+        }
+        return {};
+    }
+
     void Scene::onComponentAdded(Entity e, Component& component) {
         switch (component.getID()) {
             case CAMERA_COMPONENT_ID: {

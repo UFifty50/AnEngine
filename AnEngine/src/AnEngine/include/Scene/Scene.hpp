@@ -30,6 +30,8 @@ namespace AnEngine {
         void onUpdate(TimeStep deltaTime);
         void onResize(uint32_t width, uint32_t height);
 
+        Entity getPrimaryCamera();
+
         std::string getName() { return name; }
 
     private:

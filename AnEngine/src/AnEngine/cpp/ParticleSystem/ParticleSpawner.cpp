@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#include "Core/Core.hpp"
 #include "Core/Input.hpp"
 #include "Core/Random.hpp"
 #include "ParticleSystem/Particle.hpp"
