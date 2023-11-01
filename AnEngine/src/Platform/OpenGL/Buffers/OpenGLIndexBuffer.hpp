@@ -1,6 +1,7 @@
 #ifndef OGLINDEXBUFFER_HPP
 #define OGLINDEXBUFFER_HPP
 
+#include "Core/Core.hpp"
 #include "Renderer/Buffers/IndexBuffer.hpp"
 
 

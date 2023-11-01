@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "Core/Core.hpp"
 #include "ParticleSystem/Particle.hpp"
 #include "ParticleSystem/Particle2D.hpp"
 #include "Renderer/Camera/Camera.hpp"

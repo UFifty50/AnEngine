@@ -5,6 +5,7 @@
 
 #include "Dockspace.hpp"
 #include "Panels/Panel.hpp"
+#include "Panels/ScenesPanel.hpp"
 #include "Renderer/FrameBuffer.hpp"
 
 
@@ -13,9 +14,9 @@ namespace AnEngine::Crank {
     public:
         ViewportPanel() = default;
         ViewportPanel(std::string name, const Ref<FrameBuffer>& fbuf,
-                      Ref<DockSpace>& dspace);
+                      Ref<DockSpace>& dspace, Ref<ScenesPanel>& scenePanel);
 
-        virtual void beforeRender() override;
+        virtual ImGuiWindowFlags beforeRender() override;
         virtual void render() override;
         virtual void afterRender() override;
 
@@ -25,8 +26,14 @@ namespace AnEngine::Crank {
 
     private:
         std::string name;
+
+        int32_t gizmoType;
+        float translateSnap;
+        float rotateSnap;
+
         const Ref<FrameBuffer>& frameBuffer;
         Ref<DockSpace>& dockSpace;
+        Ref<ScenesPanel>& sceneHierarchy;
     };
 }  // namespace AnEngine::Crank
 

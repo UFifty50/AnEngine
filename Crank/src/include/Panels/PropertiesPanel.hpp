@@ -18,10 +18,11 @@ namespace AnEngine::Crank {
         PropertiesPanel() = default;
         PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel);
 
-        virtual void beforeRender() override {
+        virtual ImGuiWindowFlags beforeRender() override {
             //    ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, INFINITY});
+            return 0;
         }
-      
+
         virtual void render() override;
         virtual void afterRender() override {}
 

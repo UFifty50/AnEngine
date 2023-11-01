@@ -14,11 +14,9 @@ namespace AnEngine::Crank {
         StatisticsPanel() = default;
         StatisticsPanel(std::string name);
 
-        virtual void beforeRender() override {}
+        virtual ImGuiWindowFlags beforeRender() override { return 0; }
         virtual void render() override;
         virtual void afterRender() override {}
-      
-        virtual void onClose() override {}
 
         virtual void onClose() override {}
 

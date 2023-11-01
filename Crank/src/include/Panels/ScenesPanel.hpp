@@ -17,10 +17,11 @@ namespace AnEngine::Crank {
         void setCurrentScene(const Ref<Scene>& scene);
         Entity getSelectedEntity() { return selectedEntity; }
 
-        virtual void beforeRender() override {
+        virtual ImGuiWindowFlags beforeRender() override {
             //   ImGui::SetNextWindowSizeConstraints({200.0f, 0}, {INFINITY, INFINITY});
+            return 0;
         }
-      
+
         virtual void render() override;
         virtual void afterRender() override {}
 
@@ -32,6 +33,8 @@ namespace AnEngine::Crank {
         void drawEntityNode(Entity entity);
         void drawAddEntityUI();
 
+        friend class ViewportPanel;
+
         std::string name;
         Ref<Scene> currentScene;
         Entity selectedEntity;
@@ -42,9 +45,9 @@ namespace AnEngine::Crank {
         bool isScripted = false;
         std::string script;
         std::string tagName;
-        glm::vec3 transformPos;
-        glm::vec3 transformRot;
-        glm::vec3 transformScale;
+        glm::vec3 transformPos{};
+        glm::vec3 transformRot{};
+        glm::vec3 transformScale{};
         CameraComponent cc;
         SpriteRendererComponent sRC;
         bool entityUIOpen = false;

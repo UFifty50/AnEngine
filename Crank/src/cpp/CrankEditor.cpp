@@ -92,7 +92,8 @@ namespace AnEngine::Crank {
 
         sceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene", activeScene);
         properties = MakeRef<PropertiesPanel>("Properties", sceneHierarchy);
-        viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, dockSpace);
+        viewport =
+            MakeRef<ViewportPanel>("Viewport", frameBuffer, dockSpace, sceneHierarchy);
         statistics = MakeRef<StatisticsPanel>("Statistics");
 
         fileMenu = MakeRef<FileMenu>("File", sceneHierarchy, activeScene, dockSpace);

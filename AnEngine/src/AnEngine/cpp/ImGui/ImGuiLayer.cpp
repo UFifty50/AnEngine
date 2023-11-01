@@ -7,9 +7,11 @@
 #include <GLFW/glfw3.h>
 // clang-format on
 
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
-#include "imgui.h"
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <imgui.h>
+
+#include "ImGuizmo.h"
 
 #include "Application.hpp"
 #include "Events/Event.hpp"
@@ -82,6 +84,7 @@ namespace AnEngine {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
     }
 
     void ImGuiLayer::end() {

@@ -21,3 +21,6 @@
 [submodule "yaml-cpp"]
 	path = AnEngine/vendor/yaml-cpp
 	url = https://github.com/UFifty50/yaml-cpp-premake.git
+[submodule "AnEngine/vendor/ImGuizmo-CE"]
+	path = AnEngine/vendor/ImGuizmo-CE
+	url = https://github.com/UFifty50/ImGuizmo-CE

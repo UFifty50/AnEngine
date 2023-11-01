@@ -2,6 +2,7 @@
 
 #include "Renderer/RenderAPI.hpp"
 
+#include "Core/Core.hpp"
 #include "Exceptions/NotImplementedException.hpp"
 #include "Platform/OpenGL/OpenGLRenderAPI.hpp"
 

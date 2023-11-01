@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "Core/Core.hpp"
+
 
 namespace AnEngine {
     class IndexBuffer {

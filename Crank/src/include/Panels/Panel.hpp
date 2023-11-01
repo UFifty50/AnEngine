@@ -11,7 +11,7 @@ namespace AnEngine::Crank {
     public:
         virtual ~Panel() = default;
 
-        virtual void beforeRender() = 0;
+        virtual ImGuiWindowFlags beforeRender() = 0;
         virtual void render() = 0;
         virtual void afterRender() = 0;
 
