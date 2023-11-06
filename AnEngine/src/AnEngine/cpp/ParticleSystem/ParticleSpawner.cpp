@@ -10,7 +10,6 @@
 #include "ParticleSystem/Particle.hpp"
 #include "ParticleSystem/Particle2D.hpp"
 #include "Renderer/Camera/Camera.hpp"
-#include "Renderer/Camera/OrthographicCamera.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Time/TimeStep.hpp"
 
@@ -85,10 +84,11 @@ namespace AnEngine {
             activeParticles.end());
     }
 
-    void ParticleSpawner::emit(Ref<BaseCamera> camera) {
+    void ParticleSpawner::emit(Ref<Camera> camera) {
         if (!enabled) return;
 
-        Renderer2D::beginScene(std::dynamic_pointer_cast<OrthographicCamera>(camera));
+        Renderer2D::beginScene(camera->getProjectionMatrix(),
+                               camera->getProjectionMatrix());
 
         for (auto& particle : activeParticles) {
             if (!particle.isAlive()) {

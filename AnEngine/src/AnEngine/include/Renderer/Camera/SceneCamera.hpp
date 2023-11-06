@@ -5,7 +5,7 @@
 
 
 namespace AnEngine {
-    class SceneCamera : public ComponentCamera {
+    class SceneCamera : public Camera {
     public:
         SceneCamera();
         virtual ~SceneCamera() = default;
@@ -52,12 +52,8 @@ namespace AnEngine {
             recalculateProjection();
         }
 
-
-        decltype(auto) getOrthographicBounds() const { return orthoSettings.bounds; }
-        decltype(auto) getAllOrthographicConfig() const { return orthoSettings; }
-
-        decltype(auto) getPerspectiveBounds() const { return perspectiveSettings.bounds; }
-        decltype(auto) getAllPerspectiveConfig() const { return perspectiveSettings; }
+        decltype(auto) getOrthographicConfig() const { return orthoSettings; }
+        decltype(auto) getPerspectiveConfig() const { return perspectiveSettings; }
 
         ProjectionType getType() const { return projectionType; }
         void setType(ProjectionType type) {
@@ -95,16 +91,6 @@ namespace AnEngine {
             float FOV = glm::radians(45.0f);
             float near = 0.01f;
             float far = 1000.0f;
-
-            struct {
-                float left;
-                float right;
-                float bottom;
-                float top;
-
-                float getWidth() { return right - left; }
-                float getHeight() { return top - bottom; }
-            } bounds;
         } perspectiveSettings;
 
         friend class SceneSerialiser;

@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Scene/SceneCamera.hpp"
+#include "Renderer/Camera/SceneCamera.hpp"
 
 
 namespace AnEngine {
@@ -50,7 +50,7 @@ namespace AnEngine {
             float right = top * aspectRatio;
             float left = -right;
 
-            perspectiveSettings.bounds = {left, right, bottom, top};
+            //    perspectiveSettings.bounds = {left, right, bottom, top};
             projectionMatrix =
                 glm::perspective(perspectiveSettings.FOV, aspectRatio,
                                  perspectiveSettings.near, perspectiveSettings.far);

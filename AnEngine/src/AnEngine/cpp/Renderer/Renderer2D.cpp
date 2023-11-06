@@ -9,7 +9,7 @@
 #include "Renderer/Buffers/IndexBuffer.hpp"
 #include "Renderer/Buffers/VertexBuffer.hpp"
 #include "Renderer/Camera/Camera.hpp"
-#include "Renderer/Camera/OrthographicCamera.hpp"
+#include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/ShaderUniform.hpp"
@@ -90,8 +90,31 @@ namespace AnEngine {
         rendererData.quadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
     }
 
-    void Renderer2D::beginScene(const ComponentCamera& camera,
-                                const glm::mat4& transform) {
+    void Renderer2D::beginScene(const EditorCamera& editorCamera) {
+        AE_PROFILE_FUNCTION()
+
+        if (rendererData.activeScene) {
+            AE_CORE_ERROR(
+                "Renderer2D::beginScene() called when already rendering a scene!");
+            return;
+        }
+
+        glm::mat4 viewProjection = editorCamera.getViewProjectionMatrix();
+
+        Ref<Shader> quadShader = rendererData.shaderLibrary.get("QuadShader");
+
+        quadShader->bind();
+        quadShader->uploadUniform("viewProjectionMatrix", viewProjection);
+
+        rendererData.quadIndexCount = 0;
+        rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
+
+        rendererData.textureSlotIndex = 1;
+
+        rendererData.activeScene = true;
+    }
+
+    void Renderer2D::beginScene(const Camera& camera, const glm::mat4& transform) {
         AE_PROFILE_FUNCTION()
 
         if (rendererData.activeScene) {
@@ -109,32 +132,6 @@ namespace AnEngine {
 
         quadShader->bind();
         quadShader->uploadUniform("viewProjectionMatrix", viewProjection);
-
-        rendererData.quadIndexCount = 0;
-        rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
-
-        rendererData.textureSlotIndex = 1;
-
-        rendererData.activeScene = true;
-    }
-
-    void Renderer2D::beginScene(const Ref<OrthographicCamera>& camera) {
-        AE_PROFILE_FUNCTION()
-
-        if (rendererData.activeScene) {
-            AE_CORE_ERROR(
-                "Renderer2D::beginScene() called when already rendering a scene!");
-            return;
-        }
-
-        AE_CORE_ASSERT(camera->getType() == ProjectionType::Orthographic,
-                       "Renderer2D only supports Orthographic Cameras!");
-
-        Ref<Shader> quadShader = rendererData.shaderLibrary.get("QuadShader");
-
-        quadShader->bind();
-        quadShader->uploadUniform("viewProjectionMatrix",
-                                  camera->getViewProjectionMatrix());
 
         rendererData.quadIndexCount = 0;
         rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;

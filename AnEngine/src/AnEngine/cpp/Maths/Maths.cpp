@@ -34,7 +34,7 @@ namespace AnEngine {
 
         localMatrix[3] = glm::vec4(0, 0, 0, localMatrix[3].w);
 
-        glm::vec3 row[3], pDum3;
+        glm::vec3 row[3];
 
         for (glm::length_t i = 0; i < 3; ++i)
             for (glm::length_t j = 0; j < 3; ++j) row[i][j] = localMatrix[i][j];

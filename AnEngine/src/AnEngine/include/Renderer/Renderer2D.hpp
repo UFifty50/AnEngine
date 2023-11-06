@@ -8,7 +8,7 @@
 
 #include "Renderer/Buffers/VertexBuffer.hpp"
 #include "Renderer/Camera/Camera.hpp"
-#include "Renderer/Camera/OrthographicCamera.hpp"
+#include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/VertexArray.hpp"
 #include "Texture/Texture2D.hpp"
@@ -71,8 +71,8 @@ namespace AnEngine {
         static void init();
         static void shutdown();
 
-        static void beginScene(const Ref<OrthographicCamera>& camera);  // TODO: remove
-        static void beginScene(const ComponentCamera& camera, const glm::mat4& transform);
+        static void beginScene(const EditorCamera& camera);
+        static void beginScene(const Camera& camera, const glm::mat4& transform);
         static void endScene();
         static void flush();
 

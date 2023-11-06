@@ -19,6 +19,7 @@
 #include "Panels/ScenesPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
 #include "Panels/ViewportPanel.hpp"
+#include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Renderer2D.hpp"
@@ -66,34 +67,16 @@ namespace AnEngine::Crank {
         frameBuffer = FrameBuffer::create(spec);
 
         activeScene = MakeRef<Scene>("Test Scene");
-        // playerEntity = activeScene->createEntity("Player");
-        // bgEntity = activeScene->createEntity("Background");
-        // cameraEntity = activeScene->createEntity("Camera");
-        // lockedCameraEntity = activeScene->createEntity("LockedCamera");
 
-        // playerEntity.addComponent<SpriteRendererComponent>(
-        //     glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-
-        // bgEntity.addComponent<SpriteRendererComponent>(glm::vec4{1.0f, 0.0f,
-        // 0.0f, 1.0f});
-
-        // cameraEntity.addComponent<CameraComponent>();
-        // auto& cc = lockedCameraEntity.addComponent<CameraComponent>();
-        // cc.Primary = false;
-
-        //// cameraEntity.addNativeScript<LockedCameraController>("Camera Controller");
-        // cameraEntity.addComponent<NativeScriptComponent>("Camera Controller")
-        //     .bind<CameraController>();
-        // lockedCameraEntity.addComponent<NativeScriptComponent>("Locked Camera
-        // Controller")
-        //     .bind<CameraController>();
+        editorCam = MakeRef<EditorCamera>(
+            EditorCamera::makePerspective(30.0f, 1.788f, 0.1f, 1000.0f));
 
         dockSpace = MakeRef<DockSpace>();
 
         sceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene", activeScene);
         properties = MakeRef<PropertiesPanel>("Properties", sceneHierarchy);
-        viewport =
-            MakeRef<ViewportPanel>("Viewport", frameBuffer, dockSpace, sceneHierarchy);
+        viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam, dockSpace,
+                                          sceneHierarchy);
         statistics = MakeRef<StatisticsPanel>("Statistics");
 
         fileMenu = MakeRef<FileMenu>("File", sceneHierarchy, activeScene, dockSpace);
@@ -118,9 +101,14 @@ namespace AnEngine::Crank {
             frameBuffer->resize((uint32_t)dockSpace->getViewportSize().x,
                                 (uint32_t)dockSpace->getViewportSize().y);
 
-            activeScene->onResize(dockSpace->getViewportSize().x,
-                                  dockSpace->getViewportSize().y);
+            editorCam->setViewportSize(dockSpace->getViewportSize().x,
+                                       dockSpace->getViewportSize().y);
+
+            activeScene->onResize((uint32_t)dockSpace->getViewportSize().x,
+                                  (uint32_t)dockSpace->getViewportSize().y);
         }
+
+        editorCam->onUpdate(deltaTime);
 
         Renderer2D::resetStats();
         Renderer2D::getStats().lastFrameTime = deltaTime.getMilliseconds();
@@ -129,13 +117,15 @@ namespace AnEngine::Crank {
         RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1});
         RenderCommandQueue::clear();
 
-        activeScene->onUpdate(deltaTime);
+        activeScene->onUpdateEditor(deltaTime, *editorCam);
         frameBuffer->unBind();
     }
 
     void CrankEditor::onImGuiRender() { dockSpace->render(); }
 
     void CrankEditor::onEvent(Event& event) {
+        editorCam->onEvent(event);
+
         EventDispatcher dispatcher(event);
         dispatcher.dispatch<KeyPressedEvent>(BIND_EVENT_FN(CrankEditor::onKeyPressed));
     }

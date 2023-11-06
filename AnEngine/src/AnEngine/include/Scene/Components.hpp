@@ -9,7 +9,7 @@
 #include <functional>
 #include <string>
 
-#include "Scene/SceneCamera.hpp"
+#include "Renderer/Camera/SceneCamera.hpp"
 #include "Scene/ScriptableEntity.hpp"
 #include "Time/TimeStep.hpp"
 

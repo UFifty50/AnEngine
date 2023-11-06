@@ -10,13 +10,17 @@
 #include "Maths/Maths.hpp"
 #include "Panels/Panel.hpp"
 #include "Panels/ScenesPanel.hpp"
+#include "Renderer/Camera/EditorCamera.hpp"
+#include "Renderer/FrameBuffer.hpp"
 
 
 namespace AnEngine::Crank {
     ViewportPanel::ViewportPanel(std::string name, const Ref<FrameBuffer>& fbuf,
-                                 Ref<DockSpace>& dspace, Ref<ScenesPanel>& scenePanel)
+                                 Ref<EditorCamera>& editorCamera, Ref<DockSpace>& dspace,
+                                 Ref<ScenesPanel>& scenePanel)
         : name(name),
           frameBuffer(fbuf),
+          editorCamera(editorCamera),
           dockSpace(dspace),
           sceneHierarchy(scenePanel),
           gizmoType(-1) {}
@@ -28,7 +32,7 @@ namespace AnEngine::Crank {
 
     void ViewportPanel::render() {
         dockSpace->updateViewportInfo();
-        Application::getImGuiLayer()->shouldAllowEvents(!dockSpace->isViewportFocused() ||
+        Application::getImGuiLayer()->shouldAllowEvents(!dockSpace->isViewportFocused() &&
                                                         !dockSpace->isViewportHovered());
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("translation type")) {
@@ -56,6 +60,17 @@ namespace AnEngine::Crank {
                 }
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Editor Camera Type")) {
+                if (ImGui::MenuItem("Perspective")) {
+                    editorCamera->changeProjectionType(ProjectionType::Perspective);
+                }
+                if (ImGui::MenuItem("Orthographic")) {
+                    editorCamera->changeProjectionType(ProjectionType::Orthographic);
+                }
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenuBar();
         }
 
@@ -68,7 +83,7 @@ namespace AnEngine::Crank {
 
         if (!activeEntity || gizmoType < 0) return;
 
-        ImGuizmo::SetOrthographic(false);  // TODO: orthographic
+        ImGuizmo::SetOrthographic(!editorCamera->isPerspective());  // TODO: orthographic
         ImGuizmo::SetDrawlist();
         ImGuizmo::SetRect(dockSpace->getViewportPos().x, dockSpace->getViewportPos().y,
                           dockSpace->getViewportSize().x, dockSpace->getViewportSize().y);
@@ -78,25 +93,26 @@ namespace AnEngine::Crank {
         auto cameraEntity = sceneHierarchy->currentScene->getPrimaryCamera();
         if (!cameraEntity) return;
 
-        const auto& camera = cameraEntity.getComponent<CameraComponent>().Camera;
+        /*const auto& camera = cameraEntity.getComponent<CameraComponent>().Camera;
         const auto& camTC = cameraEntity.getComponent<TransformComponent>();
         const glm::mat4& cameraProjection = camera.getProjectionMatrix();
-        glm::mat4 cameraView = glm::inverse((glm::mat4)camTC);
+        glm::mat4 cameraView = glm::inverse((glm::mat4)camTC);*/
+        const glm::mat4& cameraProjection = editorCamera->getProjectionMatrix();
+        glm::mat4 cameraView = editorCamera->getViewMatrix();
 
         // Entity
         auto& eTC = activeEntity.getComponent<TransformComponent>();
         glm::mat4 transform = (glm::mat4)eTC;
 
         bool shouldSnap = Input::isKeyPressed(KeyCode::LeftControl);
-        float snapValue = 0.0f;
 
+        float snapValues[3];
         if (gizmoType == ImGuizmo::OPERATION::TRANSLATE) {
-            snapValue = translateSnap;
+            snapValues[0] = snapValues[1] = snapValues[2] = translateSnap;
         } else if (gizmoType == ImGuizmo::OPERATION::ROTATE) {
-            snapValue = rotateSnap;
+            snapValues[0] = snapValues[1] = snapValues[2] = rotateSnap;
         }
 
-        float snapValues[3] = {snapValue, snapValue, snapValue};
 
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                              (ImGuizmo::OPERATION)gizmoType, ImGuizmo::MODE::LOCAL,

@@ -11,7 +11,7 @@ layout(location = 5) in vec4 TintIn;
 
 out vec4 Colour;
 out vec2 TexCoord;
-out float TexIndex;
+out flat float TexIndex;
 out vec4 Tint;
 
 uniform mat4 viewProjectionMatrix;
@@ -33,7 +33,7 @@ layout(location = 0) out vec4 colour;
 
 in vec4 Colour;
 in vec2 TexCoord;
-in float TexIndex;
+in flat float TexIndex;
 in vec4 Tint;
 
 uniform sampler2D textureSamplers[32];
