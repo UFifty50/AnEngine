@@ -5,7 +5,6 @@
 #include <memory>
 #include <vector>
 
-#include "Renderer/Camera/OrthographicCamera.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/Shader.hpp"
@@ -22,8 +21,8 @@ namespace AnEngine {
         Renderer2D::init();
     }
 
-    void Renderer::beginScene(Ref<BaseCamera> camera) {
-        sceneData->viewProjectionMatrix = camera->getViewProjectionMatrix();
+    void Renderer::beginScene(Ref<Camera> camera) {
+        // sceneData->viewProjectionMatrix = camera->getViewProjectionMatrix();
     }
 
     void Renderer::onWindowResize(uint32_t width, uint32_t height) {

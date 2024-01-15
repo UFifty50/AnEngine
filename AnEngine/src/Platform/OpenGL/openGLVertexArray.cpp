@@ -28,7 +28,7 @@ namespace AnEngine {
             glVertexAttribPointer(index, element.getComponentCount(),
                                   toOpenGLBaseType(element.type),
                                   element.normalised ? GL_TRUE : GL_FALSE,
-                                  layout.getStride(), (const void*)element.offset);
+                                  layout.getStride(), (void*)element.offset);
 
             index++;
         }

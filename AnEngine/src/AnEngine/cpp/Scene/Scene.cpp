@@ -4,6 +4,7 @@
 
 #include "Scene/Scene.hpp"
 
+#include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
@@ -19,13 +20,33 @@ namespace AnEngine {
 
     void Scene::destroyEntity(Entity entity) { entityRegistry.destroy(entity); }
 
-    void Scene::onUpdate(TimeStep deltaTime) {
+    void Scene::onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) {
+        Renderer2D::beginScene(*camera);
+
+        auto spriteGroup =
+            entityRegistry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+
+        for (auto entity : spriteGroup) {
+            auto [transform, sprite] =
+                spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
+
+            Renderer2D::drawQuad((glm::mat4)transform, sprite.Colour);
+        }
+
+        Renderer2D::endScene();
+    }
+
+    void Scene::onUpdateRuntime(TimeStep deltaTime) {
         entityRegistry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
             // TODO: Move to onScenePlay functiom
             if (!nsc.Instance) {
                 AE_CORE_ASSERT(nsc.instantiateScriptInstance, "Script {0} not bound!",
                                nsc.Name);
                 nsc.instantiateScriptInstance();
+
+                AE_CORE_ASSERT(nsc.Instance,
+                               "Script {0} constructor not implemented properly!",
+                               nsc.Name);
                 nsc.Instance->entity = Entity{entity, this};
 
                 nsc.Instance->onCreate();
@@ -34,7 +55,7 @@ namespace AnEngine {
             nsc.Instance->onUpdate(deltaTime);
         });
 
-        ComponentCamera* mainCamera = nullptr;
+        Camera* mainCamera = nullptr;
         glm::mat4 mainCameraTransform;
 
         auto cameraView = entityRegistry.view<TransformComponent, CameraComponent>();

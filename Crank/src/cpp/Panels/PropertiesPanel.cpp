@@ -247,6 +247,13 @@ namespace AnEngine::Crank {
                         cam.setOrthographicFar(far);
 
                     ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+
+                    if (component.FixedAspectRatio) {
+                        float aspectRatio = cam.getAspectRatio();
+                        if (ImGui::DragFloat("Aspect Ratio", &aspectRatio, 0.05f, 0.1f,
+                                             10.0f))
+                            cam.setAspectRatio(aspectRatio);
+                    }
                 }
             },
             treeNodeFlags);

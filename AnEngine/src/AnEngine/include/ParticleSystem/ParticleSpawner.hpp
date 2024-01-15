@@ -22,7 +22,7 @@ namespace AnEngine {
         void reset();
 
         void onUpdate(TimeStep deltaTime);
-        void emit(Ref<BaseCamera> camera);
+        void emit(Ref<Camera> camera);
 
         void setSizeVariation(float variation);
         void setSpawnRate(float rate);

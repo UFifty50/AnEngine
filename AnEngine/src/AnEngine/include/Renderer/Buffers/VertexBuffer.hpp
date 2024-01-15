@@ -12,8 +12,6 @@ namespace AnEngine {
     public:
         virtual ~VertexBuffer() = default;
 
-        virtual uint32_t getSize() const = 0;
-
         virtual void bind() const = 0;
         virtual void unBind() const = 0;
 

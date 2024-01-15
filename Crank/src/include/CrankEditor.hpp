@@ -14,6 +14,7 @@
 #include "Panels/ScenesPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
 #include "Panels/ViewportPanel.hpp"
+#include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Scene/Entity.hpp"
 #include "Scene/Scene.hpp"
@@ -39,6 +40,8 @@ namespace AnEngine::Crank {
     private:
         Ref<Scene> activeScene;
         Ref<FrameBuffer> frameBuffer;
+
+        Ref<EditorCamera> editorCam;
 
         Ref<DockSpace> dockSpace;
 

@@ -45,9 +45,9 @@ namespace AnEngine::Crank {
         bool isScripted = false;
         std::string script;
         std::string tagName;
-        glm::vec3 transformPos{};
-        glm::vec3 transformRot{};
-        glm::vec3 transformScale{};
+        glm::vec3 transformPos{0.0f};
+        glm::vec3 transformRot{0.0f};
+        glm::vec3 transformScale{1.0f};
         CameraComponent cc;
         SpriteRendererComponent sRC;
         bool entityUIOpen = false;

@@ -3,7 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Scene/SceneCamera.hpp"
+#include "Renderer/Camera/SceneCamera.hpp"
+
+#include "Core/Log.hpp"
 
 
 namespace AnEngine {
@@ -31,14 +33,15 @@ namespace AnEngine {
 
     void SceneCamera::setViewportSize(uint32_t width, uint32_t height) {
         aspectRatio = (float)width / (float)height;
+
         recalculateProjection();
     }
 
     void SceneCamera::recalculateProjection() {
         if (projectionType == ProjectionType::Orthographic) {
-            float left = -orthoSettings.size * aspectRatio * 0.5;
+            float left = -orthoSettings.size * aspectRatio * 0.5f;
             float right = -left;
-            float top = orthoSettings.size * 0.5;
+            float top = orthoSettings.size * 0.5f;
             float bottom = -top;
             orthoSettings.bounds = {left, right, bottom, top};
             projectionMatrix = glm::ortho(left, right, bottom, top, orthoSettings.near,
@@ -50,7 +53,7 @@ namespace AnEngine {
             float right = top * aspectRatio;
             float left = -right;
 
-            perspectiveSettings.bounds = {left, right, bottom, top};
+            //    perspectiveSettings.bounds = {left, right, bottom, top};
             projectionMatrix =
                 glm::perspective(perspectiveSettings.FOV, aspectRatio,
                                  perspectiveSettings.near, perspectiveSettings.far);

@@ -30,7 +30,8 @@ namespace AnEngine {
                          .time_since_epoch()
                          .count();
 
-        result.threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+        result.threadID =
+            (uint32_t)std::hash<std::thread::id>{}(std::this_thread::get_id());
 
         Instrumentor::Get().writeProfile(result);
 
