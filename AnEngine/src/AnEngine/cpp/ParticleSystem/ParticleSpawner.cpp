@@ -28,7 +28,7 @@ namespace AnEngine {
 
     void ParticleSpawner::addToActive(int count) {
         for (int i = 0; i < count; i++) {
-            int index = Random::getInt(0, masterParticlePool.size() - 1);
+            int index = Random::getInt(0, (uint32_t)masterParticlePool.size() - 1);
             Particle2D value = masterParticlePool[index];
 
             if (sizeVariation > 0.0f) {

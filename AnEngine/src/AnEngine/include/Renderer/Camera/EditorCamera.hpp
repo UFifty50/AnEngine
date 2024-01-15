@@ -10,16 +10,24 @@
 
 
 namespace AnEngine {
+    struct CameraSpec {
+        ProjectionType type;
+        float FOVorSize;
+        float aspectRatio;
+        float nearPlane;
+        float farPlane;
+    };
+
     class EditorCamera : public Camera {
     public:
         enum class Direction { UP, DOWN, LEFT, RIGHT, FORWARD, BACK };
 
-        EditorCamera() = default;
+        EditorCamera(CameraSpec spec);
 
-        static EditorCamera makePerspective(float FOVdegrees, float aspectRatio,
-                                            float nearPlane, float farPlane);
-        static EditorCamera makeOrthographic(float orthoSize, float aspectRatio,
-                                             float nearPlane, float farPlane);
+        //     static EditorCamera makePerspective(float FOVdegrees, float aspectRatio,
+        //                                         float nearPlane, float farPlane);
+        //     static EditorCamera makeOrthographic(float orthoSize, float aspectRatio,
+        //                                          float nearPlane, float farPlane);
 
         void changeProjectionType(ProjectionType type);
 

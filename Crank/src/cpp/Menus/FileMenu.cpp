@@ -50,12 +50,13 @@ namespace AnEngine::Crank {
         if (auto path = Dialogues::OpenFileDialogue(
                 "CrankEngine Scene (*.aescene)\0*.aescene\0")) {
             sceneRef->clear();
-            sceneRef->onResize((uint32_t)dsRef->getViewportSize().x,
-                               (uint32_t)dsRef->getViewportSize().y);
             spRef->setCurrentScene(sceneRef);
 
             SceneSerialiser serialiser(sceneRef);
             serialiser.deserialise(*path);
+
+            sceneRef->onResize((uint32_t)dsRef->getViewportSize().x,
+                               (uint32_t)dsRef->getViewportSize().y);
         }
     }
     void FileMenu::SaveScene(Ref<Scene>& sceneRef) {

@@ -34,7 +34,7 @@ namespace AnEngine {
 
         localMatrix[3] = glm::vec4(0, 0, 0, localMatrix[3].w);
 
-        glm::vec3 row[3];
+        glm::vec3 row[3]{};
 
         for (glm::length_t i = 0; i < 3; ++i)
             for (glm::length_t j = 0; j < 3; ++j) row[i][j] = localMatrix[i][j];
@@ -55,7 +55,7 @@ namespace AnEngine {
             rotation.z = 0;
         }
 
-        std::array<glm::vec3, 3> decomposedTransform;
+        std::array<glm::vec3, 3> decomposedTransform{};
         decomposedTransform[0] = translation;
         decomposedTransform[1] = rotation;
         decomposedTransform[2] = scale;

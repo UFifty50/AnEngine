@@ -11,7 +11,7 @@ namespace AnEngine {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         //   glEnable(GL_CULL_FACE);
-        //    glCullFace(GL_BACK);
+        //   glCullFace(GL_BACK);
 
         glEnable(GL_DEPTH_TEST);
     }
@@ -29,6 +29,8 @@ namespace AnEngine {
 
     void OpenGLRenderAPI::drawIndexed(const Ref<VertexArray>& vertexArray,
                                       uint32_t indexCount) {
+        vertexArray->bind();
+
         uint32_t count =
             indexCount != 0 ? vertexArray->getIndexBuffer()->getCount() : indexCount;
         glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);

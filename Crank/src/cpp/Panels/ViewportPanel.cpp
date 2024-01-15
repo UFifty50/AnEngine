@@ -23,7 +23,9 @@ namespace AnEngine::Crank {
           editorCamera(editorCamera),
           dockSpace(dspace),
           sceneHierarchy(scenePanel),
-          gizmoType(-1) {}
+          gizmoType(ImGuizmo::OPERATION::TRANSLATE),
+          translateSnap(0.0f),
+          rotateSnap(0.0f) {}
 
     ImGuiWindowFlags ViewportPanel::beforeRender() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
@@ -83,7 +85,8 @@ namespace AnEngine::Crank {
 
         if (!activeEntity || gizmoType < 0) return;
 
-        ImGuizmo::SetOrthographic(!editorCamera->isPerspective());  // TODO: orthographic
+        // ImGuizmo::SetOrthographic(!editorCamera->isPerspective()); //TODO: orthographic
+        ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
         ImGuizmo::SetRect(dockSpace->getViewportPos().x, dockSpace->getViewportPos().y,
                           dockSpace->getViewportSize().x, dockSpace->getViewportSize().y);
@@ -93,10 +96,10 @@ namespace AnEngine::Crank {
         auto cameraEntity = sceneHierarchy->currentScene->getPrimaryCamera();
         if (!cameraEntity) return;
 
-        /*const auto& camera = cameraEntity.getComponent<CameraComponent>().Camera;
+        const auto& camera = cameraEntity.getComponent<CameraComponent>().Camera;
         const auto& camTC = cameraEntity.getComponent<TransformComponent>();
-        const glm::mat4& cameraProjection = camera.getProjectionMatrix();
-        glm::mat4 cameraView = glm::inverse((glm::mat4)camTC);*/
+        // const glm::mat4& cameraProjection = camera.getProjectionMatrix();
+        // glm::mat4 cameraView = glm::inverse((glm::mat4)camTC);
         const glm::mat4& cameraProjection = editorCamera->getProjectionMatrix();
         glm::mat4 cameraView = editorCamera->getViewMatrix();
 
@@ -106,11 +109,15 @@ namespace AnEngine::Crank {
 
         bool shouldSnap = Input::isKeyPressed(KeyCode::LeftControl);
 
-        float snapValues[3];
+        float snapValues[3] = {0.0f, 0.0f, 0.0f};
         if (gizmoType == ImGuizmo::OPERATION::TRANSLATE) {
-            snapValues[0] = snapValues[1] = snapValues[2] = translateSnap;
+            snapValues[0] = translateSnap;
+            snapValues[1] = translateSnap;
+            snapValues[2] = translateSnap;
         } else if (gizmoType == ImGuizmo::OPERATION::ROTATE) {
-            snapValues[0] = snapValues[1] = snapValues[2] = rotateSnap;
+            snapValues[0] = rotateSnap;
+            snapValues[1] = rotateSnap;
+            snapValues[2] = rotateSnap;
         }
 
 

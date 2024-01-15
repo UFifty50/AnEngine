@@ -8,7 +8,7 @@
 
 
 namespace AnEngine {
-    OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size) : size(size) {
+    OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size) {
         glCreateBuffers(1, &rendererID);
         glBindBuffer(GL_ARRAY_BUFFER, rendererID);
         glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
@@ -21,8 +21,6 @@ namespace AnEngine {
     }
 
     OpenGLVertexBuffer::~OpenGLVertexBuffer() { glDeleteBuffers(1, &rendererID); }
-
-    uint32_t OpenGLVertexBuffer::getSize() const { return this->size; }
 
     void OpenGLVertexBuffer::setData(const void* data, uint32_t size) {
         glBindBuffer(GL_ARRAY_BUFFER, rendererID);

@@ -20,8 +20,8 @@ namespace AnEngine {
 
     void Scene::destroyEntity(Entity entity) { entityRegistry.destroy(entity); }
 
-    void Scene::onUpdateEditor(TimeStep deltaTime, const EditorCamera& camera) {
-        Renderer2D::beginScene(camera);
+    void Scene::onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) {
+        Renderer2D::beginScene(*camera);
 
         auto spriteGroup =
             entityRegistry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
@@ -43,6 +43,10 @@ namespace AnEngine {
                 AE_CORE_ASSERT(nsc.instantiateScriptInstance, "Script {0} not bound!",
                                nsc.Name);
                 nsc.instantiateScriptInstance();
+
+                AE_CORE_ASSERT(nsc.Instance,
+                               "Script {0} constructor not implemented properly!",
+                               nsc.Name);
                 nsc.Instance->entity = Entity{entity, this};
 
                 nsc.Instance->onCreate();

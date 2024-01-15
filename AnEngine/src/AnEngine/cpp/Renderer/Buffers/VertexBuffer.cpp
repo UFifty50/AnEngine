@@ -38,7 +38,7 @@ namespace AnEngine {
         for (uint32_t i = 0; i < (uint32_t)vertices.size(); i++) {
             verts[i] = vertices[i];
         }
-        return create(verts, vertices.size() + 1);
+        return create(verts, (uint32_t)vertices.size() + 1);
     }
 
     template <uint32_t _Size>

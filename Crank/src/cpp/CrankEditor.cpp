@@ -68,8 +68,8 @@ namespace AnEngine::Crank {
 
         activeScene = MakeRef<Scene>("Test Scene");
 
-        editorCam = MakeRef<EditorCamera>(
-            EditorCamera::makePerspective(30.0f, 1.788f, 0.1f, 1000.0f));
+        CameraSpec camSpec{ProjectionType::Perspective, 30.0f, 1.788f, 0.1f, 1000.0f};
+        editorCam = MakeRef<EditorCamera>(camSpec);
 
         dockSpace = MakeRef<DockSpace>();
 
@@ -117,7 +117,8 @@ namespace AnEngine::Crank {
         RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1});
         RenderCommandQueue::clear();
 
-        activeScene->onUpdateEditor(deltaTime, *editorCam);
+        activeScene->onUpdateEditor(deltaTime, editorCam);
+        // activeScene->onUpdateRuntime(deltaTime);
         frameBuffer->unBind();
     }
 

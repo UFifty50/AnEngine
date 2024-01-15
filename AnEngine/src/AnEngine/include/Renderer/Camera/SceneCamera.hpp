@@ -22,6 +22,12 @@ namespace AnEngine {
         float getPerspectiveNear() const { return perspectiveSettings.near; }
         float getPerspectiveFar() const { return perspectiveSettings.far; }
 
+        float getAspectRatio() const { return aspectRatio; }
+        void setAspectRatio(float ratio) {
+            aspectRatio = ratio;
+            recalculateProjection();
+        }
+
         void setOrthographicSize(float size) {
             orthoSettings.size = size;
             recalculateProjection();

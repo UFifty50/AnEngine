@@ -37,7 +37,7 @@ namespace AnEngine {
 
         constexpr virtual uint32_t getID() override { return TRANSFORM_COMPONENT_ID; }
 
-        operator const glm::mat4&() const {
+        operator glm::mat4() const {
             return glm::translate(glm::mat4(1.0f), Position) *
                    glm::toMat4(glm::quat(Rotation)) * glm::scale(glm::mat4(1.0f), Scale);
         }

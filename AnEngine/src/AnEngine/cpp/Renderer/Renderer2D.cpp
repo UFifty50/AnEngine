@@ -49,6 +49,7 @@ namespace AnEngine {
         Scope<uint32_t[]> quadIndices = MakeScope<uint32_t[]>(rendererData.maxIndices);
 
         uint32_t offset = 0;
+
         for (uint32_t i = 0; i < rendererData.maxIndices; i += 6) {
             quadIndices[i + 0] = offset + 0;
             quadIndices[i + 1] = offset + 1;
@@ -70,7 +71,7 @@ namespace AnEngine {
         rendererData.blankTexture->setData(&whiteTextureData, sizeof(uint32_t));
 
 
-        std::array<Sampler2D, rendererData.maxTextureSlots> samplers;
+        std::array<Sampler2D, rendererData.maxTextureSlots> samplers{};
         for (uint32_t i = 0; i < rendererData.maxTextureSlots; i++) {
             samplers[i] = Sampler2D{i};
         }
@@ -158,8 +159,8 @@ namespace AnEngine {
     }
 
     void Renderer2D::endBatch() {
-        uint32_t dataSize = (uint8_t*)rendererData.quadVertexBufferPtr -
-                            (uint8_t*)rendererData.quadVertexBufferBase;
+        uint32_t dataSize = (uint32_t)((uint8_t*)rendererData.quadVertexBufferPtr -
+                                       (uint8_t*)rendererData.quadVertexBufferBase);
         rendererData.quadVB->setData(rendererData.quadVertexBufferBase, dataSize);
     }
 

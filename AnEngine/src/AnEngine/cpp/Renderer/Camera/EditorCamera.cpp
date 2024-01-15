@@ -11,7 +11,34 @@
 
 
 namespace AnEngine {
-    EditorCamera EditorCamera::makePerspective(float FOVdegrees, float aspectRatio,
+    EditorCamera::EditorCamera(CameraSpec spec) {
+        projectionType = spec.type;
+        aspectRatio = spec.aspectRatio;
+
+        switch (projectionType) {
+            case ProjectionType::Perspective:
+                perspectiveSettings = {glm::radians(spec.FOVorSize), spec.nearPlane,
+                                       spec.farPlane};
+                projectionMatrix =
+                    glm::perspective(glm::radians(spec.FOVorSize), spec.aspectRatio,
+                                     spec.nearPlane, spec.farPlane);
+                break;
+
+            case ProjectionType::Orthographic:
+                orthoSettings = {spec.FOVorSize, spec.nearPlane, spec.farPlane};
+                orthoSettings.bounds = {-spec.FOVorSize * aspectRatio,
+                                        spec.FOVorSize * aspectRatio, -spec.FOVorSize,
+                                        spec.FOVorSize};
+                projectionMatrix = glm::ortho(
+                    -spec.FOVorSize * spec.aspectRatio, spec.FOVorSize * spec.aspectRatio,
+                    -spec.FOVorSize, spec.FOVorSize, spec.nearPlane, spec.farPlane);
+                break;
+        }
+
+        updateViewMatrix();
+    }
+
+    /*EditorCamera EditorCamera::makePerspective(float FOVdegrees, float aspectRatio,
                                                float nearPlane, float farPlane) {
         EditorCamera e = EditorCamera();
         e.projectionType = ProjectionType::Perspective;
@@ -37,7 +64,7 @@ namespace AnEngine {
                                         -orthoSize, orthoSize, nearPlane, farPlane);
         e.updateViewMatrix();
         return e;
-    }
+    }*/
 
     void EditorCamera::changeProjectionType(ProjectionType type) {
         projectionType = type;
@@ -84,9 +111,9 @@ namespace AnEngine {
                 break;
 
             case Orthographic:
-                float left = -orthoSettings.size * aspectRatio * 0.5;
+                float left = -orthoSettings.size * aspectRatio * 0.5f;
                 float right = -left;
-                float bottom = -orthoSettings.size * 0.5;
+                float bottom = -orthoSettings.size * 0.5f;
                 float top = -bottom;
                 orthoSettings.bounds = {left, right, bottom, top};
                 projectionMatrix = glm::ortho(left, right, bottom, top,
@@ -120,6 +147,8 @@ namespace AnEngine {
             case BACK:
                 return glm::rotate(getOrientation(), glm::vec3(0.0f, 0.0f, 1.0f));
         }
+
+        return glm::vec3(0.0f);
     }
 
     glm::quat EditorCamera::getOrientation() const {

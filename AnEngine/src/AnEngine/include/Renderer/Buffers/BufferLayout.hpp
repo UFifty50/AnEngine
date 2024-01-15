@@ -30,7 +30,14 @@ namespace AnEngine {
             Bool
         };
 
-        static uint32_t getSize(ShaderDataType::T type) {
+        ShaderDataType() = default;
+        constexpr ShaderDataType(T other) : type(other) {}
+
+        constexpr operator T() const { return type; }
+
+        explicit constexpr operator bool() const = delete;
+
+        uint32_t getSize() {
             switch (type) {
                 case ShaderDataType::None:    return 0;
 
@@ -53,18 +60,21 @@ namespace AnEngine {
             AE_CORE_ASSERT(false, "Unknown ShaderDataType");
             return 0;
         }
+
+        private:
+            ShaderDataType::T type;
     };
 
     struct BufferElement {
         std::string name;
-        ShaderDataType::T type;
+        ShaderDataType type;
         uint32_t size;
         uint32_t offset;
         bool normalised;
 
         BufferElement() = default;
-        BufferElement(ShaderDataType::T type, std::string const& name, bool normalised = false)
-            : name(name), type(type), size(ShaderDataType::getSize(type)), offset(0), normalised(normalised) {}
+        BufferElement(ShaderDataType type, std::string const& name, bool normalised = false)
+            : name(name), type(type), size(type.getSize()), offset(0), normalised(normalised) {}
 
         uint32_t getComponentCount() const {
             switch (type) {
