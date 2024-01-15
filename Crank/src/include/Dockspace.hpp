@@ -30,11 +30,11 @@ namespace AnEngine::Crank {
         }
 
         void addMenubarMenu(Ref<Menu> menu) { menus.push_back(menu); }
-      
+
         void render();
 
         //    glm::vec2 getMousePosOnRenderedViewport(CameraComponent cameraComponent);
-        void updateViewportInfo();
+        void updateViewportInfo(uint8_t menubarCount);
 
         //       ImVec2 getMousePosInViewport() { return mousePosInViewport; }
         ImVec2 getViewportPos() { return viewportPos; }
