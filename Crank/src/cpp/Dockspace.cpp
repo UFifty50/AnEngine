@@ -105,11 +105,14 @@ namespace AnEngine::Crank {
         ImGui::End();
     }
 
-    void DockSpace::updateViewportInfo() {
+    void DockSpace::updateViewportInfo(uint8_t menubarCount) {
         viewportSize = {ImGui::GetContentRegionAvail().x,
-                        ImGui::GetContentRegionAvail().y -
-                            ImGui::GetCurrentWindow()->MenuBarHeight()};
-        viewportPos = ImGui::GetWindowPos();
+                        ImGui::GetContentRegionAvail().y};
+        viewportPos = {
+            ImGui::GetWindowPos().x,
+            ImGui::GetWindowPos().y +
+                ImGui::GetCurrentWindow()->MenuBarHeight() * (menubarCount + 1)};
+
         viewportFocused = ImGui::IsItemFocused();
         viewportHovered = ImGui::IsItemHovered();
     }  // namespace AnEngine::Crank

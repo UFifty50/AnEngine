@@ -33,7 +33,7 @@ namespace AnEngine::Crank {
     }
 
     void ViewportPanel::render() {
-        dockSpace->updateViewportInfo();
+        dockSpace->updateViewportInfo(1);
         Application::getImGuiLayer()->shouldAllowEvents(!dockSpace->isViewportFocused() &&
                                                         !dockSpace->isViewportHovered());
         if (ImGui::BeginMenuBar()) {
@@ -76,7 +76,7 @@ namespace AnEngine::Crank {
             ImGui::EndMenuBar();
         }
 
-        uint32_t texID = frameBuffer->getColorAttachmentID();
+        uint32_t texID = frameBuffer->getColorAttachmentID(0);
         ImGui::Image((void*)texID, dockSpace->getViewportSize(), {0, 1}, {1, 0});
 
 
@@ -93,13 +93,14 @@ namespace AnEngine::Crank {
 
 
         // Camera
-        auto cameraEntity = sceneHierarchy->currentScene->getPrimaryCamera();
-        if (!cameraEntity) return;
+        // auto cameraEntity = sceneHierarchy->currentScene->getPrimaryCamera();
+        // if (!cameraEntity) return;
 
-        const auto& camera = cameraEntity.getComponent<CameraComponent>().Camera;
-        const auto& camTC = cameraEntity.getComponent<TransformComponent>();
-        // const glm::mat4& cameraProjection = camera.getProjectionMatrix();
-        // glm::mat4 cameraView = glm::inverse((glm::mat4)camTC);
+        // const auto& camera = cameraEntity.getComponent<CameraComponent>().Camera;
+        // const auto& camTC = cameraEntity.getComponent<TransformComponent>();
+        //  const glm::mat4& cameraProjection = camera.getProjectionMatrix();
+        //  glm::mat4 cameraView = glm::inverse((glm::mat4)camTC);
+
         const glm::mat4& cameraProjection = editorCamera->getProjectionMatrix();
         glm::mat4 cameraView = editorCamera->getViewMatrix();
 
@@ -107,9 +108,10 @@ namespace AnEngine::Crank {
         auto& eTC = activeEntity.getComponent<TransformComponent>();
         glm::mat4 transform = (glm::mat4)eTC;
 
-        bool shouldSnap = Input::isKeyPressed(KeyCode::LeftControl);
+        bool shouldSnap = Input::isKeyPressed(KeyCode::LeftControl) ||
+                          Input::isKeyPressed(KeyCode::RightControl);
 
-        float snapValues[3] = {0.0f, 0.0f, 0.0f};
+        float snapValues[3]{};
         if (gizmoType == ImGuizmo::OPERATION::TRANSLATE) {
             snapValues[0] = translateSnap;
             snapValues[1] = translateSnap;

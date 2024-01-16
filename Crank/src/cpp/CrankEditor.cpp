@@ -64,11 +64,14 @@ namespace AnEngine::Crank {
         Application::loadUILayout("assets/layouts/CrankEditorLayout.ini");
 
         FrameBufferSpec spec = {1280, 720};
+        spec.Attachments = {FrameBufferTexFormat::RGBA8, FrameBufferTexFormat::Depth};
         frameBuffer = FrameBuffer::create(spec);
 
         activeScene = MakeRef<Scene>("Test Scene");
 
-        CameraSpec camSpec{ProjectionType::Perspective, 30.0f, 1.788f, 0.1f, 1000.0f};
+        CameraSpec camSpec{ProjectionType::Perspective, 30.0f, 16.0f / 9.0f, 0.1f,
+
+                           1000.0f};
         editorCam = MakeRef<EditorCamera>(camSpec);
 
         dockSpace = MakeRef<DockSpace>();
@@ -93,21 +96,19 @@ namespace AnEngine::Crank {
     void CrankEditor::onDetach() {}
 
     void CrankEditor::onUpdate(TimeStep deltaTime) {
+        auto vpSize = dockSpace->getViewportSize();
+
         if (auto fbSpec = frameBuffer->getSpecification();
-            dockSpace->getViewportSize().x > 0.0f &&
-            dockSpace->getViewportSize().y > 0.0f &&
-            (fbSpec.Width != dockSpace->getViewportSize().x ||
-             fbSpec.Height != dockSpace->getViewportSize().y)) {
-            frameBuffer->resize((uint32_t)dockSpace->getViewportSize().x,
-                                (uint32_t)dockSpace->getViewportSize().y);
+            vpSize.x > 0.0f && vpSize.y > 0.0f &&
+            (fbSpec.Width != vpSize.x || fbSpec.Height != vpSize.y)) {
+            frameBuffer->resize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
 
-            editorCam->setViewportSize(dockSpace->getViewportSize().x,
-                                       dockSpace->getViewportSize().y);
+            editorCam->setViewportSize(vpSize.x, vpSize.y);
 
-            activeScene->onResize((uint32_t)dockSpace->getViewportSize().x,
-                                  (uint32_t)dockSpace->getViewportSize().y);
+            activeScene->onResize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
         }
 
+        // if (dockSpace->isViewportFocused())
         editorCam->onUpdate(deltaTime);
 
         Renderer2D::resetStats();

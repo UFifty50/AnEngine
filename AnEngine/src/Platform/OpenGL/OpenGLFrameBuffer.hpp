@@ -15,8 +15,9 @@ namespace AnEngine {
             return specification;
         }
 
-        virtual uint32_t getColorAttachmentID() const override {
-            return colourAttachment;
+        virtual uint32_t getColorAttachmentID(uint32_t index = 0) const override {
+            AE_CORE_ASSERT(index < colourAttachments.size(), "Index out of range!");
+            return colourAttachments[index];
         }
 
         virtual void reconstruct() override;
@@ -27,9 +28,12 @@ namespace AnEngine {
 
     private:
         FrameBufferSpec specification;
-        uint32_t colourAttachment = 0;
-        uint32_t depthAttachment = 0;
+        std::vector<RenderID> colourAttachments;
+        RenderID depthAttachment = 0;
         RenderID rendererID = 0;
+
+        std::vector<FrameBufferTexSpec> colourAttachmentSpecs;
+        FrameBufferTexSpec depthAttachmentSpec = FrameBufferTexFormat::None;
     };
 }  // namespace AnEngine
 

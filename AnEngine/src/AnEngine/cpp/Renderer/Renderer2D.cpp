@@ -142,7 +142,7 @@ namespace AnEngine {
         rendererData.activeScene = true;
     }
 
-    void Renderer2D::shutdown() {}
+    void Renderer2D::shutdown() { delete[] rendererData.quadVertexBufferBase; }
 
     void Renderer2D::endScene() {  // draw batch
         AE_PROFILE_FUNCTION()
