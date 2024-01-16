@@ -76,7 +76,7 @@ namespace AnEngine::Crank {
             ImGui::EndMenuBar();
         }
 
-        uint32_t texID = frameBuffer->getColorAttachmentID();
+        uint32_t texID = frameBuffer->getColorAttachmentID(0);
         ImGui::Image((void*)texID, dockSpace->getViewportSize(), {0, 1}, {1, 0});
 
 
