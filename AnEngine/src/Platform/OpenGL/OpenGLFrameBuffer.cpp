@@ -13,14 +13,8 @@ namespace AnEngine {
             return isMultisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
         }
 
-        static void CreateTextures(bool isMultisampled,
-                                   std::vector<RenderID>& colourAttachments) {
-            glCreateTextures(TextureTarget(isMultisampled), colourAttachments.size(),
-                             colourAttachments.data());
-        }
-
-        static void CreateTextures(bool isMultisampled, RenderID* depthAttachment) {
-            glCreateTextures(TextureTarget(isMultisampled), 1, depthAttachment);
+        static void CreateTextures(bool isMultisampled, RenderID* outID, uint32_t count) {
+            glCreateTextures(TextureTarget(isMultisampled), count, outID);
         }
 
         static void BindTexture(bool isMultisampled, RenderID id) {
@@ -38,11 +32,11 @@ namespace AnEngine {
                 glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA,
                              GL_UNSIGNED_BYTE, nullptr);
 
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 // TODO: filtering
             }
 
@@ -60,11 +54,11 @@ namespace AnEngine {
             } else {
                 glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
 
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             }
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, type, TextureTarget(isMultisampled),
@@ -111,7 +105,8 @@ namespace AnEngine {
         if (colourAttachmentSpecs.size() > 0) {
             colourAttachments.resize(colourAttachmentSpecs.size());
 
-            Utils::CreateTextures(isMultisampled, colourAttachments);
+            Utils::CreateTextures(isMultisampled, colourAttachments.data(),
+                                  colourAttachments.size());
 
             for (uint32_t i = 0; i < colourAttachments.size(); i++) {
                 Utils::BindTexture(isMultisampled, colourAttachments[i]);
@@ -134,7 +129,7 @@ namespace AnEngine {
         }
 
         if (depthAttachmentSpec.texFormat != FrameBufferTexFormat::None) {
-            Utils::CreateTextures(isMultisampled, &depthAttachment);
+            Utils::CreateTextures(isMultisampled, &depthAttachment, 1);
             Utils::BindTexture(isMultisampled, depthAttachment);
 
             switch (depthAttachmentSpec.texFormat) {

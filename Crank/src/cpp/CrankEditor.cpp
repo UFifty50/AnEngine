@@ -64,7 +64,8 @@ namespace AnEngine::Crank {
         Application::loadUILayout("assets/layouts/CrankEditorLayout.ini");
 
         FrameBufferSpec spec = {1280, 720};
-        spec.Attachments = {FrameBufferTexFormat::RGBA8, FrameBufferTexFormat::Depth};
+        spec.Attachments = {FrameBufferTexFormat::RGBA8, FrameBufferTexFormat::RGBA8,
+                            FrameBufferTexFormat::Depth};
         frameBuffer = FrameBuffer::create(spec);
 
         activeScene = MakeRef<Scene>("Test Scene");
