@@ -37,6 +37,7 @@ namespace AnEngine {
             {ShaderDataType::Float, "TexIndexIn"},
             {ShaderDataType::Float, "TilingFactorIn"},
             {ShaderDataType::Vec4, "TintIn"},
+            {ShaderDataType::Int, "EntityID"}
         };
         // clang-format on
 
@@ -62,8 +63,7 @@ namespace AnEngine {
             offset += 4;
         }
 
-        Ref<IndexBuffer> quadIB =
-            IndexBuffer::create(quadIndices, rendererData.maxIndices);
+        Ref<IndexBuffer> quadIB = IndexBuffer::create(quadIndices, rendererData.maxIndices);
         rendererData.quadVA->setIndexBuffer(quadIB);
 
         rendererData.blankTexture = Texture2D::create(1, 1);
@@ -77,8 +77,8 @@ namespace AnEngine {
         }
 
 
-        Ref<Shader> quadShader = rendererData.shaderLibrary.load(
-            "QuadShader", "builtins/assets/shaders/quad.glsl");
+        Ref<Shader> quadShader =
+            rendererData.shaderLibrary.load("QuadShader", "builtins/assets/shaders/quad.glsl");
         quadShader->bind();
         quadShader->uploadUniform("textureSamplers", samplers);
 
@@ -95,8 +95,7 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         if (rendererData.activeScene) {
-            AE_CORE_ERROR(
-                "Renderer2D::beginScene() called when already rendering a scene!");
+            AE_CORE_ERROR("Renderer2D::beginScene() called when already rendering a scene!");
             return;
         }
 
@@ -119,8 +118,7 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         if (rendererData.activeScene) {
-            AE_CORE_ERROR(
-                "Renderer2D::beginScene() called when already rendering a scene!");
+            AE_CORE_ERROR("Renderer2D::beginScene() called when already rendering a scene!");
             return;
         }
 
@@ -187,7 +185,8 @@ namespace AnEngine {
     }
 
     // Primitives
-    void Renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& colour) {
+    void Renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& colour,
+                              uint32_t entityID) {
         AE_PROFILE_FUNCTION()
 
         if (!rendererData.activeScene) {
@@ -218,6 +217,7 @@ namespace AnEngine {
             rendererData.quadVertexBufferPtr->texIndex = texIndex;
             rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
             rendererData.quadVertexBufferPtr->tint = tint;
+            rendererData.quadVertexBufferPtr->entityID = entityID;
             rendererData.quadVertexBufferPtr++;
         }
 
@@ -226,7 +226,7 @@ namespace AnEngine {
     }
 
     void Renderer2D::drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
-                              const ShaderUniformVector& attributes) {
+                              uint32_t entityID, const ShaderUniformVector& attributes) {
         AE_PROFILE_FUNCTION()
 
         if (!rendererData.activeScene) {
@@ -275,6 +275,7 @@ namespace AnEngine {
             rendererData.quadVertexBufferPtr->texIndex = textureIndex;
             rendererData.quadVertexBufferPtr->tilingFactor = tilingFactor;
             rendererData.quadVertexBufferPtr->tint = tint;
+            rendererData.quadVertexBufferPtr->entityID = entityID;
             rendererData.quadVertexBufferPtr++;
         }
 
@@ -282,49 +283,53 @@ namespace AnEngine {
         rendererStats.quadCount++;
     }
 
-    void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
-                              float rotation, const glm::vec4& colour,
-                              const AnEngine::ShaderUniformVector& attributes) {
-        drawQuad({position.x, position.y, 0.0f}, size, rotation, colour, attributes);
-    }
+    // void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size, float
+    // rotation,
+    //                           const glm::vec4& colour,
+    //                           const AnEngine::ShaderUniformVector& attributes) {
+    //     drawQuad({position.x, position.y, 0.0f}, size, rotation, colour, attributes);
+    // }
 
-    void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size,
-                              float rotation, const glm::vec4& colour,
-                              const AnEngine::ShaderUniformVector& attributes) {
-        AE_PROFILE_FUNCTION()
+    // void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size, float
+    // rotation,
+    //                           const glm::vec4& colour,
+    //                           const AnEngine::ShaderUniformVector& attributes) {
+    //     AE_PROFILE_FUNCTION()
 
-        glm::mat4 rotationMatrix(1.0f);
-        if ((int)rotation % 180 != 0) {
-            rotationMatrix =
-                glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
-        }
+    //    glm::mat4 rotationMatrix(1.0f);
+    //    if ((int)rotation % 180 != 0) {
+    //        rotationMatrix =
+    //            glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+    //    }
 
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
-                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+    //    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
+    //                          glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
-        drawQuad(transform, colour);
-    }
+    //    drawQuad(transform, colour);
+    //}
 
-    void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size,
-                              float rotation, const Ref<Texture2D>& texture,
-                              const AnEngine::ShaderUniformVector& attributes) {
-        drawQuad({position.x, position.y, 0.0f}, size, rotation, texture, attributes);
-    }
+    // void Renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size, float
+    // rotation,
+    //                           const Ref<Texture2D>& texture,
+    //                           const AnEngine::ShaderUniformVector& attributes) {
+    //     drawQuad({position.x, position.y, 0.0f}, size, rotation, texture, attributes);
+    // }
 
-    void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size,
-                              float rotation, const Ref<Texture2D>& texture,
-                              const AnEngine::ShaderUniformVector& attributes) {
-        AE_PROFILE_FUNCTION()
+    // void Renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size, float
+    // rotation,
+    //                           const Ref<Texture2D>& texture,
+    //                           const AnEngine::ShaderUniformVector& attributes) {
+    //     AE_PROFILE_FUNCTION()
 
-        glm::mat4 rotationMatrix(1.0f);
-        if ((int)rotation % 180 != 0) {
-            rotationMatrix =
-                glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
-        }
+    //    glm::mat4 rotationMatrix(1.0f);
+    //    if ((int)rotation % 180 != 0) {
+    //        rotationMatrix =
+    //            glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f});
+    //    }
 
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
-                              glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+    //    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * rotationMatrix *
+    //                          glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
-        drawQuad(transform, texture, attributes);
-    }
+    //    drawQuad(transform, texture, attributes);
+    //}
 }  // namespace AnEngine

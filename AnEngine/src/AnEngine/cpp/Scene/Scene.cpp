@@ -30,7 +30,7 @@ namespace AnEngine {
             auto [transform, sprite] =
                 spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
-            Renderer2D::drawQuad((glm::mat4)transform, sprite.Colour);
+            Renderer2D::drawQuad((glm::mat4)transform, sprite.Colour, (uint32_t)entity);
         }
 
         Renderer2D::endScene();
@@ -45,8 +45,7 @@ namespace AnEngine {
                 nsc.instantiateScriptInstance();
 
                 AE_CORE_ASSERT(nsc.Instance,
-                               "Script {0} constructor not implemented properly!",
-                               nsc.Name);
+                               "Script {0} constructor not implemented properly!", nsc.Name);
                 nsc.Instance->entity = Entity{entity, this};
 
                 nsc.Instance->onCreate();
@@ -70,17 +69,16 @@ namespace AnEngine {
         }
 
         if (mainCamera) {
-            Renderer2D::beginScene(mainCamera->getProjectionMatrix(),
-                                   mainCameraTransform);
+            Renderer2D::beginScene(mainCamera->getProjectionMatrix(), mainCameraTransform);
 
-            auto spriteGroup = entityRegistry.group<TransformComponent>(
-                entt::get<SpriteRendererComponent>);
+            auto spriteGroup =
+                entityRegistry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 
             for (auto entity : spriteGroup) {
                 auto [transform, sprite] =
                     spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
-                Renderer2D::drawQuad((glm::mat4)transform, sprite.Colour);
+                Renderer2D::drawQuad((glm::mat4)transform, sprite.Colour, (uint32_t)entity);
             }
 
             Renderer2D::endScene();

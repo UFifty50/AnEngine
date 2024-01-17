@@ -31,9 +31,8 @@ namespace AnEngine::Crank {
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("DockSpace", &dockspaceOpen, windowFlags);
-        ImGui::PopStyleVar();
+        ImGui::PopStyleVar(3);
 
-        ImGui::PopStyleVar(2);
 
         ImGuiIO& io = ImGui::GetIO();
         ImGuiStyle& style = ImGui::GetStyle();
@@ -66,15 +65,6 @@ namespace AnEngine::Crank {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Window")) {
-                for (auto& panel : usablePanels) {
-                    if (ImGui::MenuItem(panel->getName().c_str())) {
-                        if (std::ranges::find(panels, panel) == panels.end())
-                            panels.push_back(panel);
-                    }
-                }
-                ImGui::EndMenu();
-            }
             ImGui::EndMenuBar();
         }
 
@@ -105,29 +95,30 @@ namespace AnEngine::Crank {
         ImGui::End();
     }
 
-    void DockSpace::updateViewportInfo(uint8_t menubarCount) {
+    void DockSpace::updateViewportInfo(bool hasTabBar, bool hasMenuBar) {
         viewportSize = {ImGui::GetContentRegionAvail().x,
                         ImGui::GetContentRegionAvail().y};
         viewportPos = {
             ImGui::GetWindowPos().x,
             ImGui::GetWindowPos().y +
-                ImGui::GetCurrentWindow()->MenuBarHeight() * (menubarCount + 1)};
+                ImGui::GetCurrentWindow()->MenuBarHeight() * (hasTabBar + hasMenuBar)};
 
         viewportFocused = ImGui::IsItemFocused();
         viewportHovered = ImGui::IsItemHovered();
-    }  // namespace AnEngine::Crank
+    }
 
-    // glm::vec2 DockSpace::getMousePosOnRenderedViewport(CameraComponent cameraComponent)
-    // {
-    //     // updateViewportInfo();
+    bool DockSpace::isMouseInViewport() {
+        ImVec2 mousePos = ImGui::GetMousePos();
+        return mousePos.x >= viewportPos.x &&
+               mousePos.x <= viewportPos.x + viewportSize.x &&
+               mousePos.y >= viewportPos.y &&
+               mousePos.y <= viewportPos.y + viewportSize.y;
+    }
 
-    //    auto camBounds = cameraComponent.Camera.getOrthographicBounds();
-
-    //    float x = (mousePosInViewport.x / viewportSize.x) * camBounds.getWidth() -
-    //              camBounds.getWidth() * 0.5f;
-    //    float y = camBounds.getHeight() * 0.5f -
-    //              (mousePosInViewport.y / viewportSize.y) * camBounds.getHeight();
-
-    //    return {x, y};
-    //}
+    ImVec2 DockSpace::getMousePosInViewport(bool flipY) {
+        ImVec2 mousePos = ImGui::GetMousePos();
+        return ImVec2(mousePos.x - viewportPos.x,
+                      flipY ? viewportSize.y - (mousePos.y - viewportPos.y)
+                            : mousePos.y - viewportPos.y);
+    }
 }  // namespace AnEngine::Crank

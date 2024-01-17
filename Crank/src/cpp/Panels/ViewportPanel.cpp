@@ -29,11 +29,18 @@ namespace AnEngine::Crank {
 
     ImGuiWindowFlags ViewportPanel::beforeRender() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+
+        ImGuiWindowClass window_class;
+        window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoWindowMenuButton;
+
+        ImGui::SetNextWindowClass(&window_class);
         return ImGuiWindowFlags_MenuBar;
     }
 
     void ViewportPanel::render() {
-        dockSpace->updateViewportInfo(1);
+        static uint32_t fbID = 0;
+        dockSpace->updateViewportInfo(true, true);
+
         Application::getImGuiLayer()->shouldAllowEvents(!dockSpace->isViewportFocused() &&
                                                         !dockSpace->isViewportHovered());
         if (ImGui::BeginMenuBar()) {
@@ -73,10 +80,16 @@ namespace AnEngine::Crank {
                 ImGui::EndMenu();
             }
 
+            if (ImGui::BeginMenu("Framebuffer")) {
+                if (ImGui::MenuItem("No. 1")) fbID = 0;
+                if (ImGui::MenuItem("No. 2")) fbID = 1;
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenuBar();
         }
 
-        uint32_t texID = frameBuffer->getColorAttachmentID(0);
+        uint32_t texID = frameBuffer->getColorAttachmentID(fbID);
         ImGui::Image((void*)texID, dockSpace->getViewportSize(), {0, 1}, {1, 0});
 
 

@@ -25,6 +25,7 @@ namespace AnEngine {
             float texIndex;
             float tilingFactor;
             glm::vec4 tint;
+            uint32_t entityID;
             // ShaderUniformVector attributes;
         };
 
@@ -77,23 +78,23 @@ namespace AnEngine {
         static void flush();
 
         // Primitives
-        static void drawQuad(const glm::vec2& position, const glm::vec2& size,
-                             float rotation, const glm::vec4& colour,
-                             const ShaderUniformVector& attributes = {});
-        static void drawQuad(const glm::vec3& position, const glm::vec2& size,
-                             float rotation, const glm::vec4& colour,
-                             const ShaderUniformVector& attributes = {});
-
-        static void drawQuad(const glm::mat4& transform, const glm::vec4& colour);
+        static void drawQuad(const glm::mat4& transform, const glm::vec4& colour,
+                             uint32_t entityID);
         static void drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
-                             const ShaderUniformVector& attributes = {});
+                             uint32_t entityID, const ShaderUniformVector& attributes = {});
 
-        static void drawQuad(const glm::vec2& position, const glm::vec2& size,
-                             float rotation, const Ref<Texture2D>& texture,
+
+        /*static void drawQuad(const glm::vec2& position, const glm::vec2& size, float
+        rotation, const glm::vec4& colour, const ShaderUniformVector& attributes = {}); static
+        void drawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const
+        glm::vec4& colour, const ShaderUniformVector& attributes = {});
+
+        static void drawQuad(const glm::vec2& position, const glm::vec2& size, float rotation,
+                             const Ref<Texture2D>& texture,
                              const ShaderUniformVector& attributes = {});
-        static void drawQuad(const glm::vec3& position, const glm::vec2& size,
-                             float rotation, const Ref<Texture2D>& texture,
-                             const ShaderUniformVector& attributes = {});
+        static void drawQuad(const glm::vec3& position, const glm::vec2& size, float rotation,
+                             const Ref<Texture2D>& texture,
+                             const ShaderUniformVector& attributes = {});*/
 
         // Stats
         static Statistics& getStats() { return rendererStats; }

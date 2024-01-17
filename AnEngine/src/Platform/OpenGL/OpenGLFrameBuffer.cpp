@@ -21,15 +21,16 @@ namespace AnEngine {
             glBindTexture(TextureTarget(isMultisampled), id);
         }
 
-        static void AttachColourTexture(RenderID id, uint32_t samples, GLenum format,
-                                        uint32_t width, uint32_t height, uint32_t index) {
+        static void AttachColourTexture(RenderID id, uint32_t samples, GLenum glFormat,
+                                        GLenum format, uint32_t width, uint32_t height,
+                                        uint32_t index) {
             bool isMultisampled = samples > 1;
 
             if (isMultisampled) {
-                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width,
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, glFormat, width,
                                         height, GL_FALSE);
             } else {
-                glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA,
+                glTexImage2D(GL_TEXTURE_2D, 0, glFormat, width, height, 0, format,
                              GL_UNSIGNED_BYTE, nullptr);
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -61,14 +62,49 @@ namespace AnEngine {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             }
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, type, TextureTarget(isMultisampled),
-                                   id, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, type, TextureTarget(isMultisampled), id, 0);
+        }
+
+        static GLenum GLformat(FrameBufferTexFormat format) {
+            switch (format) {
+                case FrameBufferTexFormat::RGBA8:
+                    return GL_RGBA;
+                case FrameBufferTexFormat::RED_INTEGER:
+                    return GL_RED_INTEGER;
+                default:
+                    AE_CORE_ASSERT(false, "Unknown or unsupported format!");
+                    return 0;
+            }
+        }
+
+        static GLenum GLformatType(FrameBufferTexFormat format) {
+            switch (format) {
+                case FrameBufferTexFormat::RGBA8:
+                    return GL_UNSIGNED_BYTE;
+                case FrameBufferTexFormat::RED_INTEGER:
+                    return GL_INT;
+                default:
+                    AE_CORE_ASSERT(false, "Unknown or unsupported format!");
+                    return 0;
+            }
+        }
+
+        // return size of the format in bytes
+        static uint32_t GLsizeOf(FrameBufferTexFormat format) {
+            switch (format) {
+                case FrameBufferTexFormat::RGBA8:
+                    return 4;
+                case FrameBufferTexFormat::RED_INTEGER:
+                    return 1;
+                default:
+                    AE_CORE_ASSERT(false, "Unknown or unsupported format!");
+                    return 0;
+            }
         }
 
     }  // namespace Utils
 
-    OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpec& spec)
-        : specification(spec) {
+    OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpec& spec) : specification(spec) {
         for (const auto& spec : specification.Attachments.Attachments) {
             if (spec.texFormat.isDepth())
                 depthAttachmentSpec = spec;
@@ -83,6 +119,38 @@ namespace AnEngine {
         glDeleteFramebuffers(1, &rendererID);
         glDeleteTextures(colourAttachments.size(), colourAttachments.data());
         glDeleteTextures(1, &depthAttachment);
+    }
+
+    std::vector<uint32_t> OpenGLFrameBuffer::readPixels(uint32_t attachmentIndex,
+                                                        glm::vec2 from, glm::vec2 size,
+                                                        FrameBufferTexFormat format) const {
+        // clang-format off
+        AE_CORE_ASSERT(attachmentIndex < colourAttachments.size(), "Index out of range!");
+        AE_CORE_ASSERT(from.x >= 0 && from.x <= (int)specification.Width, "from.x out of range!");
+        AE_CORE_ASSERT(from.y >= 0 && from.y <= (int)specification.Height, "from.y out of range!");
+        // clang-format on
+
+        if (from.x + size.x > specification.Width) size.x = specification.Width - from.x;
+        if (from.y + size.y > specification.Height) size.y = specification.Height - from.y;
+
+        std::vector<uint32_t> pixels(size.x * size.y * Utils::GLsizeOf(format));
+
+        //   glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID);
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+        glReadPixels(from.x, from.y, size.x, size.y, Utils::GLformat(format), GL_INT,
+                     pixels.data());
+        //    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+        return pixels;
+    }
+
+
+    void OpenGLFrameBuffer::clearColourAttachment(uint32_t attachmentIndex, int32_t value) {
+        AE_CORE_ASSERT(attachmentIndex < colourAttachments.size(), "Index out of range!");
+
+        auto& spec = colourAttachmentSpecs[attachmentIndex];
+        glClearTexImage(colourAttachments[attachmentIndex], 0, Utils::GLformat(spec.texFormat),
+                        GL_INT, &value);
     }
 
     void OpenGLFrameBuffer::reconstruct() {
@@ -113,9 +181,16 @@ namespace AnEngine {
 
                 switch (colourAttachmentSpecs[i].texFormat) {
                     case FrameBufferTexFormat::RGBA8: {
+                        Utils::AttachColourTexture(colourAttachments[i], specification.Samples,
+                                                   GL_RGBA8, GL_RGBA, specification.Width,
+                                                   specification.Height, i);
+                        break;
+                    }
+
+                    case FrameBufferTexFormat::RED_INTEGER: {
                         Utils::AttachColourTexture(
-                            colourAttachments[i], specification.Samples, GL_RGBA8,
-                            specification.Width, specification.Height, i);
+                            colourAttachments[i], specification.Samples, GL_R32I,
+                            GL_RED_INTEGER, specification.Width, specification.Height, i);
                         break;
                     }
 
@@ -135,15 +210,13 @@ namespace AnEngine {
             switch (depthAttachmentSpec.texFormat) {
                 case FrameBufferTexFormat::DEPTH24STENCIL8: {
                     Utils::AttachDepthTexture(depthAttachment, specification.Samples,
-                                              GL_DEPTH24_STENCIL8,
-                                              GL_DEPTH_STENCIL_ATTACHMENT,
+                                              GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
                                               specification.Width, specification.Height);
                     break;
                 }
 
                 default: {
-                    AE_CORE_ASSERT(false,
-                                   "Unknown or unsupported depth texture format {}!",
+                    AE_CORE_ASSERT(false, "Unknown or unsupported depth texture format {}!",
                                    depthAttachmentSpec.texFormat.toString());
                 }
             }
@@ -170,9 +243,8 @@ namespace AnEngine {
             glDrawBuffer(GL_NONE);
         }
 
-        AE_CORE_ASSERT(
-            glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE,
-            "Framebuffer is incomplete!")
+        AE_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE,
+                       "Framebuffer is incomplete!")
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }

@@ -64,7 +64,8 @@ namespace AnEngine::Crank {
         Application::loadUILayout("assets/layouts/CrankEditorLayout.ini");
 
         FrameBufferSpec spec = {1280, 720};
-        spec.Attachments = {FrameBufferTexFormat::RGBA8, FrameBufferTexFormat::RGBA8,
+        spec.Attachments = {FrameBufferTexFormat::RGBA8,
+                            FrameBufferTexFormat::RED_INTEGER,
                             FrameBufferTexFormat::Depth};
         frameBuffer = FrameBuffer::create(spec);
 
@@ -119,8 +120,18 @@ namespace AnEngine::Crank {
         RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1});
         RenderCommandQueue::clear();
 
+        frameBuffer->clearColourAttachment(1, -1);
+
         activeScene->onUpdateEditor(deltaTime, editorCam);
         // activeScene->onUpdateRuntime(deltaTime);
+
+        auto [mouseX, mouseY] = dockSpace->getMousePosInViewport(true);
+        if (dockSpace->isMouseInViewport()) {
+            std::vector<uint32_t> pixels = frameBuffer->readPixels(
+                1, {mouseX, mouseY}, {1, 1}, FrameBufferTexFormat::RED_INTEGER);
+            AE_CORE_INFO("px; {}", pixels[0]);
+        }
+
         frameBuffer->unBind();
     }
 

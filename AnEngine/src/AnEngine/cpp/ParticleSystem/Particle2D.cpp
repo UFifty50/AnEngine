@@ -55,8 +55,8 @@ namespace AnEngine {
     void Particle2D::emit() {
         if (!initialised) return;
 
-        Renderer2D::drawQuad(currentPosition, glm::vec2(currentSize), currentRotation,
-                             currentColour);
+        // Renderer2D::drawQuad(currentPosition, glm::vec2(currentSize), currentRotation,
+        //                      currentColour);
     }
 
     bool Particle2D::isAlive() const { return alive == true; }

@@ -52,8 +52,8 @@ namespace AnEngine {
             glm::vec2{texX, texY + texHeight},
         };
 
-        Renderer2D::drawQuad(position, {1.0f, 1.0f}, rotation, sheet,
-                             ShaderUniformVector{ShaderUniform("texCoords", texCoords)});
+        // Renderer2D::drawQuad(position, {1.0f, 1.0f}, rotation, sheet,
+        //                      ShaderUniformVector{ShaderUniform("texCoords", texCoords)});
     }
 
     Sprite SpriteSheet::getSprite(glm::vec2 index) const {

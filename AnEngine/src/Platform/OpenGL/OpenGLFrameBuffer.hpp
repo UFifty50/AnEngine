@@ -3,6 +3,7 @@
 
 #include "Core/Core.hpp"
 #include "Renderer/FrameBuffer.hpp"
+#include "glm/glm.hpp"
 
 
 namespace AnEngine {
@@ -19,6 +20,12 @@ namespace AnEngine {
             AE_CORE_ASSERT(index < colourAttachments.size(), "Index out of range!");
             return colourAttachments[index];
         }
+
+        virtual std::vector<uint32_t> readPixels(uint32_t attachmentIndex, glm::vec2 from,
+                                                 glm::vec2 size,
+                                                 FrameBufferTexFormat format) const override;
+
+        virtual void clearColourAttachment(uint32_t attachmentIndex, int32_t value) override;
 
         virtual void reconstruct() override;
         virtual void resize(uint32_t width, uint32_t height) override;

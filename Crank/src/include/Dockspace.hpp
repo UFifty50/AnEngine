@@ -12,7 +12,6 @@
 #include "Core/Core.hpp"
 #include "Menus/Menu.hpp"
 #include "Panels/Panel.hpp"
-// #include "Scene/Components.hpp"
 
 
 namespace AnEngine::Crank {
@@ -33,10 +32,11 @@ namespace AnEngine::Crank {
 
         void render();
 
-        //    glm::vec2 getMousePosOnRenderedViewport(CameraComponent cameraComponent);
-        void updateViewportInfo(uint8_t menubarCount);
+        // Must be called before getMousePosInViewport()
+        void updateViewportInfo(bool hasTabBar, bool hasMenuBar);
+        bool isMouseInViewport();
+        ImVec2 getMousePosInViewport(bool flipY);
 
-        //       ImVec2 getMousePosInViewport() { return mousePosInViewport; }
         ImVec2 getViewportPos() { return viewportPos; }
         ImVec2 getViewportSize() { return viewportSize; }
         bool isViewportFocused() { return viewportFocused; }
@@ -56,7 +56,6 @@ namespace AnEngine::Crank {
         bool viewportHovered = false;
         bool windowFocused = false;
         bool windowHovered = false;
-        //   ImVec2 mousePosInViewport;
         ImVec2 viewportPos;
         ImVec2 viewportSize;
         ImVec2 windowPos;
