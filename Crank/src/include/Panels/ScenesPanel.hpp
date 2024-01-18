@@ -15,6 +15,7 @@ namespace AnEngine::Crank {
         ScenesPanel(std::string name, const Ref<Scene>& scene);
 
         void setCurrentScene(const Ref<Scene>& scene);
+        void setSelectedEntity(Entity entity) { selectedEntity = entity; }
         Entity getSelectedEntity() { return selectedEntity; }
 
         virtual ImGuiWindowFlags beforeRender() override {

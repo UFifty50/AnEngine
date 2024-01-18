@@ -7,6 +7,13 @@ namespace AnEngine::Crank {
     StatisticsPanel::StatisticsPanel(std::string name) : name(name) {}
 
     void StatisticsPanel::render() {
+        ImGui::Text("Editor Stats:");
+        ImGui::Text("Hovered Entity: %s",
+                    hoveredEntity ? hoveredEntity.getComponent<TagComponent>().Tag.c_str()
+                                  : "None");
+
+        ImGui::Separator();
+
         ImGui::Text("Renderer2D Stats:");
         ImGui::Text("FrameTime: %.2fms", Renderer2D::getStats().lastFrameTime);
         ImGui::Text("FPS: %.1f", 1000.0f / Renderer2D::getStats().lastFrameTime);

@@ -7,14 +7,14 @@ layout(location = 2) in vec2 TexCoordIn;
 layout(location = 3) in float TexIndexIn;
 layout(location = 4) in float TilingFactorIn;
 layout(location = 5) in vec4 TintIn;
-//layout(location = 6) in int EntityIDin;
+layout(location = 6) in int EntityIDin;
 
 
 out vec4 Colour;
 out vec2 TexCoord;
 out flat float TexIndex;
 out vec4 Tint;
-//out flat int EntityID;
+out flat int EntityID;
 
 uniform mat4 viewProjectionMatrix;
 
@@ -24,7 +24,7 @@ void main() {
     TexCoord = TexCoordIn * TilingFactorIn;
     TexIndex = TexIndexIn;
     Tint = TintIn;
-  //  EntityID = EntityIDin;
+    EntityID = EntityIDin;
     gl_Position = viewProjectionMatrix * vec4(Position, 1.0);
 }
 
@@ -39,7 +39,7 @@ in vec4 Colour;
 in vec2 TexCoord;
 in flat float TexIndex;
 in vec4 Tint;
-//in flat int EntityID;
+in flat int EntityID;
 
 uniform sampler2D textureSamplers[32];
 	
@@ -51,5 +51,5 @@ void main() {
         discard;
 
     colour = texColour;
-    colour2 = 50;
+    colour2 = EntityID;
 }

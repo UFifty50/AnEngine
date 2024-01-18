@@ -11,6 +11,7 @@
 #include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/VertexArray.hpp"
+#include "Scene/Components.hpp"
 #include "Texture/Texture2D.hpp"
 #include "Time/TimeStep.hpp"
 
@@ -25,8 +26,10 @@ namespace AnEngine {
             float texIndex;
             float tilingFactor;
             glm::vec4 tint;
-            uint32_t entityID;
             // ShaderUniformVector attributes;
+
+            // Editor Specific
+            uint32_t entityID;
         };
 
         struct Storage {
@@ -78,10 +81,14 @@ namespace AnEngine {
         static void flush();
 
         // Primitives
+        static void drawSprite(const glm::mat4& transform,
+                               const SpriteRendererComponent& sprite, int32_t entityID);
+
         static void drawQuad(const glm::mat4& transform, const glm::vec4& colour,
-                             uint32_t entityID);
+                             int32_t entityID = -1);
         static void drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
-                             uint32_t entityID, const ShaderUniformVector& attributes = {});
+                             int32_t entityID = -1,
+                             const ShaderUniformVector& attributes = {});
 
 
         /*static void drawQuad(const glm::vec2& position, const glm::vec2& size, float

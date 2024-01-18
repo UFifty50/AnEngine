@@ -121,19 +121,19 @@ namespace AnEngine {
         glDeleteTextures(1, &depthAttachment);
     }
 
-    std::vector<uint32_t> OpenGLFrameBuffer::readPixels(uint32_t attachmentIndex,
-                                                        glm::vec2 from, glm::vec2 size,
-                                                        FrameBufferTexFormat format) const {
+    std::vector<int32_t> OpenGLFrameBuffer::readPixels(uint32_t attachmentIndex,
+                                                       glm::vec2 from, glm::vec2 size,
+                                                       FrameBufferTexFormat format) const {
         // clang-format off
         AE_CORE_ASSERT(attachmentIndex < colourAttachments.size(), "Index out of range!");
         AE_CORE_ASSERT(from.x >= 0 && from.x <= (int)specification.Width, "from.x out of range!");
         AE_CORE_ASSERT(from.y >= 0 && from.y <= (int)specification.Height, "from.y out of range!");
         // clang-format on
 
-        if (from.x + size.x > specification.Width) size.x = specification.Width - from.x;
-        if (from.y + size.y > specification.Height) size.y = specification.Height - from.y;
+        if (from.x + size.x > specification.Width + 1) size.x = specification.Width - from.x;
+        if (from.y + size.y > specification.Height + 1) size.y = specification.Height - from.y;
 
-        std::vector<uint32_t> pixels(size.x * size.y * Utils::GLsizeOf(format));
+        std::vector<int32_t> pixels(size.x * size.y * Utils::GLsizeOf(format));
 
         //   glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID);
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);

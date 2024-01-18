@@ -34,6 +34,7 @@ namespace AnEngine::Crank {
         virtual void onEvent(Event& event) override;
 
         bool onKeyPressed(KeyPressedEvent& kpEvent);
+        bool OnMouseClick(MouseButtonPressedEvent& mcEvent);
 
         friend class Panel;
 
@@ -53,6 +54,7 @@ namespace AnEngine::Crank {
         Ref<FileMenu> fileMenu;
 
         bool CameraA = true;
+        Entity hoveredEntity;
     };
 }  // namespace AnEngine::Crank
 

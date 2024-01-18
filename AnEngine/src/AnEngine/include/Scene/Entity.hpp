@@ -12,7 +12,7 @@ namespace AnEngine {
 
     class Entity {
     public:
-        Entity() : entityHandle(entt::null), scene(new Scene()) {}
+        Entity() : entityHandle(entt::null), scene(nullptr) {}
         Entity(entt::entity handle, Scene* scene) : entityHandle(handle), scene(scene) {}
         Entity(const Entity& other) = default;
 
@@ -23,19 +23,18 @@ namespace AnEngine {
 
         template <typename T>
         T& getComponent() {
-            AE_CORE_ASSERT(hasComponent<T>(),
-                           "Entity does not have component of type {0}!",
+            AE_CORE_ASSERT(hasComponent<T>(), "Entity does not have component of type {0}!",
                            typeid(T).name());
             return scene->entityRegistry.get<T>(entityHandle);
         }
 
         template <typename T, typename... Args>
         T& addComponent(Args&&... args) {
-            AE_CORE_ASSERT(!hasComponent<T>(),
-                           "Entity already has component of type {0}!", typeid(T).name());
-          
-            T& component = scene->entityRegistry.emplace<T>(entityHandle,
-                                                            std::forward<Args>(args)...);
+            AE_CORE_ASSERT(!hasComponent<T>(), "Entity already has component of type {0}!",
+                           typeid(T).name());
+
+            T& component =
+                scene->entityRegistry.emplace<T>(entityHandle, std::forward<Args>(args)...);
             scene->onComponentAdded(*this, component);
             return component;
         }

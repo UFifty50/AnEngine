@@ -13,6 +13,8 @@ namespace AnEngine {
     public:
         enum T : uint8_t {
             None = 0,
+            
+            Bool,
 
             // Vector types (int/float)
             Int, Int2, Int3, Int4,
@@ -26,11 +28,10 @@ namespace AnEngine {
 
             // Matrix types (always float)
             Mat3, Mat4,
-
-            Bool
         };
 
         ShaderDataType() = default;
+        constexpr ShaderDataType(int type) : type((T)type) {}
         constexpr ShaderDataType(T other) : type(other) {}
 
         constexpr operator T() const { return type; }
@@ -39,7 +40,7 @@ namespace AnEngine {
 
         uint32_t getSize() {
             switch (type) {
-                case ShaderDataType::None:    return 0;
+                case ShaderDataType::Bool:     return 1;
 
                 case ShaderDataType::Int:      return 4;
                 case ShaderDataType::Int2:     return 4 * 2;
@@ -54,7 +55,7 @@ namespace AnEngine {
                 case ShaderDataType::Mat3:     return 4 * 3 * 3;
                 case ShaderDataType::Mat4:     return 4 * 4 * 4;
 
-                case ShaderDataType::Bool:     return 1;
+                case ShaderDataType::None:    return 0;
             }
 
             AE_CORE_ASSERT(false, "Unknown ShaderDataType");

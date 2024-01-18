@@ -185,8 +185,13 @@ namespace AnEngine {
     }
 
     // Primitives
+    void Renderer2D::drawSprite(const glm::mat4& transform,
+                                const SpriteRendererComponent& sprite, int32_t entityID) {
+        drawQuad(transform, sprite.Colour, entityID);
+    }
+
     void Renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& colour,
-                              uint32_t entityID) {
+                              int32_t entityID) {
         AE_PROFILE_FUNCTION()
 
         if (!rendererData.activeScene) {
@@ -226,7 +231,7 @@ namespace AnEngine {
     }
 
     void Renderer2D::drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
-                              uint32_t entityID, const ShaderUniformVector& attributes) {
+                              int32_t entityID, const ShaderUniformVector& attributes) {
         AE_PROFILE_FUNCTION()
 
         if (!rendererData.activeScene) {

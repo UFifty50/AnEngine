@@ -4,6 +4,7 @@
 
 #include "CrankEditor.hpp"
 
+#include "ImGuizmo.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -127,9 +128,11 @@ namespace AnEngine::Crank {
 
         auto [mouseX, mouseY] = dockSpace->getMousePosInViewport(true);
         if (dockSpace->isMouseInViewport()) {
-            std::vector<uint32_t> pixels = frameBuffer->readPixels(
-                1, {mouseX, mouseY}, {1, 1}, FrameBufferTexFormat::RED_INTEGER);
-            AE_CORE_INFO("px; {}", pixels[0]);
+            int32_t pixel = frameBuffer->readPixels(1, {mouseX, mouseY}, {1, 1},
+                                                    FrameBufferTexFormat::RED_INTEGER)[0];
+            hoveredEntity =
+                pixel == -1 ? Entity() : Entity{(entt::entity)pixel, activeScene.get()};
+            statistics->setHoveredEntity(hoveredEntity);
         }
 
         frameBuffer->unBind();
@@ -142,6 +145,8 @@ namespace AnEngine::Crank {
 
         EventDispatcher dispatcher(event);
         dispatcher.dispatch<KeyPressedEvent>(BIND_EVENT_FN(CrankEditor::onKeyPressed));
+        dispatcher.dispatch<MouseButtonPressedEvent>(
+            BIND_EVENT_FN(CrankEditor::OnMouseClick));
     }
 
     bool CrankEditor::onKeyPressed(KeyPressedEvent& kpEvent) {
@@ -168,4 +173,14 @@ namespace AnEngine::Crank {
 
         return true;
     }
+
+    bool CrankEditor::OnMouseClick(MouseButtonPressedEvent& mcEvent) {
+        if (mcEvent.getMouseButton() == MouseCode::ButtonLeft) {
+            if (dockSpace->isMouseInViewport() && !ImGuizmo::IsOver())
+                sceneHierarchy->setSelectedEntity(hoveredEntity);
+        }
+
+        return true;
+    }
+
 }  // namespace AnEngine::Crank

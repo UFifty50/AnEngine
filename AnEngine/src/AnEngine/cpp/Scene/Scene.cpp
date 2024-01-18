@@ -30,7 +30,7 @@ namespace AnEngine {
             auto [transform, sprite] =
                 spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
-            Renderer2D::drawQuad((glm::mat4)transform, sprite.Colour, (uint32_t)entity);
+            Renderer2D::drawSprite((glm::mat4)transform, sprite, (uint32_t)entity);
         }
 
         Renderer2D::endScene();
@@ -78,7 +78,11 @@ namespace AnEngine {
                 auto [transform, sprite] =
                     spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
-                Renderer2D::drawQuad((glm::mat4)transform, sprite.Colour, (uint32_t)entity);
+                if ((uint32_t)entity > std::numeric_limits<int32_t>::max()) {
+                    AE_CORE_ASSERT(false, "Too many entities in scene :(     TODO: fixme");
+                }
+
+                Renderer2D::drawSprite((glm::mat4)transform, sprite, (int32_t)entity);
             }
 
             Renderer2D::endScene();

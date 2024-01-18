@@ -22,8 +22,12 @@ namespace AnEngine::Crank {
 
         virtual std::string getName() override { return name; }
 
+        void setHoveredEntity(Entity entity) { hoveredEntity = entity; }
+        Entity getHoveredEntity() { return hoveredEntity; }
+
     private:
         std::string name;
+        Entity hoveredEntity;
     };
 }  // namespace AnEngine::Crank
 

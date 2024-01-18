@@ -84,9 +84,9 @@ namespace AnEngine {
 
         virtual const FrameBufferSpec& getSpecification() const = 0;
         virtual uint32_t getColorAttachmentID(uint32_t index = 0) const = 0;
-        virtual std::vector<uint32_t> readPixels(uint32_t attachmentIndex, glm::vec2 from,
-                                                 glm::vec2 size,
-                                                 FrameBufferTexFormat format) const = 0;
+        virtual std::vector<int32_t> readPixels(uint32_t attachmentIndex, glm::vec2 from,
+                                                glm::vec2 size,
+                                                FrameBufferTexFormat format) const = 0;
 
         virtual void clearColourAttachment(uint32_t attachmentIndex, int32_t value) = 0;
 

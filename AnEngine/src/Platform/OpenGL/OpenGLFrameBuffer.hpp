@@ -21,9 +21,9 @@ namespace AnEngine {
             return colourAttachments[index];
         }
 
-        virtual std::vector<uint32_t> readPixels(uint32_t attachmentIndex, glm::vec2 from,
-                                                 glm::vec2 size,
-                                                 FrameBufferTexFormat format) const override;
+        virtual std::vector<int32_t> readPixels(uint32_t attachmentIndex, glm::vec2 from,
+                                                glm::vec2 size,
+                                                FrameBufferTexFormat format) const override;
 
         virtual void clearColourAttachment(uint32_t attachmentIndex, int32_t value) override;
 
