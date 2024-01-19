@@ -84,8 +84,7 @@
     #define AE_PROFILE_BEGIN_SESSION(name, filepath) \
         ::AnEngine::Instrumentor::Get().beginSession(name, filepath);
     #define AE_PROFILE_END_SESSION() ::AnEngine::Instrumentor::Get().endSession();
-    #define AE_PROFILE_SCOPE(name) \
-        ::AnEngine::InstrumentationTimer C(timer, __LINE__)(name);
+    #define AE_PROFILE_SCOPE(name) ::AnEngine::InstrumentationTimer C(timer, __LINE__)(name);
     #define AE_PROFILE_FUNCTION() AE_PROFILE_SCOPE(__FUNCSIG__)
 
     #define PROFILE_UI()
@@ -108,10 +107,8 @@
 #define BIT(x) (1 << x)
 
 // std::bind(&fn, this, std::placeholders::_1)
-#define BIND_EVENT_FN(fn)                                 \
-    [&](auto&&... args) -> decltype(auto) {               \
-        return fn(std::forward<decltype(args)>(args)...); \
-    }
+#define BIND_EVENT_FN(fn) \
+    [&](auto&&... args) -> decltype(auto) { return fn(std::forward<decltype(args)>(args)...); }
 
 namespace AnEngine {
     typedef uint32_t RenderID;

@@ -29,10 +29,19 @@ namespace AnEngine {
     private:
         RenderID rendererID = NULL;
         std::string name;
+        std::string filePath;
+        std::unordered_map<GLenum, std::vector<uint32_t>> vulkanSPRIV;
+        std::unordered_map<GLenum, std::vector<uint32_t>> openglSPRIV;
 
         std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
-        uint32_t compile(const std::unordered_map<uint32_t, std::string>& shaderSources)
-            const override;
+
+        void compileOrGetVulkanBinaries(
+            const std::unordered_map<GLenum, std::string>& shaderSources);
+
+        void reflect(GLenum shaderType, const std::vector<uint32_t>& spirvCode);
+
+        virtual uint32_t compile(
+            const std::unordered_map<uint32_t, std::string>& shaderSources) const override;
     };
 
     class ShaderParser {

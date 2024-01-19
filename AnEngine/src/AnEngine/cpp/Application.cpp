@@ -24,9 +24,8 @@ namespace AnEngine {
 
         if (RenderAPI::getAPI() == RenderAPI::NoAPI) {
             std::stringstream msg;
-            msg << "AnEngine::Renderer::setAPI() needs to be called in "
-                   "CreateApplication with one "
-                   "of"
+            msg << "AnEngine::Renderer::setAPI() needs to be called"
+                   "in CreateApplication with one of"
                 << std::endl;
             msg << "| RenderAPI::OpenGL" << std::endl;
             msg << "| RenderAPI::DirectX11" << std::endl;
@@ -58,8 +57,7 @@ namespace AnEngine {
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
-        dispatcher.dispatch<WindowResizeEvent>(
-            BIND_EVENT_FN(Application::onWindowResize));
+        dispatcher.dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::onWindowResize));
 
         for (auto it = applicationData.layerStack.end();
              it != applicationData.layerStack.begin();) {
@@ -128,6 +126,7 @@ namespace AnEngine {
 
     int Application::AEmain(int argc, char** argv) {
         Log::init();
+        applicationData.commandLine.reinit(argc, argv);
 
         AE_PROFILE_BEGIN_SESSION("Startup", "AnEngineProfile-Startup.json");
         auto app = CreateApplication();

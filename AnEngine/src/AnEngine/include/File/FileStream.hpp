@@ -14,7 +14,7 @@ namespace AnEngine {
     template <>
     class FileStream<Direction::Input> {
     public:
-        virtual ~FileStream(){};
+        virtual ~FileStream() = default;
 
         virtual const std::string readAll() const = 0;
         virtual void close() = 0;
@@ -27,7 +27,7 @@ namespace AnEngine {
     template <>
     class FileStream<Direction::Output> {
     public:
-        virtual ~FileStream(){};
+        virtual ~FileStream() = default;
 
         virtual void writeString(const std::string& str) = 0;
         virtual void close() = 0;

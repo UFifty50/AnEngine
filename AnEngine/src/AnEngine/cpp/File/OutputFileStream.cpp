@@ -8,8 +8,7 @@
 
 
 namespace AnEngine {
-    OutputFileStream::OutputFileStream(const std::string& path,
-                                       std::ios_base::openmode type)
+    OutputFileStream::OutputFileStream(const std::string& path, std::ios_base::openmode type)
         : iMode(type) {
 #if defined(AE_WIN)
         char exePathName[MAX_PATH];
@@ -48,12 +47,6 @@ namespace AnEngine {
         if (!stream.is_open()) {
             AE_ERROR("Error opening file {0}", this->path);
         }
-    }
-
-    OutputFileStream::OutputFileStream() : path(""), name(""), extension("") {}
-
-    OutputFileStream::~OutputFileStream() {
-        if (stream.is_open()) this->close();
     }
 
     void OutputFileStream::writeString(const std::string& str) {

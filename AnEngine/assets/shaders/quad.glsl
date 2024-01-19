@@ -9,22 +9,32 @@ layout(location = 4) in float TilingFactorIn;
 layout(location = 5) in vec4 TintIn;
 layout(location = 6) in int EntityIDin;
 
+layout(std140, binding = 0) uniform Camera {
+    mat4 viewProjectionMatrix;
+};
 
-out vec4 Colour;
-out vec2 TexCoord;
-out flat float TexIndex;
-out vec4 Tint;
-out flat int EntityID;
 
-uniform mat4 viewProjectionMatrix;
+// All scalar and non-double vector types take up 1 slot
+struct VertexOutput {
+    vec4 Colour;
+    vec2 TexCoord;
+    float TexIndex;
+    float TilingFactor;
+    vec4 Tint;
+};
+
+layout(location = 0) out VertexOutput Output;
+layout(location = 5) out flat int EntityID;
 
 
 void main() {
-    Colour = ColourIn;
-    TexCoord = TexCoordIn * TilingFactorIn;
-    TexIndex = TexIndexIn;
-    Tint = TintIn;
+    Output.Colour = ColourIn;
+    Output.TexCoord = TexCoordIn * TilingFactorIn;
+    Output.TexIndex = TexIndexIn;
+    Output.TilingFactor = TilingFactorIn;
+    Output.Tint = TintIn;
     EntityID = EntityIDin;
+
     gl_Position = viewProjectionMatrix * vec4(Position, 1.0);
 }
 
@@ -35,18 +45,23 @@ void main() {
 layout(location = 0) out vec4 colour;
 layout(location = 1) out int colour2;
 
-in vec4 Colour;
-in vec2 TexCoord;
-in flat float TexIndex;
-in vec4 Tint;
-in flat int EntityID;
+struct VertexOutput {
+    vec4 Colour;
+    vec2 TexCoord;
+    float TexIndex;
+    float TilingFactor;
+    vec4 Tint;
+};
 
-uniform sampler2D textureSamplers[32];
+layout(location = 0) in VertexOutput Input;
+layout(location = 5) in flat int EntityID;
+
+layout(binding = 0) uniform sampler2D textureSamplers[32];
 	
 
 void main() {
     // maybe int switch() or if() for texture index
-    vec4 texColour = texture(textureSamplers[int(TexIndex)], TexCoord) * Colour * Tint;
+    vec4 texColour = Input.Colour * Input.Tint * texture(textureSamplers[int(Input.TexIndex)], Input.TexCoord);
     if(texColour.a < 0.05)
         discard;
 

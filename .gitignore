@@ -439,5 +439,9 @@ Makefile
 *.vcxproj*
 *.sln*
 !vendor/premake/premake5.exe
-/Sandbox/imgui.ini
 README.md
+
+AnEngine/vendor/VulkanSDK
+Crank/assets/cache
+
+Dependencies.lua

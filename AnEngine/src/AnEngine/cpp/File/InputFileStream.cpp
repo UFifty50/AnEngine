@@ -6,8 +6,7 @@
 
 
 namespace AnEngine {
-    InputFileStream::InputFileStream(const std::string& path,
-                                     std::ios_base::openmode type) {
+    InputFileStream::InputFileStream(const std::string& path, std::ios_base::openmode type) {
 #if defined(AE_WIN)
         char exePathName[MAX_PATH];
         GetModuleFileNameA(NULL, exePathName, sizeof(exePathName));
@@ -37,6 +36,12 @@ namespace AnEngine {
             this->name = this->path.substr(this->path.find_last_of("\\") + 1);
         } else {
             this->name = this->path.substr(this->path.find_last_of("/") + 1);
+        }
+
+        if (this->path.find_last_of("/") != std::string::npos) {
+            this->name = this->path.substr(this->path.find_last_of("/") + 1);
+        } else {
+            this->name = this->path.substr(this->path.find_last_of("\\") + 1);
         }
 
         this->extension = this->path.substr(this->path.find_last_of(".") + 1);

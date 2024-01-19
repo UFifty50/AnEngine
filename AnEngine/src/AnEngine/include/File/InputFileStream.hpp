@@ -1,6 +1,7 @@
 #ifndef INPUTFILESTREAM_HPP
 #define INPUTFILESTREAM_HPP
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -13,6 +14,10 @@ namespace AnEngine {
         InputFileStream(const std::string& path,
                         std::ios_base::openmode type = std::ios::binary);
 
+        InputFileStream(const std::filesystem::path& path,
+                        std::ios_base::openmode type = std::ios::binary)
+            : InputFileStream(path.string(), type) {}
+
         InputFileStream(nullptr_t);
 
         virtual ~InputFileStream() override;
@@ -21,6 +26,15 @@ namespace AnEngine {
         virtual void close() override;
 
         bool is_open() const { return this->stream.is_open(); }
+        void read(char* buffer, uint32_t size) { stream.read(buffer, size); }
+
+        uint32_t size() {
+            stream.seekg(0, std::ios::end);
+            uint32_t size = stream.tellg();
+            stream.seekg(0, std::ios::beg);
+
+            return size;
+        }
 
         const std::string& getFilePath() const override { return this->path; }
         const std::string& getFileName() const override { return this->name; }

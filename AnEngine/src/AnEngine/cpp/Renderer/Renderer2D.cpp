@@ -79,8 +79,6 @@ namespace AnEngine {
 
         Ref<Shader> quadShader =
             rendererData.shaderLibrary.load("QuadShader", "builtins/assets/shaders/quad.glsl");
-        quadShader->bind();
-        quadShader->uploadUniform("textureSamplers", samplers);
 
         // Set texture slot 0 to blank texture
         rendererData.textureSlots[0] = rendererData.blankTexture;

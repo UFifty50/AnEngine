@@ -1,6 +1,8 @@
 #include "aepch.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <shaderc/shaderc.hpp>
+#include <spirv_cross/spirv_cross.hpp>
 
 #include "OpenGLShader.hpp"
 
@@ -8,30 +10,122 @@
 
 #include <algorithm>
 #include <cctype>
+#include <filesystem>
 
 #include "File/InputFileStream.hpp"
+#include "File/OutputFileStream.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/ShaderUniform.hpp"
 
 
+namespace fs = std::filesystem;
+
 namespace AnEngine {
+    namespace Utils {
+        // using BinarySet = std::unordered_map<GLenum, Binary>;
+
+        // enum class BinaryType : uint8_t { Vulkan, OpenGL };
+
+        static fs::path GetCacheDirectory() { return "assets/cache/shader/opengl"; }
+
+        static bool CacheExists() { return fs::exists(GetCacheDirectory()); }
+
+        static void CreateCacheDirectory() { fs::create_directories(GetCacheDirectory()); }
+
+        // static std::optional<BinarySet> CacheGet(BinaryType type) {
+        //     ig
+        // }
+
+        static shaderc_shader_kind ShaderCType(GLenum type) {
+            switch (type) {
+                case GL_VERTEX_SHADER:
+                    return shaderc_glsl_vertex_shader;
+                case GL_FRAGMENT_SHADER:
+                    return shaderc_glsl_fragment_shader;
+                case GL_GEOMETRY_SHADER:
+                    return shaderc_glsl_geometry_shader;
+                case GL_COMPUTE_SHADER:
+                    return shaderc_glsl_compute_shader;
+
+                default:
+                    AE_CORE_ASSERT(false, "Unknown shader type.");
+                    return shaderc_glsl_infer_from_source;
+            }
+        }
+
+        static std::string GLStringType(GLenum type) {
+            switch (type) {
+                case GL_VERTEX_SHADER:
+                    return "GL_VERTEX_SHADER";
+                case GL_FRAGMENT_SHADER:
+                    return "GL_FRAGMENT_SHADER";
+                case GL_GEOMETRY_SHADER:
+                    return "GL_GEOMETRY_SHADER";
+                case GL_COMPUTE_SHADER:
+                    return "GL_COMPUTE_SHADER";
+
+                default:
+                    AE_CORE_ASSERT(false, "Unknown shader type.");
+                    return "";
+            }
+        }
+
+        // GL Shader Cache from GL Shader stage
+        static std::string GLShaderGLCacheExtension(GLenum shaderType) {
+            switch (shaderType) {
+                case GL_VERTEX_SHADER:
+                    return ".glcache.glvert";
+                case GL_FRAGMENT_SHADER:
+                    return ".glcache.glfrag";
+
+                default:
+                    AE_CORE_ASSERT(false, "Unknown shader type.");
+                    return "";
+            }
+        }
+
+        // VK Shader Cache from GL Shader stage
+        static std::string GLShaderVKCacheExtension(GLenum shaderType) {
+            switch (shaderType) {
+                case GL_VERTEX_SHADER:
+                    return ".vkcache.glvert";
+                case GL_FRAGMENT_SHADER:
+                    return ".vkcache.glfrag";
+
+                default:
+                    AE_CORE_ASSERT(false, "Unknown shader type.");
+                    return "";
+            }
+        }
+    };  // namespace Utils
+
     OpenGLShader::OpenGLShader(InputFileStream& mixedShaderStream,
-                               const std::string& name) {
+                               const std::string& shaderName) {
         if (!mixedShaderStream.is_open()) {
             AE_CORE_CRITICAL("Cannot compile as {0} is not open.",
                              mixedShaderStream.getFilePath());
             return;
         }
 
+        if (!Utils::CacheExists()) Utils::CreateCacheDirectory();
+
+        name = shaderName != "" ? shaderName : mixedShaderStream.getFileName();
+        filePath = mixedShaderStream.getFilePath();
 
         std::unordered_map<GLenum, std::string> shaderSources =
             this->preProcess(mixedShaderStream.readAll());
         mixedShaderStream.close();
 
-        name != "" ? this->name = name : this->name = mixedShaderStream.getFileName();
+        // if (auto vkBinary = Utils::CacheGet(Utils::BinaryType::Vulkan)) {
+        // }
 
-        this->rendererID = this->compile(shaderSources);
+        compileOrGetVulkanBinaries(shaderSources);
+
+
+        rendererID = this->compile(shaderSources);
     }
+
+    OpenGLShader::~OpenGLShader() { glDeleteProgram(this->rendererID); }
 
     std::unordered_map<GLenum, std::string> OpenGLShader::preProcess(
         const std::string& mixedShaderSrc) {
@@ -46,6 +140,82 @@ namespace AnEngine {
         }
 
         return shaderSources;
+    }
+
+    void OpenGLShader::compileOrGetVulkanBinaries(
+        const std::unordered_map<GLenum, std::string>& shaderSources) {
+        AE_PROFILE_FUNCTION()
+
+        GLuint program = glCreateProgram();
+
+        shaderc::Compiler compiler;
+        shaderc::CompileOptions options;
+        options.SetTargetEnvironment(shaderc_target_env_vulkan,
+                                     shaderc_env_version_vulkan_1_3);
+        // macro defs can go here
+
+        constexpr bool optimise = true;
+        if (optimise) options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+        vulkanSPRIV.clear();
+        for (auto&& [shaderType, source] : shaderSources) {
+            fs::path cachePath = Utils::GetCacheDirectory() /
+                                 (name + Utils::GLShaderVKCacheExtension(shaderType));
+
+            InputFileStream in(cachePath, std::ios::in | std::ios::binary);
+
+            // if file exists, read it in as code
+            if (in.is_open()) {
+                auto& data = vulkanSPRIV[shaderType];
+                data.resize(in.size() / sizeof(uint32_t));
+                in.read((char*)data.data(), in.size());
+            }
+            // file doesnt exist, compile shader into it
+            else {
+                shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(
+                    source.c_str(), Utils::ShaderCType(shaderType), filePath.c_str(), options);
+
+                if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
+                    AE_CORE_ERROR(module.GetErrorMessage());
+                    AE_CORE_ASSERT(false, "");
+                }
+
+                vulkanSPRIV[shaderType] =
+                    std::vector<uint32_t>(module.cbegin(), module.cend());
+
+                OutputFileStream out(cachePath, std::ios::out | std::ios::binary);
+                AE_CORE_ASSERT(out.is_open(), "Couldn't open file {}", out.getFilePath());
+
+                auto& data = vulkanSPRIV[shaderType];
+                out.writeBytes((char*)data.data(), data.size() * sizeof(uint32_t));
+                out.close();
+            }
+        }
+
+        for (auto&& [shaderType, data] : vulkanSPRIV) reflect(shaderType, data);
+    }
+
+    void OpenGLShader::reflect(GLenum shaderType, const std::vector<uint32_t>& spirvCode) {
+        spirv_cross::Compiler compiler(spirvCode);
+        spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+
+        AE_CORE_TRACE("OpenGLShader::reflect - {0} {1}", Utils::GLStringType(shaderType),
+                      filePath);
+        AE_CORE_TRACE("    {0} uniform buffer(s)", resources.uniform_buffers.size());
+        AE_CORE_TRACE("    {0} resource(s)", resources.sampled_images.size());
+
+        AE_CORE_TRACE("Uniform buffers:");
+        for (const auto& res : resources.uniform_buffers) {
+            const auto& bufferType = compiler.get_type(res.base_type_id);
+            uint32_t bufferSize = compiler.get_declared_struct_size(bufferType);
+            uint32_t binding = compiler.get_decoration(res.id, spv::DecorationBinding);
+            uint32_t memberCount = bufferType.member_types.size();
+
+            AE_CORE_TRACE("  {0}", res.name);
+            AE_CORE_TRACE("    Size = {0}", bufferSize);
+            AE_CORE_TRACE("    Binding = {0}", binding);
+            AE_CORE_TRACE("    Members = {0}", memberCount);
+        }
     }
 
     uint32_t OpenGLShader::compile(
@@ -112,8 +282,6 @@ namespace AnEngine {
 
         return program;
     }
-
-    OpenGLShader::~OpenGLShader() { glDeleteProgram(this->rendererID); }
 
     void OpenGLShader::bind() const {
         AE_PROFILE_FUNCTION()
@@ -238,8 +406,7 @@ namespace AnEngine {
             uint32_t slot = std::any_cast<Sampler2D>(uniform).slot;
             glUniform1i(location, slot);
         } else if (uniform.type() == typeid(std::array<Sampler2D, maxTextureSlots>)) {
-            auto samplerArray =
-                std::any_cast<std::array<Sampler2D, maxTextureSlots>>(uniform);
+            auto samplerArray = std::any_cast<std::array<Sampler2D, maxTextureSlots>>(uniform);
             int32_t data[maxTextureSlots];
 
             for (uint32_t i = 0; i < maxTextureSlots; i++) {
@@ -294,8 +461,7 @@ namespace AnEngine {
                         shaderType = GL_COMPUTE_SHADER;
                         break;
                     default:
-                        AE_CORE_ASSERT(false, "Unknown shader type: \"{0}\"",
-                                       shaderTypeStr);
+                        AE_CORE_ASSERT(false, "Unknown shader type: \"{0}\"", shaderTypeStr);
                         break;
                 }
 

@@ -72,9 +72,7 @@ namespace AnEngine::Crank {
 
         activeScene = MakeRef<Scene>("Test Scene");
 
-        CameraSpec camSpec{ProjectionType::Perspective, 30.0f, 16.0f / 9.0f, 0.1f,
-
-                           1000.0f};
+        CameraSpec camSpec{ProjectionType::Perspective, 30.0f, 1.778f, 0.1f, 1000.0f};
         editorCam = MakeRef<EditorCamera>(camSpec);
 
         dockSpace = MakeRef<DockSpace>();
@@ -94,6 +92,17 @@ namespace AnEngine::Crank {
         dockSpace->addPanel(statistics);
 
         dockSpace->addMenubarMenu(fileMenu);
+
+        CommandLine cmdLine = Application::getCommandLine();
+        if (cmdLine.hasArgs()) {
+            std::string sceneFilePath = cmdLine.args[0];
+            SceneSerialiser serialiser(activeScene);
+            try {
+                serialiser.deserialise(sceneFilePath);
+            } catch (std::runtime_error& e) {
+                AE_CORE_ERROR("Failed to load scene file: {0}", e.what());
+            }
+        }
     }
 
     void CrankEditor::onDetach() {}

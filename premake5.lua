@@ -1,3 +1,5 @@
+include "Dependencies.lua"
+
 workspace "AnEngine"
     architecture "x86_64"
     configurations { "Debug", "Release", "Dist" }
@@ -6,17 +8,6 @@ workspace "AnEngine"
     debugdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Crank"
 
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
-includeDir = {}
-includeDir['GLFW'] = "%{wks.location}/AnEngine/vendor/GLFW/include"
-includeDir['Glad'] = "%{wks.location}/AnEngine/vendor/Glad/include"
-includeDir['ImGui'] = "%{wks.location}/AnEngine/vendor/ImGui/"
-includeDir['glm'] = "%{wks.location}/AnEngine/vendor/glm/"
-includeDir['fmt'] = "%{wks.location}/AnEngine/vendor/fmt/include/"
-includeDir['stb'] = "%{wks.location}/AnEngine/vendor/stb/"
-includeDir['entt'] = "%{wks.location}/AnEngine/vendor/ENTT/single_include/"
-includeDir['yaml_cpp'] = "%{wks.location}/AnEngine/vendor/yaml-cpp/include/"
-includeDir['ImGuizmo'] = "%{wks.location}/AnEngine/vendor/ImGuizmo-CE/"
 
 group "Dependencies"
     include "AnEngine/vendor/GLFW"
@@ -30,7 +21,7 @@ group ""
 project "AnEngine"
     location "AnEngine"
     kind "StaticLib"
-    staticruntime "on"
+    staticruntime "off"
     language "C++"
     cppdialect "C++20"
     
@@ -71,7 +62,8 @@ project "AnEngine"
         "%{includeDir.stb}",
         "%{includeDir.entt}",
         "%{includeDir.yaml_cpp}",
-        "%{includeDir.ImGuizmo}"
+        "%{includeDir.ImGuizmo}",
+        "%{includeDir.vulkanSDK}"
     }
 
     externalincludedirs {
@@ -167,22 +159,41 @@ project "AnEngine"
         runtime "Debug"
         symbols "on"
 
+        links {
+			"%{Library.ShaderC_Dbg}",
+			"%{Library.SPIRV_Cross_Dbg}",
+			"%{Library.SPIRV_Cross_GLSL_Dbg}"
+        }
+
     filter "configurations:Release"
         defines { "AE_RELEASE" }
         flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
 
+        links {
+            "%{Library.ShaderC_Rel}",
+            "%{Library.SPIRV_Cross_Rel}",
+            "%{Library.SPIRV_Cross_GLSL_Rel}"
+        }
+
     filter "configurations:Dist"
         defines { "AE_DIST" }
         flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
+        
+        links {
+            "%{Library.ShaderC_Rel}",
+            "%{Library.SPIRV_Cross_Rel}",
+            "%{Library.SPIRV_Cross_GLSL_Rel}"
+        }
+
 
 project "Crank"
     location "Crank"
     kind "ConsoleApp"
-    staticruntime "on"
+    staticruntime "off"
     language "C++"
     cppdialect "C++20"
 

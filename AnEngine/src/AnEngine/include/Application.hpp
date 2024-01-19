@@ -10,11 +10,30 @@
 
 
 namespace AnEngine {
+    struct CommandLine {
+        std::string exeName;
+        std::vector<std::string> args;
+
+        CommandLine() = default;
+        CommandLine(int argc, char** argv) { reinit(argc, argv); }
+
+        void reinit(int argc, char** argv) {
+            exeName = argv[0];
+            args.clear();
+            for (int i = 1; i < argc; i++) {
+                args.emplace_back(argv[i]);
+            }
+        }
+
+        bool hasArgs() { return args.size() > 0; }
+    };
+
     class Application {
     public:
         struct Data {
             bool initialized = false;
 
+            CommandLine commandLine;
             Scope<Window> window;
             Ref<ImGuiLayer> imGuiLayer;
             bool minimized = false;
@@ -37,6 +56,8 @@ namespace AnEngine {
 
         static Window& getWindow() { return *applicationData.window; }
         static Ref<ImGuiLayer> getImGuiLayer() { return applicationData.imGuiLayer; }
+
+        static CommandLine getCommandLine() { return applicationData.commandLine; }
 
 
         /*
