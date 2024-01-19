@@ -9,8 +9,9 @@ namespace AnEngine::Crank {
     void StatisticsPanel::render() {
         ImGui::Text("Editor Stats:");
         ImGui::Text("Hovered Entity: %s",
-                    hoveredEntity ? hoveredEntity.getComponent<TagComponent>().Tag.c_str()
-                                  : "None");
+                    hoveredEntity.hasComponent<TagComponent>()
+                        ? hoveredEntity.getComponent<TagComponent>().Tag.c_str()
+                        : "None");
 
         ImGui::Separator();
 

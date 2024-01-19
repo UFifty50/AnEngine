@@ -16,6 +16,7 @@
 #include "Core/Random.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Menus/Filemenu.hpp"
+#include "Panels/ContentBrowserPanel.hpp"
 #include "Panels/PropertiesPanel.hpp"
 #include "Panels/ScenesPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
@@ -81,6 +82,7 @@ namespace AnEngine::Crank {
         properties = MakeRef<PropertiesPanel>("Properties", sceneHierarchy);
         viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam, dockSpace,
                                           sceneHierarchy);
+        contentBrowser = MakeRef<ContentBrowserPanel>("Content Browser");
         statistics = MakeRef<StatisticsPanel>("Statistics");
 
         fileMenu = MakeRef<FileMenu>("File", sceneHierarchy, activeScene, dockSpace);
@@ -89,6 +91,7 @@ namespace AnEngine::Crank {
         dockSpace->addPanel(sceneHierarchy);
         dockSpace->addPanel(properties);
         dockSpace->addPanel(viewport);
+        dockSpace->addPanel(contentBrowser);
         dockSpace->addPanel(statistics);
 
         dockSpace->addMenubarMenu(fileMenu);

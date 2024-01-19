@@ -9,6 +9,7 @@
 #include "Events/Event.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Menus/Filemenu.hpp"
+#include "Panels/ContentBrowserPanel.hpp"
 #include "Panels/Panel.hpp"
 #include "Panels/PropertiesPanel.hpp"
 #include "Panels/ScenesPanel.hpp"
@@ -49,6 +50,7 @@ namespace AnEngine::Crank {
         Ref<ScenesPanel> sceneHierarchy;
         Ref<PropertiesPanel> properties;
         Ref<ViewportPanel> viewport;
+        Ref<ContentBrowserPanel> contentBrowser;
         Ref<StatisticsPanel> statistics;
 
         Ref<FileMenu> fileMenu;

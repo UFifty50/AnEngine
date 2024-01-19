@@ -33,7 +33,6 @@ namespace AnEngine {
         bool allowEvents = false;
         bool newConfigQueued = false;
         std::string configPath;
-        float prevTime = 0.0f;
     };
 }  // namespace AnEngine
 

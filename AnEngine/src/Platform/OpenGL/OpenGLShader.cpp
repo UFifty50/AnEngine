@@ -115,6 +115,7 @@ namespace AnEngine {
             Timer timer;
             compileOrGetVulkanBinaries(shaderSources);
             compileOrGetOpenGLBinaries();
+            for (auto&& [shaderType, data] : vulkanSPRIV) reflect(shaderType, data);
             rendererID = createProgram();
             AE_CORE_WARN("Shader compilation took {0}ms", timer.elapsedMs());
         }
@@ -186,8 +187,6 @@ namespace AnEngine {
                 out.close();
             }
         }
-
-        for (auto&& [shaderType, data] : vulkanSPRIV) reflect(shaderType, data);
     }
 
     void OpenGLShader::compileOrGetOpenGLBinaries() {

@@ -18,6 +18,7 @@ namespace AnEngine {
 
         template <typename T>
         bool hasComponent() {
+            if (scene == nullptr || entityHandle == entt::null) return false;
             return scene->entityRegistry.any_of<T>(entityHandle);
         }
 
