@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_cross.hpp>
+#include <spirv_cross/spirv_glsl.hpp>
 
 #include "OpenGLShader.hpp"
 
@@ -11,7 +12,9 @@
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
+#include <ranges>
 
+#include "Core/Timer.hpp"
 #include "File/InputFileStream.hpp"
 #include "File/OutputFileStream.hpp"
 #include "Renderer/Renderer2D.hpp"
@@ -22,19 +25,11 @@ namespace fs = std::filesystem;
 
 namespace AnEngine {
     namespace Utils {
-        // using BinarySet = std::unordered_map<GLenum, Binary>;
-
-        // enum class BinaryType : uint8_t { Vulkan, OpenGL };
-
-        static fs::path GetCacheDirectory() { return "assets/cache/shader/opengl"; }
+        static fs::path GetCacheDirectory() { return "builtins/cache/shader/opengl"; }
 
         static bool CacheExists() { return fs::exists(GetCacheDirectory()); }
 
         static void CreateCacheDirectory() { fs::create_directories(GetCacheDirectory()); }
-
-        // static std::optional<BinarySet> CacheGet(BinaryType type) {
-        //     ig
-        // }
 
         static shaderc_shader_kind ShaderCType(GLenum type) {
             switch (type) {
@@ -116,13 +111,13 @@ namespace AnEngine {
             this->preProcess(mixedShaderStream.readAll());
         mixedShaderStream.close();
 
-        // if (auto vkBinary = Utils::CacheGet(Utils::BinaryType::Vulkan)) {
-        // }
-
-        compileOrGetVulkanBinaries(shaderSources);
-
-
-        rendererID = this->compile(shaderSources);
+        {
+            Timer timer;
+            compileOrGetVulkanBinaries(shaderSources);
+            compileOrGetOpenGLBinaries();
+            rendererID = createProgram();
+            AE_CORE_WARN("Shader compilation took {0}ms", timer.elapsedMs());
+        }
     }
 
     OpenGLShader::~OpenGLShader() { glDeleteProgram(this->rendererID); }
@@ -195,6 +190,97 @@ namespace AnEngine {
         for (auto&& [shaderType, data] : vulkanSPRIV) reflect(shaderType, data);
     }
 
+    void OpenGLShader::compileOrGetOpenGLBinaries() {
+        AE_PROFILE_FUNCTION()
+
+        shaderc::Compiler compiler;
+        shaderc::CompileOptions options;
+        options.SetTargetEnvironment(shaderc_target_env_opengl,
+                                     shaderc_env_version_opengl_4_5);
+        // macro defs can go here
+
+        constexpr bool optimise = true;
+        if (optimise) options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+        openglSPRIV.clear();
+        openglSource.clear();
+        for (auto&& [shaderType, spirvCode] : vulkanSPRIV) {
+            fs::path cachePath = Utils::GetCacheDirectory() /
+                                 (name + Utils::GLShaderGLCacheExtension(shaderType));
+
+            InputFileStream in(cachePath, std::ios::in | std::ios::binary);
+            // if file exists, read it in as code
+            if (in.is_open()) {
+                auto& data = openglSPRIV[shaderType];
+                data.resize(in.size() / sizeof(uint32_t));
+                in.read((char*)data.data(), in.size());
+            }
+            // file doesnt exist, compile shader into it
+            else {
+                spirv_cross::CompilerGLSL glslCompiler(spirvCode);
+                openglSource[shaderType] = glslCompiler.compile();
+                auto& source = openglSource[shaderType];
+
+                shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(
+                    source.c_str(), Utils::ShaderCType(shaderType), filePath.c_str(), options);
+
+                if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
+                    AE_CORE_ERROR(module.GetErrorMessage());
+                    AE_CORE_ASSERT(false, "");
+                }
+
+                openglSPRIV[shaderType] =
+                    std::vector<uint32_t>(module.cbegin(), module.cend());
+
+                OutputFileStream out(cachePath, std::ios::out | std::ios::binary);
+                AE_CORE_ASSERT(out.is_open(), "Couldn't open file {}", out.getFilePath());
+
+                auto& data = openglSPRIV[shaderType];
+                out.writeBytes((char*)data.data(), data.size() * sizeof(uint32_t));
+                out.close();
+            }
+        }
+    }
+
+    GLuint OpenGLShader::createProgram() {
+        GLuint program = glCreateProgram();
+
+        std::vector<GLuint> shaderIDs;
+        for (auto&& [shaderType, spirvCode] : openglSPRIV) {
+            GLuint shaderID = shaderIDs.emplace_back(glCreateShader(shaderType));
+            glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirvCode.data(),
+                           spirvCode.size() * sizeof(uint32_t));
+            glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
+            glAttachShader(program, shaderID);
+        }
+
+        glLinkProgram(program);
+
+        GLint isLinked;
+        glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+        if (isLinked == GL_FALSE) {
+            GLint len;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+
+            std::vector<GLchar> infoLog(len);
+            glGetProgramInfoLog(program, len, &len, infoLog.data());
+            AE_CORE_ERROR("Shader linking failed ({0}):\n{1}", filePath, infoLog.data());
+
+            glDeleteProgram(program);
+
+            for (auto id : shaderIDs) glDeleteShader(id);
+        }
+
+        for (auto id : shaderIDs) {
+            glDetachShader(program, id);
+            glDeleteShader(id);
+        }
+
+        AE_CORE_DEBUG("Shader {0} compiled successfully.", name);
+
+        return program;
+    }
+
     void OpenGLShader::reflect(GLenum shaderType, const std::vector<uint32_t>& spirvCode) {
         spirv_cross::Compiler compiler(spirvCode);
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
@@ -204,7 +290,8 @@ namespace AnEngine {
         AE_CORE_TRACE("    {0} uniform buffer(s)", resources.uniform_buffers.size());
         AE_CORE_TRACE("    {0} resource(s)", resources.sampled_images.size());
 
-        AE_CORE_TRACE("Uniform buffers:");
+        if (resources.uniform_buffers.size() > 0) AE_CORE_TRACE("Uniform buffers:");
+
         for (const auto& res : resources.uniform_buffers) {
             const auto& bufferType = compiler.get_type(res.base_type_id);
             uint32_t bufferSize = compiler.get_declared_struct_size(bufferType);
@@ -218,91 +305,21 @@ namespace AnEngine {
         }
     }
 
-    uint32_t OpenGLShader::compile(
-        const std::unordered_map<uint32_t, std::string>& shaderSources) const {
-        AE_PROFILE_FUNCTION()
+    void OpenGLShader::bind() const { glUseProgram(rendererID); }
 
-        std::vector<GLuint> shaderIDs;
-        shaderIDs.resize(shaderSources.size());
-
-        GLuint program = glCreateProgram();
-
-        AE_CORE_DEBUG("Compiling shader {0}", program);
-
-        for (auto& [shaderType, shaderSrc] : shaderSources) {
-            GLuint shader = glCreateShader(shaderType);
-
-            const GLchar* source = shaderSrc.c_str();
-            glShaderSource(shader, 1, &source, 0);
-            glCompileShader(shader);
-
-            GLint compileResult;
-            glGetShaderiv(shader, GL_COMPILE_STATUS, &compileResult);
-            if (compileResult == GL_FALSE) {
-                GLint InfoLogLength = 0;
-                glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &InfoLogLength);
-                std::vector<GLchar> infoLog(InfoLogLength);
-                glGetShaderInfoLog(shader, InfoLogLength, &InfoLogLength, &infoLog[0]);
-                AE_CORE_CRITICAL("Shader compilation failed: {0}", infoLog.data());
-                glDeleteShader(shader);
-                return -1;
-            }
-
-            glAttachShader(program, shader);
-            shaderIDs.push_back(shader);
-        }
-
-        glLinkProgram(program);
-
-        GLint linkResult = 0;
-        glGetProgramiv(program, GL_LINK_STATUS, (int*)&linkResult);
-        if (linkResult == GL_FALSE) {
-            GLint InfoLogLength = 0;
-            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &InfoLogLength);
-            std::vector<GLchar> infoLog(InfoLogLength);
-            glGetProgramInfoLog(program, InfoLogLength, &InfoLogLength,
-                                &infoLog.front());  // .front called on empty vector
-
-            glDeleteProgram(program);
-            for (auto& shader : shaderIDs) {
-                glDeleteShader(shader);
-            }
-
-            AE_CORE_CRITICAL("Shader linking failed: {0}", infoLog.data());
-            return -1;
-        }
-
-
-        for (auto& shader : shaderIDs) {
-            glDetachShader(program, shader);
-            glDeleteShader(shader);
-        }
-
-        AE_CORE_DEBUG("Shader {0} compiled", program);
-
-        return program;
-    }
-
-    void OpenGLShader::bind() const {
-        AE_PROFILE_FUNCTION()
-        glUseProgram(this->rendererID);
-    }
-
-    void OpenGLShader::unbind() const {
-        AE_PROFILE_FUNCTION()
-        glUseProgram(0);
-    }
+    void OpenGLShader::unbind() const { glUseProgram(0); }
 
     void OpenGLShader::uploadUniform(const std::string& name, std::any uniform) {
         AE_PROFILE_FUNCTION()
 
         const uint32_t maxTextureSlots = Renderer2D::rendererData.maxTextureSlots;
 
-        GLint location = glGetUniformLocation(this->rendererID, name.c_str());
+        GLint location = glGetUniformLocation(rendererID, name.c_str());
         if (location == -1) {
             AE_CORE_ERROR("Uniform {0} doesn't exist.", name);
             return;
         }
+
         // integral types
         if (uniform.type() == typeid(int32_t)) {
             glUniform1i(location, std::any_cast<int32_t>(uniform));
@@ -423,7 +440,7 @@ namespace AnEngine {
 
 
     ShaderParser::ShaderParser(const std::string& mixedShaderSrc)
-        : mixedShaderSrc(mixedShaderSrc) {}
+        : mixedShaderSrc(mixedShaderSrc), shaderType(GL_FALSE) {}
 
     void ShaderParser::parse() {
         std::string line;

@@ -126,7 +126,7 @@ namespace AnEngine {
 
     int Application::AEmain(int argc, char** argv) {
         Log::init();
-        applicationData.commandLine.reinit(argc, argv);
+        applicationData.commandLine = CommandLine(argc, argv);
 
         AE_PROFILE_BEGIN_SESSION("Startup", "AnEngineProfile-Startup.json");
         auto app = CreateApplication();

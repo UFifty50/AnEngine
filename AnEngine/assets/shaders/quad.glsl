@@ -1,5 +1,5 @@
 #type vertex
-#version 460 core
+#version 450 core
 
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec4 ColourIn;
@@ -40,7 +40,7 @@ void main() {
 
 
 #type pixel
-#version 460 core
+#version 450 core
 
 layout(location = 0) out vec4 colour;
 layout(location = 1) out int colour2;

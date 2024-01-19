@@ -116,6 +116,8 @@ namespace AnEngine {
     void Scene::onComponentAdded(Entity e, Component& component) {
         switch (component.getID()) {
             case CAMERA_COMPONENT_ID: {
+                if (viewportWidth <= 0 || viewportHeight <= 0) return;
+
                 auto& cameraComponent = (CameraComponent&)component;
                 cameraComponent.Camera.setViewportSize(viewportWidth, viewportHeight);
                 break;

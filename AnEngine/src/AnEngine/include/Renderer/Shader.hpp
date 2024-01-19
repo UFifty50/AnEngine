@@ -26,10 +26,6 @@ namespace AnEngine {
         virtual void uploadUniform(const std::string& name, std::any uniform) = 0;
 
         virtual const std::string& getName() const = 0;
-
-    protected:
-        virtual uint32_t compile(
-            const std::unordered_map<uint32_t, std::string>& shaderSources) const = 0;
     };
 
     class ShaderLibrary {

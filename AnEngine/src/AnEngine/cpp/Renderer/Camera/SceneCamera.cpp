@@ -5,6 +5,7 @@
 
 #include "Renderer/Camera/SceneCamera.hpp"
 
+#include "Core/Core.hpp"
 #include "Core/Log.hpp"
 
 
@@ -32,8 +33,9 @@ namespace AnEngine {
     }
 
     void SceneCamera::setViewportSize(uint32_t width, uint32_t height) {
-        aspectRatio = (float)width / (float)height;
+        AE_CORE_ASSERT(width > 0 && height > 0, "Invalid viewport width or height!");
 
+        aspectRatio = (float)width / (float)height;
         recalculateProjection();
     }
 
@@ -44,11 +46,10 @@ namespace AnEngine {
             float top = orthoSettings.size * 0.5f;
             float bottom = -top;
             orthoSettings.bounds = {left, right, bottom, top};
-            projectionMatrix = glm::ortho(left, right, bottom, top, orthoSettings.near,
-                                          orthoSettings.far);
+            projectionMatrix =
+                glm::ortho(left, right, bottom, top, orthoSettings.near, orthoSettings.far);
         } else {
-            float top =
-                glm::tan(perspectiveSettings.FOV * 0.5f) * perspectiveSettings.near;
+            float top = glm::tan(perspectiveSettings.FOV * 0.5f) * perspectiveSettings.near;
             float bottom = -top;
             float right = top * aspectRatio;
             float left = -right;

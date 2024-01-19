@@ -6,6 +6,7 @@
 #include <memory>
 #include <type_traits>
 
+#include "Renderer/Buffers/UniformBuffer.hpp"
 #include "Renderer/Buffers/VertexBuffer.hpp"
 #include "Renderer/Camera/Camera.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
@@ -53,6 +54,12 @@ namespace AnEngine {
             glm::vec4 quadVertexPositions[4];
 
             bool activeScene = false;
+
+            struct CameraData {
+                glm::mat4 viewProjection;
+            };
+            CameraData cameraBuffer;
+            Ref<UniformBuffer> cameraUniformBuffer;
         };
 
         struct Statistics {
@@ -92,16 +99,15 @@ namespace AnEngine {
 
 
         /*static void drawQuad(const glm::vec2& position, const glm::vec2& size, float
-        rotation, const glm::vec4& colour, const ShaderUniformVector& attributes = {}); static
-        void drawQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const
-        glm::vec4& colour, const ShaderUniformVector& attributes = {});
+        rotation, const glm::vec4& colour, const ShaderUniformVector& attributes = {});
+        static void drawQuad(const glm::vec3& position, const glm::vec2& size, float
+        rotation, const glm::vec4& colour, const ShaderUniformVector& attributes = {});
 
-        static void drawQuad(const glm::vec2& position, const glm::vec2& size, float rotation,
-                             const Ref<Texture2D>& texture,
-                             const ShaderUniformVector& attributes = {});
-        static void drawQuad(const glm::vec3& position, const glm::vec2& size, float rotation,
-                             const Ref<Texture2D>& texture,
-                             const ShaderUniformVector& attributes = {});*/
+        static void drawQuad(const glm::vec2& position, const glm::vec2& size, float
+        rotation, const Ref<Texture2D>& texture, const ShaderUniformVector& attributes =
+        {}); static void drawQuad(const glm::vec3& position, const glm::vec2& size, float
+        rotation, const Ref<Texture2D>& texture, const ShaderUniformVector& attributes =
+        {});*/
 
         // Stats
         static Statistics& getStats() { return rendererStats; }

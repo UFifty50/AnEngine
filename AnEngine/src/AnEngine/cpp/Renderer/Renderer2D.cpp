@@ -87,6 +87,9 @@ namespace AnEngine {
         rendererData.quadVertexPositions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
         rendererData.quadVertexPositions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
         rendererData.quadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
+
+        rendererData.cameraUniformBuffer =
+            UniformBuffer::Create(sizeof(Renderer2D::Storage::CameraData), 0);
     }
 
     void Renderer2D::beginScene(const EditorCamera& editorCamera) {
@@ -97,12 +100,9 @@ namespace AnEngine {
             return;
         }
 
-        glm::mat4 viewProjection = editorCamera.getViewProjectionMatrix();
-
-        Ref<Shader> quadShader = rendererData.shaderLibrary.get("QuadShader");
-
-        quadShader->bind();
-        quadShader->uploadUniform("viewProjectionMatrix", viewProjection);
+        rendererData.cameraBuffer.viewProjection = editorCamera.getViewProjectionMatrix();
+        rendererData.cameraUniformBuffer->setData(&rendererData.cameraBuffer,
+                                                  sizeof(Renderer2D::Storage::CameraData));
 
         rendererData.quadIndexCount = 0;
         rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
@@ -123,12 +123,10 @@ namespace AnEngine {
         //  AE_CORE_ASSERT(camera.getType() == ProjectionType::Orthographic,
         //                  "Renderer2D only supports Orthographic Cameras!");
 
-        glm::mat4 viewProjection = camera.getProjectionMatrix() * glm::inverse(transform);
-
-        Ref<Shader> quadShader = rendererData.shaderLibrary.get("QuadShader");
-
-        quadShader->bind();
-        quadShader->uploadUniform("viewProjectionMatrix", viewProjection);
+        rendererData.cameraBuffer.viewProjection =
+            camera.getProjectionMatrix() * glm::inverse(transform);
+        rendererData.cameraUniformBuffer->setData(&rendererData.cameraBuffer,
+                                                  sizeof(Renderer2D::Storage::CameraData));
 
         rendererData.quadIndexCount = 0;
         rendererData.quadVertexBufferPtr = rendererData.quadVertexBufferBase;
@@ -178,6 +176,7 @@ namespace AnEngine {
             rendererData.textureSlots[i]->bind(i);
         }
 
+        rendererData.shaderLibrary.get("QuadShader")->bind();
         RenderCommandQueue::drawIndexed(rendererData.quadVA, rendererData.quadIndexCount);
         rendererStats.draws++;
     }
