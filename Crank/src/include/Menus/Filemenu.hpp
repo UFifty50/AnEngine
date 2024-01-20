@@ -1,6 +1,7 @@
 #ifndef FILEMENU_HPP
 #define FILEMENU_HPP
 
+#include <filesystem>
 #include <string>
 
 #include "Core/Core.hpp"
@@ -9,6 +10,8 @@
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Scene.hpp"
 
+
+namespace fs = std::filesystem;
 
 namespace AnEngine::Crank {
     class FileMenu : public Menu {
@@ -22,14 +25,16 @@ namespace AnEngine::Crank {
         virtual void renderMenu() override;
         virtual void renderMenuPopups() override {}
 
-        virtual std::string getMenuName() { return name; }
+        virtual std::string getMenuName() override { return name; }
 
 
         static void NewScene(Ref<ScenesPanel>& spRef, Ref<Scene>& sceneRef,
                              const Ref<DockSpace>& dsRef);
 
-        static void OpenScene(Ref<ScenesPanel>& spRef, Ref<Scene>& sceneRef,
+        static bool OpenScene(Ref<ScenesPanel>& spRef, Ref<Scene>& sceneRef,
                               const Ref<DockSpace>& dsRef);
+
+        static bool OpenScene(const fs::path& path, Ref<Scene>& scene);
 
         static void SaveScene(Ref<Scene>& sceneRef);
 

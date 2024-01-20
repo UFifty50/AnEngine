@@ -16,9 +16,10 @@
 
 #define TRANSFORM_COMPONENT_ID 0
 #define SPRITERENDERER_COMPONENT_ID 1
-#define TAG_COMPONENT_ID 2
-#define CAMERA_COMPONENT_ID 3
-#define NATIVESCRIPT_COMPONENT_ID 4
+#define MATERIAL_COMPONENT_ID 2
+#define TAG_COMPONENT_ID 3
+#define CAMERA_COMPONENT_ID 4
+#define NATIVESCRIPT_COMPONENT_ID 5
 
 namespace AnEngine {
     struct Component {
@@ -52,9 +53,14 @@ namespace AnEngine {
         SpriteRendererComponent(const SpriteRendererComponent&) = default;
         SpriteRendererComponent(const glm::vec4& colour) : Colour(colour) {}
 
-        constexpr virtual uint32_t getID() override {
-            return SPRITERENDERER_COMPONENT_ID;
-        }
+        constexpr virtual uint32_t getID() override { return SPRITERENDERER_COMPONENT_ID; }
+    };
+
+    struct MaterialComponent : Component {
+        MaterialComponent() = default;
+        MaterialComponent(const MaterialComponent&) = default;
+
+        constexpr virtual uint32_t getID() override { return MATERIAL_COMPONENT_ID; }
     };
 
     struct TagComponent : Component {

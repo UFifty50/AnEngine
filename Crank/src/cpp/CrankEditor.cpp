@@ -81,7 +81,7 @@ namespace AnEngine::Crank {
         sceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene", activeScene);
         properties = MakeRef<PropertiesPanel>("Properties", sceneHierarchy);
         viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam, dockSpace,
-                                          sceneHierarchy);
+                                          sceneHierarchy, activeScene);
         contentBrowser = MakeRef<ContentBrowserPanel>("Content Browser");
         statistics = MakeRef<StatisticsPanel>("Statistics");
 

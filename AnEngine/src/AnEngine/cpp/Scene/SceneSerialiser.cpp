@@ -54,7 +54,12 @@ namespace AnEngine {
 
     bool SceneSerialiser::deserialise(const std::string& path) {
         YAML::Node data = YAML::LoadFile(path);
-        if (!data["Scene"]) return false;
+        try {
+            if (!data["Scene"]) return false;
+        } catch (std::exception e) {
+            AE_CORE_ERROR("SceneSerialiser::deserialise: {0}", e.what());
+            return false;
+        }
 
         std::string sceneName = data["Scene"].as<std::string>();
         AE_CORE_TRACE("Deserialising scene '{0}'", sceneName);
@@ -70,8 +75,8 @@ namespace AnEngine {
             auto tagComponent = entity["TagComponent"];
 
             if (!tagComponent) {
-                AE_CORE_WARN(
-                    "Entity with ID = {0} is invalid (no tag component), skipping", uuid);
+                AE_CORE_WARN("Entity with ID = {0} is invalid (no tag component), skipping",
+                             uuid);
                 continue;
             }
 
@@ -126,10 +131,8 @@ namespace AnEngine {
             if (auto nativeScriptComponent = entity["NativeScriptComponent"]) {
                 class temp : public ScriptableEntity {};
 
-                std::string scriptName =
-                    nativeScriptComponent["ScriptName"].as<std::string>();
-                auto& nSC =
-                    deserialisedEntity.addComponent<NativeScriptComponent>(scriptName);
+                std::string scriptName = nativeScriptComponent["ScriptName"].as<std::string>();
+                auto& nSC = deserialisedEntity.addComponent<NativeScriptComponent>(scriptName);
                 nSC.bind<temp>();
             }
 
@@ -202,8 +205,7 @@ namespace AnEngine {
                 outYAML << YAML::Value << cc.Camera.perspectiveSettings.far;
             } else {
                 outYAML << YAML::Key << "ProjectionType" << YAML::Value << "Orthographic";
-                outYAML << YAML::Key << "Size" << YAML::Value
-                        << cc.Camera.orthoSettings.size;
+                outYAML << YAML::Key << "Size" << YAML::Value << cc.Camera.orthoSettings.size;
                 outYAML << YAML::Key << "NearPlane";
                 outYAML << YAML::Value << cc.Camera.orthoSettings.near;
                 outYAML << YAML::Key << "FarPlane";

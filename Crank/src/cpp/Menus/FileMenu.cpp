@@ -45,7 +45,12 @@ namespace AnEngine::Crank {
         spRef->setCurrentScene(sceneRef);
     }
 
-    void FileMenu::OpenScene(Ref<ScenesPanel>& spRef, Ref<Scene>& sceneRef,
+    bool FileMenu::OpenScene(const fs::path& path, Ref<Scene>& scene) {
+        SceneSerialiser serialiser(scene);
+        return serialiser.deserialise(path.string());
+    }
+
+    bool FileMenu::OpenScene(Ref<ScenesPanel>& spRef, Ref<Scene>& sceneRef,
                              const Ref<DockSpace>& dsRef) {
         if (auto path = Dialogues::OpenFileDialogue(
                 "CrankEngine Scene (*.aescene)\0*.aescene\0")) {
@@ -53,12 +58,17 @@ namespace AnEngine::Crank {
             spRef->setCurrentScene(sceneRef);
 
             SceneSerialiser serialiser(sceneRef);
-            serialiser.deserialise(*path);
+            if (!serialiser.deserialise(*path)) return false;
 
             sceneRef->onResize((uint32_t)dsRef->getViewportSize().x,
                                (uint32_t)dsRef->getViewportSize().y);
+
+            return true;
         }
+
+        return false;
     }
+
     void FileMenu::SaveScene(Ref<Scene>& sceneRef) {
         if (auto path = Dialogues::SaveFileDialogue(
                 "CrankEngine Scene (*.aescene)\0 *.aescene\0")) {

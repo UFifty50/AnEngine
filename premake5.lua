@@ -229,7 +229,8 @@ project "Crank"
     postbuildcommands {
             "{MKDIR} ../bin/" .. outputDir .. "/Crank/builtins",
             "{COPYDIR} ../Crank/assets ../bin/" .. outputDir .. "/Crank/assets",
-            "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Crank/builtins/assets"
+            "{COPYDIR} ../AnEngine/assets/ ../bin/" .. outputDir .. "/Crank/builtins/assets",
+            "{COPYDIR} ../Crank/resources ../bin/" .. outputDir .. "/Crank/builtins"
     }
 
     filter "system:Linux"

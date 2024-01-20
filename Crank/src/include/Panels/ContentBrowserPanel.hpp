@@ -6,21 +6,25 @@
 #include <filesystem>
 
 #include "Panels/Panel.hpp"
+#include "Texture/Texture2D.hpp"
 
 
 namespace fs = std::filesystem;
 
 namespace AnEngine::Crank {
-    static const fs::path baseAssetsDirectory = "assets";  // TODO: add projects
-
     class ContentBrowserPanel : public Panel {
     public:
-        ContentBrowserPanel(std::string name)
-            : name(name), currentPath(baseAssetsDirectory) {}
+        ContentBrowserPanel(std::string name);
 
-        virtual ImGuiWindowFlags beforeRender() override { return 0; }
+        virtual ImGuiWindowFlags beforeRender() override {
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+
+            return ImGuiWindowFlags_MenuBar;
+        }
+
         virtual void render() override;
-        virtual void afterRender() override {}
+
+        virtual void afterRender() override { ImGui::PopStyleVar(); }
 
         virtual void onClose() override {}
 
@@ -29,6 +33,12 @@ namespace AnEngine::Crank {
     private:
         std::string name;
         fs::path currentPath;
+
+        Ref<Texture2D> directoryIcon;
+        Ref<Texture2D> fileIcon;
+
+        float thumbSize = 120.0f;
+        float paddingWidth = 5.0f;
     };
 }  // namespace AnEngine::Crank
 

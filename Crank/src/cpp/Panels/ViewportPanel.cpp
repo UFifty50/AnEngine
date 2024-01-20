@@ -8,6 +8,7 @@
 #include "Core/Input.hpp"
 #include "Core/KeyCodes.hpp"
 #include "Maths/Maths.hpp"
+#include "Menus/Filemenu.hpp"
 #include "Panels/Panel.hpp"
 #include "Panels/ScenesPanel.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
@@ -15,14 +16,17 @@
 
 
 namespace AnEngine::Crank {
+    extern const fs::path baseAssetsDirectory;
+
     ViewportPanel::ViewportPanel(std::string name, const Ref<FrameBuffer>& fbuf,
                                  Ref<EditorCamera>& editorCamera, Ref<DockSpace>& dspace,
-                                 Ref<ScenesPanel>& scenePanel)
+                                 Ref<ScenesPanel>& scenePanel, Ref<Scene>& activeScene)
         : name(name),
           frameBuffer(fbuf),
           editorCamera(editorCamera),
           dockSpace(dspace),
           sceneHierarchy(scenePanel),
+          activeScene(activeScene),
           gizmoType(ImGuizmo::OPERATION::TRANSLATE),
           translateSnap(0.0f),
           rotateSnap(0.0f) {}
@@ -91,6 +95,29 @@ namespace AnEngine::Crank {
 
         uint32_t texID = frameBuffer->getColorAttachmentID(fbID);
         ImGui::Image((void*)texID, dockSpace->getViewportSize(), {0, 1}, {1, 0});
+
+
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload =
+                    ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
+                const wchar_t* path = (const wchar_t*)payload->Data;
+
+                activeScene->clear();
+                sceneHierarchy->setCurrentScene(activeScene);
+
+                bool success = FileMenu::OpenScene(fs::path(baseAssetsDirectory) / path,
+                                                   activeScene);
+
+                if (!success) {
+                    AE_CORE_ERROR("Couldn't load Scene {}", (char*)path);
+                    return;
+                }
+
+
+                activeScene->onResize(dockSpace->getViewportSize().x,
+                                      dockSpace->getViewportSize().y);
+            }
+        }
 
 
         // Gizmos
