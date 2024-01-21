@@ -148,6 +148,12 @@ namespace AnEngine::Crank {
         }
 
         frameBuffer->unBind();
+
+        /// contents of activeScene
+        AE_CORE_DEBUG("Scene: {0}", activeScene->getName());
+        activeScene->entityRegistry.each([](const entt::entity entityID) -> void {
+            AE_CORE_DEBUG("Entity ID: {0}", (uint32_t)entityID);
+        });
     }
 
     void CrankEditor::onImGuiRender() { dockSpace->render(); }
@@ -173,13 +179,16 @@ namespace AnEngine::Crank {
                 break;
 
             case KeyCode::N:
-                if (ctrl && !shift)
-                    FileMenu::NewScene(sceneHierarchy, activeScene, dockSpace);
+                if (ctrl && !shift) {
+                    Ref<Scene> newScene = FileMenu::NewScene(sceneHierarchy, dockSpace);
+                    activeScene.swap(newScene);
+                }
                 break;
 
             case KeyCode::O:
                 if (ctrl && !shift)
-                    FileMenu::OpenScene(sceneHierarchy, activeScene, dockSpace);
+                    if (auto newScene = FileMenu::OpenScene(sceneHierarchy, dockSpace))
+                        activeScene.swap(*newScene);
                 break;
         }
 

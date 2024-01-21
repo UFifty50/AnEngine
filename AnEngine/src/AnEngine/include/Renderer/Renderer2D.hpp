@@ -34,7 +34,7 @@ namespace AnEngine {
         };
 
         struct Storage {
-            static const uint32_t maxQuads = 10'000;
+            static const uint32_t maxQuads = 100'000;
             static const uint32_t maxVertices = maxQuads * 4;
             static const uint32_t maxIndices = maxQuads * 6;
             static const uint32_t maxTextureSlots = 32;  // TODO: Render Capabilities

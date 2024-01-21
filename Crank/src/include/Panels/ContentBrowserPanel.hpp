@@ -39,6 +39,10 @@ namespace AnEngine::Crank {
 
         float thumbSize = 120.0f;
         float paddingWidth = 5.0f;
+
+        const char* labelFromInt(uint32_t i) {
+            return ("##" + std::to_string(i)).c_str();
+        }
     };
 }  // namespace AnEngine::Crank
 

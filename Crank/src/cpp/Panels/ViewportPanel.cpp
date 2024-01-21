@@ -102,20 +102,13 @@ namespace AnEngine::Crank {
                     ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
                 const wchar_t* path = (const wchar_t*)payload->Data;
 
-                activeScene->clear();
-                sceneHierarchy->setCurrentScene(activeScene);
-
-                bool success = FileMenu::OpenScene(fs::path(baseAssetsDirectory) / path,
-                                                   activeScene);
-
-                if (!success) {
+                if (auto newScene = FileMenu::OpenScene(
+                        fs::path(baseAssetsDirectory) / path, sceneHierarchy, dockSpace))
+                    activeScene = *newScene;
+                else {
                     AE_CORE_ERROR("Couldn't load Scene {}", (char*)path);
                     return;
                 }
-
-
-                activeScene->onResize(dockSpace->getViewportSize().x,
-                                      dockSpace->getViewportSize().y);
             }
         }
 

@@ -36,11 +36,12 @@ namespace AnEngine {
 
         std::string getName() { return name; }
 
+        entt::registry entityRegistry;
+
     private:
         void onComponentAdded(Entity e, Component& component);
 
         std::string name = "Unnamed Scene";
-        entt::registry entityRegistry;
         uint32_t viewportWidth = 0;
         uint32_t viewportHeight = 0;
 

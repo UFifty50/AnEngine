@@ -31,8 +31,10 @@ namespace AnEngine {
                                       uint32_t indexCount) {
         vertexArray->bind();
 
-        uint32_t count =
-            indexCount != 0 ? vertexArray->getIndexBuffer()->getCount() : indexCount;
-        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+        //   uint32_t count = indexCount ? indexCount :
+        //   vertexArray->getIndexBuffer()->getCount();
+        AE_CORE_WARN("idxCount: {0}, count: {1}", indexCount, count);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+        //  glBindTexture(GL_TEXTURE_2D, 0);
     }
 };  // namespace AnEngine

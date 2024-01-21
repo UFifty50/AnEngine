@@ -265,6 +265,7 @@ namespace AnEngine::Crank {
             },
             treeNodeFlags);
 
+
         drawComponent<NativeScriptComponent>(
             "Script", entity, true,
             [&](auto& component) { ImGui::Text("%s", component.Name.c_str()); },

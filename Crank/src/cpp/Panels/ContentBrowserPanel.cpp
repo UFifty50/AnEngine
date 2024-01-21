@@ -54,26 +54,25 @@ namespace AnEngine::Crank {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0, 0, 0, 0});
 
         if (ImGui::BeginTable("##Content", numCols)) {
-            for (int i = 0; i < numCols; i++) {
-                ImGui::TableSetupColumn(("##" + std::to_string(i)).c_str(),
+            for (int col = 0; col < numCols; col++) {
+                ImGui::TableSetupColumn(labelFromInt(col),
                                         ImGuiTableColumnFlags_WidthFixed, cellSize);
             }
-            int idx = 0;
-
             ImGui::TableNextRow();
 
+            uint16_t column = 0;
 
             for (auto& dirEnt : fs::directory_iterator(currentPath)) {
-                const fs::path& path = dirEnt.path();
-
-                fs::path relPath = fs::relative(path, baseAssetsDirectory);
-                std::string relPathName = relPath.filename().string();
+                const fs::path path = dirEnt.path();
+                const fs::path relPath = fs::relative(path, baseAssetsDirectory);
+                const std::string relPathName = relPath.filename().string();
+                const Ref<Texture2D> icon =
+                    dirEnt.is_directory() ? directoryIcon : fileIcon;
 
                 ImGui::PushID(relPathName.c_str());
-                Ref<Texture2D> icon = dirEnt.is_directory() ? directoryIcon : fileIcon;
 
-                ImGui::TableSetColumnIndex(idx);
-                ImGui::ImageButton(("##" + std::to_string(idx)).c_str(),
+                ImGui::TableSetColumnIndex(column);
+                ImGui::ImageButton(labelFromInt(column),
                                    (ImTextureID)icon->getSampler().slot,
                                    {thumbSize, thumbSize}, {0, 1}, {1, 0});
 
@@ -91,12 +90,13 @@ namespace AnEngine::Crank {
 
                 ImGui::TextWrapped(relPathName.c_str());
 
-                if (idx + 1 < numCols) {
-                    idx++;
+                if (column < (numCols - 1)) {
+                    column++;
                 } else {
-                    idx = 0;
+                    column = 0;
                     ImGui::TableNextRow();
                 }
+
 
                 ImGui::PopID();
             }
