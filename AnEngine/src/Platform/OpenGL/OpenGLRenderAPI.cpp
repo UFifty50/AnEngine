@@ -33,7 +33,6 @@ namespace AnEngine {
 
         //   uint32_t count = indexCount ? indexCount :
         //   vertexArray->getIndexBuffer()->getCount();
-        AE_CORE_WARN("idxCount: {0}, count: {1}", indexCount, count);
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
         //  glBindTexture(GL_TEXTURE_2D, 0);
     }

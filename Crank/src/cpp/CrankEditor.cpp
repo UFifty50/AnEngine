@@ -148,12 +148,6 @@ namespace AnEngine::Crank {
         }
 
         frameBuffer->unBind();
-
-        /// contents of activeScene
-        AE_CORE_DEBUG("Scene: {0}", activeScene->getName());
-        activeScene->entityRegistry.each([](const entt::entity entityID) -> void {
-            AE_CORE_DEBUG("Entity ID: {0}", (uint32_t)entityID);
-        });
     }
 
     void CrankEditor::onImGuiRender() { dockSpace->render(); }
