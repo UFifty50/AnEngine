@@ -32,7 +32,8 @@ namespace AnEngine::Crank {
           rotateSnap(0.0f) {}
 
     ImGuiWindowFlags ViewportPanel::beforeRender() {
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{0.1f, 0.1f, 0.1f, 1.0f});
 
         ImGuiWindowClass window_class;
         window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoWindowMenuButton;
@@ -47,6 +48,7 @@ namespace AnEngine::Crank {
 
         Application::getImGuiLayer()->shouldAllowEvents(!dockSpace->isViewportFocused() &&
                                                         !dockSpace->isViewportHovered());
+
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("translation type")) {
                 if (ImGui::MenuItem("Position"))
@@ -96,7 +98,6 @@ namespace AnEngine::Crank {
         uint32_t texID = frameBuffer->getColorAttachmentID(fbID);
         ImGui::Image((void*)texID, dockSpace->getViewportSize(), {0, 1}, {1, 0});
 
-
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload =
                     ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
@@ -110,6 +111,8 @@ namespace AnEngine::Crank {
                     return;
                 }
             }
+
+            ImGui::EndDragDropTarget();
         }
 
 
@@ -174,5 +177,8 @@ namespace AnEngine::Crank {
         }
     }
 
-    void ViewportPanel::afterRender() { ImGui::PopStyleVar(); }
+    void ViewportPanel::afterRender() {
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor();
+    }
 }  // namespace AnEngine::Crank

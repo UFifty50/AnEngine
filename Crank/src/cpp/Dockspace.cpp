@@ -103,8 +103,8 @@ namespace AnEngine::Crank {
             ImGui::GetWindowPos().y +
                 ImGui::GetCurrentWindow()->MenuBarHeight() * (hasTabBar + hasMenuBar)};
 
-        viewportFocused = ImGui::IsItemFocused();
-        viewportHovered = ImGui::IsItemHovered();
+        viewportFocused = ImGui::IsWindowFocused();
+        viewportHovered = ImGui::IsWindowHovered();
     }
 
     bool DockSpace::isMouseInViewport() {

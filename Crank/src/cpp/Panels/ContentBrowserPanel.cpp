@@ -76,10 +76,14 @@ namespace AnEngine::Crank {
                                    (ImTextureID)icon->getSampler().slot,
                                    {thumbSize, thumbSize}, {0, 1}, {1, 0});
 
-                if (ImGui::BeginDragDropSource()) {
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
                     const wchar_t* itemPath = relPath.c_str();
                     ImGui::SetDragDropPayload("CONTENTBROWSER_ITEM", itemPath,
                                               (wcslen(itemPath) + 1) * sizeof(wchar_t));
+
+                    ImGui::Image((void*)icon->getSampler().slot, {thumbSize, thumbSize},
+                                 {0, 1}, {1, 0});
+
                     ImGui::EndDragDropSource();
                 }
 
