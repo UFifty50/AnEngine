@@ -50,6 +50,7 @@ namespace AnEngine::Crank {
         CameraComponent cc;
         SpriteRendererComponent sRC;
         bool entityUIOpen = false;
+        std::unordered_map<uint32_t, bool> isEntityBeingEdited;
 
 
         friend class ViewportPanel;

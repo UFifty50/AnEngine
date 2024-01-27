@@ -2,7 +2,9 @@
 
 #include "Panels/ScenesPanel.hpp"
 
+#include <algorithm>
 #include <cstdio>
+#include <ranges>
 
 #include "imgui.h"
 
@@ -85,7 +87,12 @@ namespace AnEngine::Crank {
             if (ImGui::IsItemHovered()) ImGui::SetTooltip("Add Entity");
             addEntityButtonWidth = ImGui::GetItemRectSize().x;
 
-            if (entityUIOpen) drawAddEntityUI();
+            //   if (entityUIOpen) drawAddEntityUI();
+            if (entityUIOpen) {
+                Entity e = currentScene->createEntity(tagName);
+                entityUIOpen = false;
+                std::ranges::fill(std::ranges::views::values(isEntityBeingEdited), false);
+            }
 
             if (entityTreeOpen) {
                 for (const auto& [entityID] :
@@ -108,14 +115,28 @@ namespace AnEngine::Crank {
 
     void ScenesPanel::drawEntityNode(Entity entity) {
         auto& tag = entity.getComponent<TagComponent>().Tag;
+        tag.resize(255);
 
         ImGuiTreeNodeFlags flags =
             ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
         flags |= (selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0;
 
-        bool opened =
-            ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, "%s", tag.c_str());
-        if (ImGui::IsItemClicked()) selectedEntity = entity;
+        bool opened = false;
+        if (!isEntityBeingEdited[(uint32_t)entity])
+            opened = ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.c_str());
+        else {
+            ImGui::InputTextWithHint(("##" + std::to_string((uint32_t)entity)).c_str(),
+                                     "Enter a new tag", tag.data(), tag.size() + 1);
+            if (ImGui::IsKeyPressed(ImGuiKey_Enter) ||
+                (!ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)))
+                isEntityBeingEdited[(uint32_t)entity] = false;
+        }
+
+        if (!isEntityBeingEdited[(uint32_t)entity] && ImGui::IsItemHovered() &&
+            ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+            isEntityBeingEdited[(uint32_t)entity] = true;
+        else if (!isEntityBeingEdited[(uint32_t)entity] && ImGui::IsItemClicked())
+            selectedEntity = entity;
 
         bool entityDeleted = false;
         if (ImGui::BeginPopupContextItem()) {
@@ -125,7 +146,6 @@ namespace AnEngine::Crank {
             ImGui::EndPopup();
         }
 
-        // if (ImGui::IsMouseDoubleClicked()) {) Modify name
         if (opened) ImGui::TreePop();
 
         if (entityDeleted) {
@@ -134,6 +154,7 @@ namespace AnEngine::Crank {
         }
     }
 
+    /*
     void ScenesPanel::drawAddEntityUI() {
         ImGui::Begin("Add Entity", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -248,4 +269,6 @@ namespace AnEngine::Crank {
         if (ImGui::Button("Cancel")) entityUIOpen = false;
         ImGui::End();
     }
+    */
+
 };  // namespace AnEngine::Crank
