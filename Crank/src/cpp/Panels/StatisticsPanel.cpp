@@ -4,8 +4,6 @@
 
 
 namespace AnEngine::Crank {
-    StatisticsPanel::StatisticsPanel(std::string name) : name(name) {}
-
     void StatisticsPanel::render() {
         ImGui::Text("Editor Stats:");
         ImGui::Text("Hovered Entity: %s",

@@ -12,7 +12,7 @@ namespace AnEngine::Crank {
     class StatisticsPanel : public Panel {
     public:
         StatisticsPanel() = default;
-        StatisticsPanel(std::string name);
+        StatisticsPanel(const std::string& name) : name(name) {}
 
         virtual ImGuiWindowFlags beforeRender() override { return 0; }
         virtual void render() override;

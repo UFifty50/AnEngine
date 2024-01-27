@@ -8,22 +8,24 @@
 #include "Core/Core.hpp"
 #include "Core/Utils/PlatformUtils.hpp"
 #include "Dockspace.hpp"
-#include "Scene/Scene.hpp"
+#include "Globals.hpp"
+#include "Scene/Scene2D.hpp"
+#include "Scene/Scene3D.hpp"
 #include "Scene/SceneSerialiser.hpp"
 
 
 namespace AnEngine::Crank {
     void FileMenu::renderMenu() {
         if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
-            NewScene(scenesPanel, dockSapce);
+            NewScene();
         }
 
         if (ImGui::MenuItem("Open", "Ctrl+O")) {
-            OpenScene(scenesPanel, dockSapce);
+            if (!OpenSceneMenu()) AE_CORE_WARN("Failed to open scene!");
         }
 
         if (ImGui::MenuItem("Save As", "CTRL+Shift+S")) {
-            SaveScene(scene);
+            SaveActiveScene();
         }
 
         if (ImGui::MenuItem("Save UI Layout"))
@@ -37,53 +39,53 @@ namespace AnEngine::Crank {
         if (ImGui::MenuItem("Redo", "CTRL+Y")) {}
         */
     }
-    Ref<Scene> FileMenu::NewScene(Ref<ScenesPanel>& spRef, const Ref<DockSpace>& dsRef) {
-        Ref<Scene> scene = MakeRef<Scene>();
-        scene->onResize((uint32_t)dsRef->getViewportSize().x,
-                        (uint32_t)dsRef->getViewportSize().y);
-        spRef->setCurrentScene(scene);
 
-        return scene;
+    void FileMenu::NewScene() {
+        g_ActiveScene = MakeRef<Scene2D>();
+        g_ActiveScene->onResize((uint32_t)g_DockSpace->getViewportSize().x,
+                                (uint32_t)g_DockSpace->getViewportSize().y);
+        gPanel_SceneHierarchy->updateCurrentSceneFromActive();
     }
 
-    std::optional<Ref<Scene>> FileMenu::OpenScene(const fs::path& path,
-                                                  Ref<ScenesPanel>& spRef,
-                                                  const Ref<DockSpace>& dsRef) {
+    bool FileMenu::OpenScene(const fs::path& path) {
         if (!fs::exists(path)) {
             AE_CORE_WARN("File does not exist!");
-            return std::nullopt;
+            return false;
         }
 
         if (fs::is_directory(path)) {
             AE_CORE_WARN("File is a directory!");
-            return std::nullopt;
+            return false;
         }
 
-        Ref<Scene> scene = MakeRef<Scene>();
-        scene->onResize((uint32_t)dsRef->getViewportSize().x,
-                        (uint32_t)dsRef->getViewportSize().y);
-        spRef->setCurrentScene(scene);
+        NewScene();
+        SceneSerialiser serialiser(g_ActiveScene);
+        if (serialiser.deserialise(path.string())) return true;
 
-        SceneSerialiser serialiser(scene);
-        if (serialiser.deserialise(path.string())) return scene;
-
-        return std::nullopt;
+        return false;
     }
 
-    std::optional<Ref<Scene>> FileMenu::OpenScene(Ref<ScenesPanel>& spRef,
-                                                  const Ref<DockSpace>& dsRef) {
+    bool FileMenu::OpenSceneMenu() {
         if (auto path = Dialogues::OpenFileDialogue(
                 "CrankEngine Scene (*.aescene)\0*.aescene\0")) {
-            return OpenScene(*path, spRef, dsRef);
+            return OpenScene(*path);
         }
 
-        return std::nullopt;
+        return false;
     }
 
-    void FileMenu::SaveScene(Ref<Scene>& sceneRef) {
+    void FileMenu::SaveActiveScene() {
         if (auto path = Dialogues::SaveFileDialogue(
                 "CrankEngine Scene (*.aescene)\0 *.aescene\0")) {
-            SceneSerialiser serialiser(sceneRef);
+            SceneSerialiser serialiser(g_ActiveScene);
+            serialiser.serialise(*path);
+        }
+    }
+
+    void FileMenu::SaveScene(const Ref<Scene>& scene) {
+        if (auto path = Dialogues::SaveFileDialogue(
+                "CrankEngine Scene (*.aescene)\0 *.aescene\0")) {
+            SceneSerialiser serialiser(scene);
             serialiser.serialise(*path);
         }
     }

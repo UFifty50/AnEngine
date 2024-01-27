@@ -2,6 +2,7 @@
 #define CORE_HPP
 
 #include <memory>
+#include <string>
 
 #include "Core/Log.hpp"
 #include "CoreConfig.hpp"
@@ -39,16 +40,6 @@
     #endif
 #else
     #error No platform defined, or platform not supported
-#endif
-
-#if USE_FMT == 1 || !defined(__cpp_lib_format)
-    #include <fmt/format.h>
-    #define SPDLOG_FMT_EXTERNAL
-    #define AE_FMT_STR(str, ...) fmt::vformat(str, fmt::make_format_args(__VA_ARGS__))
-#else
-    #include <format>
-    #define SPDLOG_USE_STD_FORMAT
-    #define AE_FMT_STR(str, ...) std::vformat(str, std::make_format_args(__VA_ARGS__))
 #endif
 
 #if defined(AE_DEBUG_FLAG) and not defined(AE_ENABLE_ASSERTS)

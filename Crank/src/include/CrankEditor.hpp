@@ -18,7 +18,7 @@
 #include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Scene/Entity.hpp"
-#include "Scene/Scene.hpp"
+#include "Scene/Scene2D.hpp"
 
 
 namespace AnEngine::Crank {
@@ -40,24 +40,13 @@ namespace AnEngine::Crank {
         friend class Panel;
 
     private:
-        Ref<Scene> activeScene;
+        Ref<EditorCamera2D> editorCam2D;
         Ref<FrameBuffer> frameBuffer;
 
-        Ref<EditorCamera> editorCam;
-
-        Ref<DockSpace> dockSpace;
-
-        Ref<ScenesPanel> sceneHierarchy;
-        Ref<PropertiesPanel> properties;
-        Ref<ViewportPanel> viewport;
-        Ref<ContentBrowserPanel> contentBrowser;
-        Ref<StatisticsPanel> statistics;
-
-        Ref<FileMenu> fileMenu;
 
         bool CameraA = true;
         Entity hoveredEntity;
     };
-}  // namespace AnEngine::Crank
+};  // namespace AnEngine::Crank
 
 #endif

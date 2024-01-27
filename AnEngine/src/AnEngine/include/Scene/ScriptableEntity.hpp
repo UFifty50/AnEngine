@@ -2,6 +2,7 @@
 #define SCRIPTABLEENTITY_HPP
 
 #include "Scene/Entity.hpp"
+#include "Time/TimeStep.hpp"
 
 
 namespace AnEngine {
@@ -36,7 +37,8 @@ namespace AnEngine {
 
     private:
         Entity entity;
-        friend class Scene;
+        friend class Scene2D;
+        friend class Scene3D;
     };
 };  // namespace AnEngine
 

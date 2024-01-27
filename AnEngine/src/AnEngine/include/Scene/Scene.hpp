@@ -3,52 +3,48 @@
 
 #include <entt/entt.hpp>
 
+#include <string>
+
+#include "Core/Core.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
-#include "Time/TimeStep.hpp"
 
 
 namespace AnEngine {
     class Entity;
     struct Component;
-    namespace Crank {
-        class ScenesPanel;
-    };
 
     class Scene {
     public:
         Scene() = default;
-        Scene(std::string name) : name(name) {}
-        ~Scene() = default;
+        virtual ~Scene() = default;
 
-        void clear() {
-            name = "";
-            entityRegistry.clear();
-        }
+        virtual bool is3D() const = 0;
 
-        Entity createEntity(const std::string& name = "");
-        void destroyEntity(Entity entity);
+        entt::registry& getRegistry() { return entityRegistry; }
 
-        void onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera);
-        void onUpdateRuntime(TimeStep deltaTime);
-        void onResize(uint32_t width, uint32_t height);
+        virtual const std::string& getName() const { return name; }
+        virtual void setName(const std::string& newName) { name = newName; }
 
-        Entity getPrimaryCamera();
+        virtual void destroyEntity(Entity& entity) = 0;
+        virtual Entity& createEntity(const std::string& name = "") = 0;
+        virtual void onResize(uint32_t width, uint32_t height) = 0;
 
-        std::string getName() { return name; }
+        virtual void onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) = 0;
+        virtual void onUpdateRuntime(TimeStep deltaTime) = 0;
 
-        entt::registry entityRegistry;
-
-    private:
-        void onComponentAdded(Entity e, Component& component);
+    protected:
+        virtual void onComponentAdded(Entity& e, Component& component) = 0;
 
         std::string name = "Unnamed Scene";
+        entt::registry entityRegistry;
+
         uint32_t viewportWidth = 0;
         uint32_t viewportHeight = 0;
 
+
         friend class Entity;
         friend class SceneSerialiser;
-        friend class Crank::ScenesPanel;
     };
-}  // namespace AnEngine
+};  // namespace AnEngine
 
 #endif

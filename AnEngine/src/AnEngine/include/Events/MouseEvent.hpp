@@ -9,7 +9,7 @@
 
 
 namespace AnEngine {
-    class AE_API MouseMovedEvent : public Event {
+    class MouseMovedEvent : public Event {
     private:
         float mouseX, mouseY;
 
@@ -29,7 +29,7 @@ namespace AnEngine {
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
     };
 
-    class AE_API MouseScrolledEvent : public Event {
+    class MouseScrolledEvent : public Event {
     private:
         float Xoffset;
         float Yoffset;
@@ -51,7 +51,7 @@ namespace AnEngine {
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
     };
 
-    class AE_API MouseButtonEvent : public Event {
+    class MouseButtonEvent : public Event {
     protected:
         MouseButtonEvent(int button) : button(button) {}
         int button;
@@ -62,7 +62,7 @@ namespace AnEngine {
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
     };
 
-    class AE_API MouseButtonPressedEvent : public MouseButtonEvent {
+    class MouseButtonPressedEvent : public MouseButtonEvent {
     public:
         MouseButtonPressedEvent(int button) : MouseButtonEvent(button) {}
 
@@ -75,7 +75,7 @@ namespace AnEngine {
         EVENT_CLASS_TYPE(MouseButtonPressed)
     };
 
-    class AE_API MouseButtonReleasedEvent : public MouseButtonEvent {
+    class MouseButtonReleasedEvent : public MouseButtonEvent {
     public:
         MouseButtonReleasedEvent(int button) : MouseButtonEvent(button) {}
 

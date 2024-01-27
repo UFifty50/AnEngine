@@ -14,9 +14,8 @@ namespace AnEngine::Crank {
     class ViewportPanel : public Panel {
     public:
         ViewportPanel() = default;
-        ViewportPanel(std::string name, const Ref<FrameBuffer>& fbuf,
-                      Ref<EditorCamera>& editorCamera, Ref<DockSpace>& dspace,
-                      Ref<ScenesPanel>& scenePanel, Ref<Scene>& activeScene);
+        ViewportPanel(const std::string& name, const Ref<FrameBuffer>& fbuf,
+                      const Ref<EditorCamera>& editorCamera);
 
         virtual ImGuiWindowFlags beforeRender() override;
         virtual void render() override;
@@ -33,11 +32,8 @@ namespace AnEngine::Crank {
         float translateSnap;
         float rotateSnap;
 
-        const Ref<FrameBuffer>& frameBuffer;
-        Ref<EditorCamera>& editorCamera;
-        Ref<DockSpace>& dockSpace;
-        Ref<ScenesPanel>& sceneHierarchy;
-        Ref<Scene>& activeScene;
+        Ref<FrameBuffer> frameBuffer;
+        Ref<EditorCamera> editorCamera;
     };
 }  // namespace AnEngine::Crank
 

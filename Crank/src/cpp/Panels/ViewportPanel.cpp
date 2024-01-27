@@ -7,6 +7,7 @@
 #include "Application.hpp"
 #include "Core/Input.hpp"
 #include "Core/KeyCodes.hpp"
+#include "Globals.hpp"
 #include "Maths/Maths.hpp"
 #include "Menus/Filemenu.hpp"
 #include "Panels/Panel.hpp"
@@ -18,15 +19,11 @@
 namespace AnEngine::Crank {
     extern const fs::path baseAssetsDirectory;
 
-    ViewportPanel::ViewportPanel(std::string name, const Ref<FrameBuffer>& fbuf,
-                                 Ref<EditorCamera>& editorCamera, Ref<DockSpace>& dspace,
-                                 Ref<ScenesPanel>& scenePanel, Ref<Scene>& activeScene)
+    ViewportPanel::ViewportPanel(const std::string& name, const Ref<FrameBuffer>& fbuf,
+                                 const Ref<EditorCamera>& editorCamera)
         : name(name),
           frameBuffer(fbuf),
           editorCamera(editorCamera),
-          dockSpace(dspace),
-          sceneHierarchy(scenePanel),
-          activeScene(activeScene),
           gizmoType(ImGuizmo::OPERATION::TRANSLATE),
           translateSnap(0.0f),
           rotateSnap(0.0f) {}
@@ -44,10 +41,10 @@ namespace AnEngine::Crank {
 
     void ViewportPanel::render() {
         static uint32_t fbID = 0;
-        dockSpace->updateViewportInfo(true, true);
+        g_DockSpace->updateViewportInfo(true, true);
 
-        Application::getImGuiLayer()->shouldAllowEvents(!dockSpace->isViewportFocused() &&
-                                                        !dockSpace->isViewportHovered());
+        Application::getImGuiLayer()->shouldAllowEvents(
+            g_DockSpace->isViewportFocused() || g_DockSpace->isViewportHovered());
 
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("translation type")) {
@@ -76,14 +73,16 @@ namespace AnEngine::Crank {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Editor Camera Type")) {
-                if (ImGui::MenuItem("Perspective")) {
-                    editorCamera->changeProjectionType(ProjectionType::Perspective);
+            if (editorCamera->is3D()) {
+                if (ImGui::BeginMenu("Editor Camera Type")) {
+                    if (ImGui::MenuItem("Perspective")) {
+                        editorCamera->changeProjectionType(ProjectionType::Perspective);
+                    }
+                    if (ImGui::MenuItem("Orthographic")) {
+                        editorCamera->changeProjectionType(ProjectionType::Orthographic);
+                    }
+                    ImGui::EndMenu();
                 }
-                if (ImGui::MenuItem("Orthographic")) {
-                    editorCamera->changeProjectionType(ProjectionType::Orthographic);
-                }
-                ImGui::EndMenu();
             }
 
             if (ImGui::BeginMenu("Framebuffer")) {
@@ -96,18 +95,15 @@ namespace AnEngine::Crank {
         }
 
         uint32_t texID = frameBuffer->getColorAttachmentID(fbID);
-        ImGui::Image((void*)texID, dockSpace->getViewportSize(), {0, 1}, {1, 0});
+        ImGui::Image((void*)texID, g_DockSpace->getViewportSize(), {0, 1}, {1, 0});
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload =
                     ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
                 const wchar_t* path = (const wchar_t*)payload->Data;
 
-                if (auto newScene = FileMenu::OpenScene(
-                        fs::path(baseAssetsDirectory) / path, sceneHierarchy, dockSpace))
-                    activeScene = *newScene;
-                else {
-                    AE_CORE_ERROR("Couldn't load Scene {}", (char*)path);
+                if (!FileMenu::OpenScene(fs::path(baseAssetsDirectory) / path)) {
+                    AE_CORE_ERROR(L"Couldn't load Scene {}", path);
                     return;
                 }
             }
@@ -117,15 +113,16 @@ namespace AnEngine::Crank {
 
 
         // Gizmos
-        Entity activeEntity = sceneHierarchy->selectedEntity;
+        Entity activeEntity = gPanel_SceneHierarchy->selectedEntity;
 
         if (!activeEntity || gizmoType < 0) return;
 
-        // ImGuizmo::SetOrthographic(!editorCamera->isPerspective()); //TODO: orthographic
-        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetOrthographic(!editorCamera->isPerspective());  // TODO: orthographic
+        // ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist();
-        ImGuizmo::SetRect(dockSpace->getViewportPos().x, dockSpace->getViewportPos().y,
-                          dockSpace->getViewportSize().x, dockSpace->getViewportSize().y);
+        ImGuizmo::SetRect(
+            g_DockSpace->getViewportPos().x, g_DockSpace->getViewportPos().y,
+            g_DockSpace->getViewportSize().x, g_DockSpace->getViewportSize().y);
 
 
         // Camera

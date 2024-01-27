@@ -52,13 +52,13 @@ namespace AnEngine {
         uint32_t offset = 0;
 
         for (uint32_t i = 0; i < rendererData.maxIndices; i += 6) {
-            quadIndices[i + 0] = offset + 0;
-            quadIndices[i + 1] = offset + 1;
-            quadIndices[i + 2] = offset + 2;
+            quadIndices[(size_t)i + 0] = offset + 0;
+            quadIndices[(size_t)i + 1] = offset + 1;
+            quadIndices[(size_t)i + 2] = offset + 2;
 
-            quadIndices[i + 3] = offset + 2;
-            quadIndices[i + 4] = offset + 3;
-            quadIndices[i + 5] = offset + 0;
+            quadIndices[(size_t)i + 3] = offset + 2;
+            quadIndices[(size_t)i + 4] = offset + 3;
+            quadIndices[(size_t)i + 5] = offset + 0;
 
             offset += 4;
         }
@@ -92,7 +92,7 @@ namespace AnEngine {
             UniformBuffer::Create(sizeof(Renderer2D::Storage::CameraData), 0);
     }
 
-    void Renderer2D::beginScene(const EditorCamera& editorCamera) {
+    void Renderer2D::beginScene(const EditorCamera2D& editorCamera) {
         AE_PROFILE_FUNCTION()
 
         if (rendererData.activeScene) {
@@ -112,7 +112,7 @@ namespace AnEngine {
         rendererData.activeScene = true;
     }
 
-    void Renderer2D::beginScene(const Camera& camera, const glm::mat4& transform) {
+    void Renderer2D::beginScene(const Scope<Camera>& camera, const glm::mat4& transform) {
         AE_PROFILE_FUNCTION()
 
         if (rendererData.activeScene) {
@@ -124,7 +124,7 @@ namespace AnEngine {
         //                  "Renderer2D only supports Orthographic Cameras!");
 
         rendererData.cameraBuffer.viewProjection =
-            camera.getProjectionMatrix() * glm::inverse(transform);
+            camera->getProjectionMatrix() * glm::inverse(transform);
         rendererData.cameraUniformBuffer->setData(&rendererData.cameraBuffer,
                                                   sizeof(Renderer2D::Storage::CameraData));
 

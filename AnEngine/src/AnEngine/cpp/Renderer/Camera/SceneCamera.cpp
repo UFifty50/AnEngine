@@ -11,23 +11,69 @@
 
 namespace AnEngine {
     SceneCamera::SceneCamera() { recalculateProjection(); }
+    SceneCamera::SceneCamera(CameraSpec3D spec) {
+        projectionType = spec.type;
+        isPerspective = spec.type == ProjectionType::Perspective;
+        aspectRatio = spec.aspectRatio;
 
-    void SceneCamera::setOrthographic(float size, float nearPlane, float farPlane) {
-        projectionType = ProjectionType::Orthographic;
+        switch (projectionType) {
+            case ProjectionType::Perspective:
+                perspectiveSettings = {glm::radians(spec.FOVorSize), spec.nearPlane,
+                                       spec.farPlane};
+                projectionMatrix =
+                    glm::perspective(glm::radians(spec.FOVorSize), spec.aspectRatio,
+                                     spec.nearPlane, spec.farPlane);
+                break;
 
-        orthoSettings.size = size;
-        orthoSettings.near = nearPlane;
-        orthoSettings.far = farPlane;
-
-        recalculateProjection();
+            case ProjectionType::Orthographic:
+                orthoSettings = {spec.FOVorSize, spec.nearPlane, spec.farPlane};
+                orthoSettings.bounds = {-spec.FOVorSize * aspectRatio,
+                                        spec.FOVorSize * aspectRatio, -spec.FOVorSize,
+                                        spec.FOVorSize};
+                projectionMatrix = glm::ortho(
+                    -spec.FOVorSize * spec.aspectRatio, spec.FOVorSize * spec.aspectRatio,
+                    -spec.FOVorSize, spec.FOVorSize, spec.nearPlane, spec.farPlane);
+                break;
+        }
     }
 
-    void SceneCamera::setPerspective(float FOV, float nearPlane, float farPlane) {
-        projectionType = ProjectionType::Perspective;
+    void SceneCamera::updateSpec(CameraSpec3D::Feild feild, float value) {
+        switch (feild) {
+            using enum CameraSpec3D::Feild;
 
-        perspectiveSettings.FOV = FOV;
-        perspectiveSettings.near = nearPlane;
-        perspectiveSettings.far = farPlane;
+            case Type:
+                projectionType = ProjectionType::fromFloat(value);
+                isPerspective = projectionType == ProjectionType::Perspective;
+                break;
+
+            case FOVorSize:
+                if (isPerspective)
+                    perspectiveSettings.FOV = glm::radians(value);
+                else
+                    orthoSettings.size = value;
+
+            case AspectRatio:
+                aspectRatio = value;
+                break;
+
+            case NearPlane:
+                if (isPerspective)
+                    perspectiveSettings.near = value;
+                else
+                    orthoSettings.near = value;
+                break;
+
+            case FarPlane:
+                if (isPerspective)
+                    perspectiveSettings.far = value;
+                else
+                    orthoSettings.far = value;
+                break;
+
+            default:
+                AE_CORE_ASSERT(false, "Invalid camera spec feild!");
+                return;
+        }
 
         recalculateProjection();
     }
@@ -49,12 +95,6 @@ namespace AnEngine {
             projectionMatrix =
                 glm::ortho(left, right, bottom, top, orthoSettings.near, orthoSettings.far);
         } else {
-            float top = glm::tan(perspectiveSettings.FOV * 0.5f) * perspectiveSettings.near;
-            float bottom = -top;
-            float right = top * aspectRatio;
-            float left = -right;
-
-            //    perspectiveSettings.bounds = {left, right, bottom, top};
             projectionMatrix =
                 glm::perspective(perspectiveSettings.FOV, aspectRatio,
                                  perspectiveSettings.near, perspectiveSettings.far);

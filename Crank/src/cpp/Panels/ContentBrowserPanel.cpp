@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 namespace AnEngine::Crank {
     extern const fs::path baseAssetsDirectory = "assets";  // TODO: add projects
 
-    ContentBrowserPanel::ContentBrowserPanel(std::string name)
+    ContentBrowserPanel::ContentBrowserPanel(const std::string& name)
         : name(name), currentPath(baseAssetsDirectory) {
         directoryIcon = Texture2D::create("builtins/icons/DirectoryIcon.png");
         fileIcon = Texture2D::create("builtins/icons/FileIcon.png");

@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 namespace AnEngine::Crank {
     class ContentBrowserPanel : public Panel {
     public:
-        ContentBrowserPanel(std::string name);
+        ContentBrowserPanel(const std::string& name);
 
         virtual ImGuiWindowFlags beforeRender() override {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
@@ -39,6 +39,7 @@ namespace AnEngine::Crank {
 
         float thumbSize = 120.0f;
         float paddingWidth = 5.0f;
+
 
         const char* labelFromInt(uint32_t i) {
             return ("##" + std::to_string(i)).c_str();

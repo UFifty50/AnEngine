@@ -2,42 +2,43 @@
 
 #include <glm/glm.hpp>
 
-#include "Scene/Scene.hpp"
+#include "Scene/Scene3D.hpp"
 
 #include "Renderer/Camera/EditorCamera.hpp"
-#include "Renderer/Renderer2D.hpp"
+#include "Renderer/Renderer.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
 
 
 namespace AnEngine {
-    Entity Scene::createEntity(const std::string& name) {
-        Entity e = {entityRegistry.create(), this};
+    Entity& Scene3D::createEntity(const std::string& name) {
+        Entity e = {this->entityRegistry.create(), this};
         e.addComponent<TransformComponent>();
         auto& tag = e.addComponent<TagComponent>(name.empty() ? "Entity" : name);
         return e;
     }
 
-    void Scene::destroyEntity(Entity entity) { entityRegistry.destroy(entity); }
+    void Scene3D::destroyEntity(Entity& entity) { this->entityRegistry.destroy(entity); }
 
-    void Scene::onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) {
-        Renderer2D::beginScene(*camera);
+    void Scene3D::onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) {
+        //    Renderer::beginScene(*camera);
 
         auto spriteGroup =
-            entityRegistry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            this->entityRegistry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 
         for (auto entity : spriteGroup) {
             auto [transform, sprite] =
                 spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
-            Renderer2D::drawSprite((glm::mat4)transform, sprite, (uint32_t)entity);
+            //      Renderer::drawObject((glm::mat4)transform, sprite, (uint32_t)entity);
         }
 
-        Renderer2D::endScene();
+        Renderer::endScene();
     }
 
-    void Scene::onUpdateRuntime(TimeStep deltaTime) {
-        entityRegistry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
+    void Scene3D::onUpdateRuntime(TimeStep deltaTime) {
+        this->entityRegistry.view<NativeScriptComponent>().each([=](const auto entity,
+                                                                    auto& nsc) {
             // TODO: Move to onScenePlay functiom
             if (!nsc.Instance) {
                 AE_CORE_ASSERT(nsc.instantiateScriptInstance, "Script {0} not bound!",
@@ -57,7 +58,7 @@ namespace AnEngine {
         Camera* mainCamera = nullptr;
         glm::mat4 mainCameraTransform;
 
-        auto cameraView = entityRegistry.view<TransformComponent, CameraComponent>();
+        auto cameraView = this->entityRegistry.view<TransformComponent, CameraComponent>();
         for (auto entity : cameraView) {
             auto [transform, camera] =
                 cameraView.get<TransformComponent, CameraComponent>(entity);
@@ -69,10 +70,11 @@ namespace AnEngine {
         }
 
         if (mainCamera) {
-            Renderer2D::beginScene(mainCamera->getProjectionMatrix(), mainCameraTransform);
+            //     Renderer::beginScene(mainCamera->getProjectionMatrix(),
+            //     mainCameraTransform);
 
-            auto spriteGroup =
-                entityRegistry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            auto spriteGroup = this->entityRegistry.group<TransformComponent>(
+                entt::get<SpriteRendererComponent>);
 
             for (auto entity : spriteGroup) {
                 auto [transform, sprite] =
@@ -82,18 +84,18 @@ namespace AnEngine {
                     AE_CORE_ASSERT(false, "Too many entities in scene :(     TODO: fixme");
                 }
 
-                Renderer2D::drawSprite((glm::mat4)transform, sprite, (int32_t)entity);
+                //        Renderer::drawObject((glm::mat4)transform, sprite, (int32_t)entity);
             }
 
-            Renderer2D::endScene();
+            Renderer::endScene();
         }
     }
 
-    void Scene::onResize(uint32_t width, uint32_t height) {
-        viewportWidth = width;
-        viewportHeight = height;
+    void Scene3D::onResize(uint32_t width, uint32_t height) {
+        this->viewportWidth = width;
+        this->viewportHeight = height;
 
-        auto view = entityRegistry.view<CameraComponent>();
+        auto view = this->entityRegistry.view<CameraComponent>();
         for (auto entity : view) {
             auto& cameraComponent = view.get<CameraComponent>(entity);
             if (!cameraComponent.FixedAspectRatio) {
@@ -102,8 +104,8 @@ namespace AnEngine {
         }
     }
 
-    Entity Scene::getPrimaryCamera() {
-        auto view = entityRegistry.view<CameraComponent>();
+    Entity Scene3D::getPrimaryCamera() {
+        auto view = this->entityRegistry.view<CameraComponent>();
         for (auto entity : view) {
             const auto& cameraComponent = view.get<CameraComponent>(entity);
             if (cameraComponent.Primary) {
@@ -113,13 +115,14 @@ namespace AnEngine {
         return {};
     }
 
-    void Scene::onComponentAdded(Entity e, Component& component) {
+    void Scene3D::onComponentAdded(Entity& e, Component& component) {
         switch (component.getID()) {
             case CAMERA_COMPONENT_ID: {
-                if (viewportWidth <= 0 || viewportHeight <= 0) return;
+                if (this->viewportWidth <= 0 || this->viewportHeight <= 0) return;
 
                 auto& cameraComponent = (CameraComponent&)component;
-                cameraComponent.Camera.setViewportSize(viewportWidth, viewportHeight);
+                cameraComponent.Camera.setViewportSize(this->viewportWidth,
+                                                       this->viewportHeight);
                 break;
             }
 

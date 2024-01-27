@@ -28,11 +28,24 @@
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
 #include "Scene/Scene.hpp"
+#include "Scene/Scene2D.hpp"
 #include "Scene/SceneSerialiser.hpp"
 #include "Scene/ScriptableEntity.hpp"
 
 
 namespace AnEngine::Crank {
+    Ref<Scene> g_ActiveScene;
+
+    Ref<DockSpace> g_DockSpace;
+
+    Ref<ScenesPanel> gPanel_SceneHierarchy;
+    Ref<PropertiesPanel> gPanel_Properties;
+    Ref<ViewportPanel> gPanel_Viewport;
+    Ref<ContentBrowserPanel> gPanel_ContentBrowser;
+    Ref<StatisticsPanel> gPanel_Statistics;
+
+    Ref<FileMenu> gMenu_FileOps;
+
     class CameraController : public ScriptableEntity {
     public:
         void onCreate() {
@@ -71,35 +84,35 @@ namespace AnEngine::Crank {
                             FrameBufferTexFormat::Depth};
         frameBuffer = FrameBuffer::create(spec);
 
-        activeScene = MakeRef<Scene>("Test Scene");
+        g_ActiveScene = MakeRef<Scene2D>("Test Scene");
 
-        CameraSpec camSpec{ProjectionType::Perspective, 30.0f, 1.778f, 0.1f, 1000.0f};
-        editorCam = MakeRef<EditorCamera>(camSpec);
+        CameraSpec2D camSpec{30.0f, 1.778f, 0.1f, 1000.0f};
+        editorCam2D = MakeRef<EditorCamera2D>(camSpec);
 
-        dockSpace = MakeRef<DockSpace>();
+        g_DockSpace = MakeRef<DockSpace>();
 
-        sceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene", activeScene);
-        properties = MakeRef<PropertiesPanel>("Properties", sceneHierarchy);
-        viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam, dockSpace,
-                                          sceneHierarchy, activeScene);
-        contentBrowser = MakeRef<ContentBrowserPanel>("Content Browser");
-        statistics = MakeRef<StatisticsPanel>("Statistics");
+        gPanel_SceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene");
+        gPanel_Properties = MakeRef<PropertiesPanel>("Properties");
+        gPanel_Viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam2D);
+        gPanel_ContentBrowser = MakeRef<ContentBrowserPanel>("Content Browser");
+        gPanel_Statistics = MakeRef<StatisticsPanel>("Statistics");
 
-        fileMenu = MakeRef<FileMenu>("File", sceneHierarchy, activeScene, dockSpace);
+        gMenu_FileOps = MakeRef<FileMenu>("File");
 
 
-        dockSpace->addPanel(sceneHierarchy);
-        dockSpace->addPanel(properties);
-        dockSpace->addPanel(viewport);
-        dockSpace->addPanel(contentBrowser);
-        dockSpace->addPanel(statistics);
+        g_DockSpace->addPanel(gPanel_SceneHierarchy);
+        g_DockSpace->addPanel(gPanel_Properties);
+        g_DockSpace->addPanel(gPanel_Viewport);
+        g_DockSpace->addPanel(gPanel_ContentBrowser);
+        g_DockSpace->addPanel(gPanel_Statistics);
 
-        dockSpace->addMenubarMenu(fileMenu);
+        g_DockSpace->addMenubarMenu(gMenu_FileOps);
+
 
         CommandLine cmdLine = Application::getCommandLine();
         if (cmdLine.hasArgs()) {
             std::string sceneFilePath = cmdLine.args[0];
-            SceneSerialiser serialiser(activeScene);
+            SceneSerialiser serialiser(g_ActiveScene);
             try {
                 serialiser.deserialise(sceneFilePath);
             } catch (std::runtime_error& e) {
@@ -111,49 +124,49 @@ namespace AnEngine::Crank {
     void CrankEditor::onDetach() {}
 
     void CrankEditor::onUpdate(TimeStep deltaTime) {
-        auto vpSize = dockSpace->getViewportSize();
+        auto vpSize = g_DockSpace->getViewportSize();
 
         if (auto fbSpec = frameBuffer->getSpecification();
             vpSize.x > 0.0f && vpSize.y > 0.0f &&
             (fbSpec.Width != vpSize.x || fbSpec.Height != vpSize.y)) {
             frameBuffer->resize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
 
-            editorCam->setViewportSize(vpSize.x, vpSize.y);
+            editorCam2D->setViewportSize(vpSize.x, vpSize.y);
 
-            activeScene->onResize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
+            g_ActiveScene->onResize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
         }
 
         // if (dockSpace->isViewportFocused())
-        editorCam->onUpdate(deltaTime);
+        editorCam2D->onUpdate(deltaTime);
 
         Renderer2D::resetStats();
         Renderer2D::getStats().lastFrameTime = deltaTime.getMilliseconds();
 
         frameBuffer->bind();
-        RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1});
+        RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1.0f});
         RenderCommandQueue::clear();
 
         frameBuffer->clearColourAttachment(1, -1);
 
-        activeScene->onUpdateEditor(deltaTime, editorCam);
+        g_ActiveScene->onUpdateEditor(deltaTime, editorCam2D);
         // activeScene->onUpdateRuntime(deltaTime);
 
-        auto [mouseX, mouseY] = dockSpace->getMousePosInViewport(true);
-        if (dockSpace->isMouseInViewport()) {
+        auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
+        if (g_DockSpace->isMouseInViewport()) {
             int32_t pixel = frameBuffer->readPixels(1, {mouseX, mouseY}, {1, 1},
                                                     FrameBufferTexFormat::RED_INTEGER)[0];
             hoveredEntity =
-                pixel == -1 ? Entity() : Entity{(entt::entity)pixel, activeScene.get()};
-            statistics->setHoveredEntity(hoveredEntity);
+                pixel == -1 ? Entity() : Entity{(entt::entity)pixel, g_ActiveScene.get()};
+            gPanel_Statistics->setHoveredEntity(hoveredEntity);
         }
 
         frameBuffer->unBind();
     }
 
-    void CrankEditor::onImGuiRender() { dockSpace->render(); }
+    void CrankEditor::onImGuiRender() { g_DockSpace->render(); }
 
     void CrankEditor::onEvent(Event& event) {
-        editorCam->onEvent(event);
+        editorCam2D->onEvent(event);
 
         EventDispatcher dispatcher(event);
         dispatcher.dispatch<KeyPressedEvent>(BIND_EVENT_FN(CrankEditor::onKeyPressed));
@@ -169,20 +182,17 @@ namespace AnEngine::Crank {
 
         switch (kpEvent.getKeyCode()) {
             case KeyCode::S:
-                if (ctrl && shift) FileMenu::SaveScene(activeScene);
+                if (ctrl && shift) FileMenu::SaveActiveScene();
                 break;
 
             case KeyCode::N:
-                if (ctrl && !shift) {
-                    Ref<Scene> newScene = FileMenu::NewScene(sceneHierarchy, dockSpace);
-                    activeScene.swap(newScene);
-                }
+                if (ctrl && !shift) FileMenu::NewScene();
                 break;
 
             case KeyCode::O:
                 if (ctrl && !shift)
-                    if (auto newScene = FileMenu::OpenScene(sceneHierarchy, dockSpace))
-                        activeScene.swap(*newScene);
+                    if (!FileMenu::OpenSceneMenu())
+                        AE_CORE_ERROR("Failed to open scene.");
                 break;
         }
 
@@ -191,8 +201,8 @@ namespace AnEngine::Crank {
 
     bool CrankEditor::OnMouseClick(MouseButtonPressedEvent& mcEvent) {
         if (mcEvent.getMouseButton() == MouseCode::ButtonLeft) {
-            if (dockSpace->isMouseInViewport() && !ImGuizmo::IsOver())
-                sceneHierarchy->setSelectedEntity(hoveredEntity);
+            if (g_DockSpace->isMouseInViewport() && !ImGuizmo::IsOver())
+                gPanel_SceneHierarchy->setSelectedEntity(hoveredEntity);
         }
 
         return true;

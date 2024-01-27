@@ -6,6 +6,7 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
+#include "Globals.hpp"
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
@@ -16,13 +17,12 @@
 
 
 namespace AnEngine::Crank {
-    PropertiesPanel::PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel)
-        : name(name), scenesPanel(scenesPanel) {}
+    PropertiesPanel::PropertiesPanel(const std::string& name) : name(name) {}
 
     void PropertiesPanel::render() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {370.0f, 10.0f});
 
-        Entity selectedEntity = scenesPanel->getSelectedEntity();
+        Entity selectedEntity = gPanel_SceneHierarchy->getSelectedEntity();
 
         if (selectedEntity) {
             if (selectedEntity.hasComponent<TagComponent>()) {
@@ -194,22 +194,17 @@ namespace AnEngine::Crank {
 
                 ImGui::Checkbox("Primary", &component.Primary);
 
-                const char* projectionTypes[] = {"perspective", "orthographic"};
-                const char* currentProjectionType = projectionTypes[(int)cam.getType()];
-
                 if (ImGui::BeginCombo("Projection Type",
-                                      projectionTypes[(int)cam.getType()])) {
-                    bool isPerspective = currentProjectionType == projectionTypes[0];
-                    bool isOrthographic = !isPerspective;
+                                      cam.getProjectionType().toString().c_str())) {
+                    bool isPerspective =
+                        cam.getProjectionType() == ProjectionType::Perspective;
 
-                    if (ImGui::Selectable(projectionTypes[0], isPerspective)) {
-                        currentProjectionType = projectionTypes[0];
-                        cam.setType(ProjectionType::Perspective);
+                    if (ImGui::Selectable("Perspective", isPerspective)) {
+                        cam.changeProjectionType(ProjectionType::Perspective);
                     }
 
-                    if (ImGui::Selectable(projectionTypes[1], isOrthographic)) {
-                        currentProjectionType = projectionTypes[1];
-                        cam.setType(ProjectionType::Orthographic);
+                    if (ImGui::Selectable("Orthographic", !isPerspective)) {
+                        cam.changeProjectionType(ProjectionType::Orthographic);
                     }
 
                     ImGui::SetItemDefaultFocus();
@@ -217,34 +212,34 @@ namespace AnEngine::Crank {
                     ImGui::EndCombo();
                 }
 
-                if (cam.getType() == ProjectionType::Perspective) {
-                    float fov = glm::degrees(cam.getPerspectiveFOV());
-                    float near = cam.getPerspectiveNear();
-                    float far = cam.getPerspectiveFar();
+                if (cam.getProjectionType() == ProjectionType::Perspective) {
+                    float fov = glm::degrees(cam.getFOV());
+                    float near = cam.getNearPlane();
+                    float far = cam.getFarPlane();
 
                     if (ImGui::DragFloat("Field Of View", &fov, 1.0f, 10.0f, 150.0f))
-                        cam.setPerspectiveFOV(glm::radians(fov));
+                        cam.updateSpec(CameraSpec3D::Feild::FOVorSize, glm::radians(fov));
 
                     if (ImGui::DragFloat("Near", &near, 0.5f, -far, far - 0.01f))
-                        cam.setPerspectiveNear(near);
+                        cam.updateSpec(CameraSpec3D::Feild::NearPlane, near);
 
                     if (ImGui::DragFloat("Far", &far, 0.5f, near + 0.01f, 1000.0f))
-                        cam.setPerspectiveFar(far);
+                        cam.updateSpec(CameraSpec3D::Feild::FarPlane, far);
                 }
 
-                if (cam.getType() == ProjectionType::Orthographic) {
-                    float size = cam.getOrthographicSize();
-                    float near = cam.getOrthographicNear();
-                    float far = cam.getOrthographicFar();
+                if (cam.getProjectionType() == ProjectionType::Orthographic) {
+                    float size = cam.getOrthoSize();
+                    float near = cam.getNearPlane();
+                    float far = cam.getFarPlane();
 
                     if (ImGui::DragFloat("Size", &size, 1.0f, 1.0f, 200.0f))
-                        cam.setOrthographicSize(size);
+                        cam.updateSpec(CameraSpec3D::Feild::FOVorSize, size);
 
                     if (ImGui::DragFloat("Near", &near, 0.5f, -far, far - 0.01f))
-                        cam.setOrthographicNear(near);
+                        cam.updateSpec(CameraSpec3D::Feild::NearPlane, near);
 
                     if (ImGui::DragFloat("Far", &far, 0.5f, near + 0.01f, 1000.0f))
-                        cam.setOrthographicFar(far);
+                        cam.updateSpec(CameraSpec3D::Feild::FarPlane, far);
 
                     ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 
@@ -252,7 +247,7 @@ namespace AnEngine::Crank {
                         float aspectRatio = cam.getAspectRatio();
                         if (ImGui::DragFloat("Aspect Ratio", &aspectRatio, 0.05f, 0.1f,
                                              10.0f))
-                            cam.setAspectRatio(aspectRatio);
+                            cam.updateSpec(CameraSpec3D::Feild::AspectRatio, aspectRatio);
                     }
                 }
             },

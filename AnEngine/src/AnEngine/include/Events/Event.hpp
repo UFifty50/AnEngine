@@ -50,7 +50,6 @@ namespace AnEngine {
 
 
     class Event {
-        //     friend class EventDispatcher;
     public:
         bool handled = false;
 
@@ -70,9 +69,6 @@ namespace AnEngine {
         template <typename T>
         using EventFn = std::function<bool(T&)>;
 
-    private:
-        Event& event;
-
     public:
         EventDispatcher(Event& event) : event(event) {}
 
@@ -84,6 +80,9 @@ namespace AnEngine {
             }
             return false;
         }
+
+    private:
+        Event& event;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Event& e) {

@@ -30,11 +30,11 @@ namespace AnEngine {
         YAML::Emitter outYAML;
         outYAML << YAML::BeginMap;
         outYAML << YAML::Key << "Scene";
-        outYAML << YAML::Value << scene->name;
+        outYAML << YAML::Value << scene->getName();
         outYAML << YAML::Key << "Entities";
         outYAML << YAML::Value << YAML::BeginSeq;
 
-        for (auto [entityID] : scene->entityRegistry.storage<entt::entity>().each()) {
+        for (auto [entityID] : scene->getRegistry().storage<entt::entity>().each()) {
             Entity entity = {entityID, scene.get()};
             if (!entity) return;
 
@@ -107,25 +107,29 @@ namespace AnEngine {
 
                 cc.Camera.isPerspective =
                     cameraProps["ProjectionType"].as<std::string>() == "Perspective";
-                cc.Camera.isOrthographic = !cc.Camera.isPerspective;
+
 
                 if (cc.Camera.isPerspective) {
-                    cc.Camera.setPerspectiveFOV(cameraProps["FOV"].as<float>());
-                    cc.Camera.setPerspectiveNear(cameraProps["NearPlane"].as<float>());
-                    cc.Camera.setPerspectiveFar(cameraProps["FarPlane"].as<float>());
+                    cc.Camera.updateSpec(CameraSpec3D::Feild::FOVorSize,
+                                         cameraProps["FOV"].as<float>());
                 } else {
-                    cc.Camera.setOrthographicSize(cameraProps["Size"].as<float>());
-                    cc.Camera.setOrthographicNear(cameraProps["NearPlane"].as<float>());
-                    cc.Camera.setOrthographicFar(cameraProps["FarPlane"].as<float>());
+                    cc.Camera.updateSpec(CameraSpec3D::Feild::FOVorSize,
+                                         cameraProps["Size"].as<float>());
                     cc.FixedAspectRatio =
                         cameraProps["AspectRatioType"].as<std::string>() == "Fixed";
                 }
 
+                cc.Camera.updateSpec(CameraSpec3D::Feild::NearPlane,
+                                     cameraProps["NearPlane"].as<float>());
+                cc.Camera.updateSpec(CameraSpec3D::Feild::FarPlane,
+                                     cameraProps["FarPlane"].as<float>());
+
                 cc.Primary = cameraComponent["Primary"].as<bool>();
                 cc.Camera.aspectRatio = cameraComponent["AspectRatio"].as<float>();
 
-                cc.Camera.setType(cc.Camera.isPerspective ? ProjectionType::Perspective
-                                                          : ProjectionType::Orthographic);
+                cc.Camera.changeProjectionType(cc.Camera.isPerspective
+                                                   ? ProjectionType::Perspective
+                                                   : ProjectionType::Orthographic);
             }
 
             if (auto nativeScriptComponent = entity["NativeScriptComponent"]) {

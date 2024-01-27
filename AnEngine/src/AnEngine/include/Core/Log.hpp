@@ -1,6 +1,25 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
+#include "CoreConfig.hpp"
+
+
+#if USE_FMT == 1 || !defined(__cpp_lib_format)
+    #include <fmt/format.h>
+    #define SPDLOG_FMT_EXTERNAL
+    #define SPDLOG_WCHAR_TO_UTF8_SUPPORT
+    #define AE_FMT_STR(str, ...) fmt::vformat(str, fmt::make_format_args(__VA_ARGS__))
+    #define AE_FMT_WSTR(locale, str, ...) \
+        fmt::vformat(locale, std::wstring_view(str), fmt::make_wformat_args(__VA_ARGS__))
+#else
+    #include <format>
+    #define SPDLOG_USE_STD_FORMAT
+    #define SPDLOG_WCHAR_TO_UTF8_SUPPORT
+    #define AE_FMT_STR(str, ...) std::vformat(str, std::make_format_args(__VA_ARGS__))
+    #define AE_FMT_WSTR(locale, str, ...) \
+        std::vformat(locale, std::wstring_view(str), std::make_wformat_args(__VA_ARGS__))
+#endif
+
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
 
@@ -21,6 +40,7 @@ namespace AnEngine {
         }
     };
 }  // namespace AnEngine
+
 
 // core engine logging macros
 // clang-format off

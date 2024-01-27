@@ -16,7 +16,7 @@ namespace AnEngine::Crank {
     class PropertiesPanel : public Panel {
     public:
         PropertiesPanel() = default;
-        PropertiesPanel(std::string name, Ref<ScenesPanel> scenesPanel);
+        PropertiesPanel(const std::string& name);
 
         virtual ImGuiWindowFlags beforeRender() override {
             //    ImGui::SetNextWindowSizeConstraints({370.0f, -1}, {INFINITY, INFINITY});
@@ -34,6 +34,9 @@ namespace AnEngine::Crank {
                                        float defaultValue = 0.0f);
 
     private:
+        std::string name;
+
+
         void drawComponents(Entity entity);
 
         template <typename T>
@@ -80,9 +83,6 @@ namespace AnEngine::Crank {
 
             if (removable && removeComponent) entity.removeComponent<T>();
         }
-
-        std::string name;
-        Ref<ScenesPanel> scenesPanel;
     };
 };  // namespace AnEngine::Crank
 

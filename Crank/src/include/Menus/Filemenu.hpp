@@ -18,9 +18,7 @@ namespace AnEngine::Crank {
     public:
         FileMenu() = default;
 
-        FileMenu(const std::string& name, Ref<ScenesPanel>& sp, Ref<Scene>& sceneRef,
-                 const Ref<DockSpace>& dockSpace)
-            : name(name), scenesPanel(sp), scene(sceneRef), dockSapce(dockSpace) {}
+        FileMenu(const std::string& name) : name(name) {}
 
         virtual void renderMenu() override;
         virtual void renderMenuPopups() override {}
@@ -28,22 +26,16 @@ namespace AnEngine::Crank {
         virtual std::string getMenuName() override { return name; }
 
 
-        static Ref<Scene> NewScene(Ref<ScenesPanel>& spRef, const Ref<DockSpace>& dsRef);
+        static void NewScene();
 
-        static std::optional<Ref<Scene>> OpenScene(Ref<ScenesPanel>& spRef,
-                                                   const Ref<DockSpace>& dsRef);
+        static bool OpenSceneMenu();
+        static bool OpenScene(const fs::path& path);
 
-        static std::optional<Ref<Scene>> OpenScene(const fs::path& path,
-                                                   Ref<ScenesPanel>& spRef,
-                                                   const Ref<DockSpace>& dsRef);
-
-        static void SaveScene(Ref<Scene>& sceneRef);
+        static void SaveActiveScene();
+        static void SaveScene(const Ref<Scene>& scene);
 
     private:
         std::string name;
-        Ref<ScenesPanel> scenesPanel;
-        Ref<Scene> scene;
-        Ref<DockSpace> dockSapce;
 
         bool loadSceneOpen = false;
         bool saveSceneOpen = false;

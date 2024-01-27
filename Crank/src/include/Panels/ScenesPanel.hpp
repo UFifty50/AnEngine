@@ -12,9 +12,9 @@ namespace AnEngine::Crank {
     class ScenesPanel : public Panel {
     public:
         ScenesPanel() = default;
-        ScenesPanel(std::string name, const Ref<Scene>& scene);
+        ScenesPanel(const std::string& name);
 
-        void setCurrentScene(const Ref<Scene>& scene);
+        void updateCurrentSceneFromActive();
         void setSelectedEntity(Entity entity) { selectedEntity = entity; }
         Entity getSelectedEntity() { return selectedEntity; }
 
@@ -34,8 +34,6 @@ namespace AnEngine::Crank {
         void drawEntityNode(Entity entity);
         void drawAddEntityUI();
 
-        friend class ViewportPanel;
-
         std::string name;
         Ref<Scene> currentScene;
         Entity selectedEntity;
@@ -52,6 +50,9 @@ namespace AnEngine::Crank {
         CameraComponent cc;
         SpriteRendererComponent sRC;
         bool entityUIOpen = false;
+
+
+        friend class ViewportPanel;
     };
 };  // namespace AnEngine::Crank
 
