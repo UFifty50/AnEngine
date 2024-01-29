@@ -11,12 +11,14 @@
 
 #include "Renderer/Camera/SceneCamera.hpp"
 #include "Scene/ScriptableEntity.hpp"
+#include "Texture/Material.hpp"
+#include "Texture/Texture2D.hpp"
 #include "Time/TimeStep.hpp"
 
 
 #define TRANSFORM_COMPONENT_ID 0
-#define SPRITERENDERER_COMPONENT_ID 1
-#define MATERIAL_COMPONENT_ID 2
+#define OBJECTRENDERER_COMPONENT_ID 1
+#define SPRITERENDERER_COMPONENT_ID 2
 #define TAG_COMPONENT_ID 3
 #define CAMERA_COMPONENT_ID 4
 #define NATIVESCRIPT_COMPONENT_ID 5
@@ -44,23 +46,24 @@ namespace AnEngine {
         }
     };
 
+    struct ObjectRendererComponent : Component {
+        Material ObjMaterial;
+
+        ObjectRendererComponent() = default;
+        ObjectRendererComponent(const ObjectRendererComponent&) = default;
+        ObjectRendererComponent(const Material& material) : ObjMaterial(material) {}
+
+        constexpr virtual uint32_t getID() override { return OBJECTRENDERER_COMPONENT_ID; }
+    };
+
     struct SpriteRendererComponent : Component {
-        glm::vec4 Colour{1.0f};
-        // TODO: Ref<Material>
-        // Ref<Texture2D> Texture = {};
+        Material SpriteMaterial;
 
         SpriteRendererComponent() = default;
         SpriteRendererComponent(const SpriteRendererComponent&) = default;
-        SpriteRendererComponent(const glm::vec4& colour) : Colour(colour) {}
+        SpriteRendererComponent(const Material& material) : SpriteMaterial(material) {}
 
         constexpr virtual uint32_t getID() override { return SPRITERENDERER_COMPONENT_ID; }
-    };
-
-    struct MaterialComponent : Component {
-        MaterialComponent() = default;
-        MaterialComponent(const MaterialComponent&) = default;
-
-        constexpr virtual uint32_t getID() override { return MATERIAL_COMPONENT_ID; }
     };
 
     struct TagComponent : Component {

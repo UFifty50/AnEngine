@@ -30,7 +30,7 @@ namespace AnEngine {
 
         uint32_t size() {
             stream.seekg(0, std::ios::end);
-            uint32_t size = stream.tellg();
+            uint32_t size = static_cast<uint32_t>(stream.tellg());
             stream.seekg(0, std::ios::beg);
 
             return size;

@@ -25,10 +25,12 @@
 #include "Renderer/FrameBuffer.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Renderer2D.hpp"
+#include "Renderer/Renderer3D.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
 #include "Scene/Scene.hpp"
 #include "Scene/Scene2D.hpp"
+#include "Scene/Scene3D.hpp"
 #include "Scene/SceneSerialiser.hpp"
 #include "Scene/ScriptableEntity.hpp"
 
@@ -87,13 +89,13 @@ namespace AnEngine::Crank {
         g_ActiveScene = MakeRef<Scene2D>("Test Scene");
 
         CameraSpec2D camSpec{30.0f, 1.778f, 0.1f, 1000.0f};
-        editorCam2D = MakeRef<EditorCamera2D>(camSpec);
+        editorCam3D = MakeRef<EditorCamera2D>(camSpec);
 
         g_DockSpace = MakeRef<DockSpace>();
 
         gPanel_SceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene");
         gPanel_Properties = MakeRef<PropertiesPanel>("Properties");
-        gPanel_Viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam2D);
+        gPanel_Viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam3D);
         gPanel_ContentBrowser = MakeRef<ContentBrowserPanel>("Content Browser");
         gPanel_Statistics = MakeRef<StatisticsPanel>("Statistics");
 
@@ -131,16 +133,16 @@ namespace AnEngine::Crank {
             (fbSpec.Width != vpSize.x || fbSpec.Height != vpSize.y)) {
             frameBuffer->resize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
 
-            editorCam2D->setViewportSize(vpSize.x, vpSize.y);
+            editorCam3D->setViewportSize(vpSize.x, vpSize.y);
 
             g_ActiveScene->onResize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
         }
 
         // if (dockSpace->isViewportFocused())
-        editorCam2D->onUpdate(deltaTime);
+        editorCam3D->onUpdate(deltaTime);
 
-        Renderer2D::resetStats();
-        Renderer2D::getStats().lastFrameTime = deltaTime.getMilliseconds();
+        Renderer3D::resetStats();
+        Renderer3D::getStats().lastFrameTime = deltaTime.getMilliseconds();
 
         frameBuffer->bind();
         RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1.0f});
@@ -148,7 +150,7 @@ namespace AnEngine::Crank {
 
         frameBuffer->clearColourAttachment(1, -1);
 
-        g_ActiveScene->onUpdateEditor(deltaTime, editorCam2D);
+        g_ActiveScene->onUpdateEditor(deltaTime, editorCam3D);
         // activeScene->onUpdateRuntime(deltaTime);
 
         auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
@@ -166,7 +168,7 @@ namespace AnEngine::Crank {
     void CrankEditor::onImGuiRender() { g_DockSpace->render(); }
 
     void CrankEditor::onEvent(Event& event) {
-        editorCam2D->onEvent(event);
+        editorCam3D->onEvent(event);
 
         EventDispatcher dispatcher(event);
         dispatcher.dispatch<KeyPressedEvent>(BIND_EVENT_FN(CrankEditor::onKeyPressed));

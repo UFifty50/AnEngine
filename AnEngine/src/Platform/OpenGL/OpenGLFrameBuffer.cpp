@@ -105,11 +105,11 @@ namespace AnEngine {
     }  // namespace Utils
 
     OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpec& spec) : specification(spec) {
-        for (const auto& spec : specification.Attachments.Attachments) {
-            if (spec.texFormat.isDepth())
-                depthAttachmentSpec = spec;
+        for (const auto& attachmentSpec : specification.Attachments.Attachments) {
+            if (attachmentSpec.texFormat.isDepth())
+                depthAttachmentSpec = attachmentSpec;
             else
-                colourAttachmentSpecs.emplace_back(spec);
+                colourAttachmentSpecs.emplace_back(attachmentSpec);
         }
 
         reconstruct();
@@ -117,7 +117,7 @@ namespace AnEngine {
 
     OpenGLFrameBuffer::~OpenGLFrameBuffer() {
         glDeleteFramebuffers(1, &rendererID);
-        glDeleteTextures(colourAttachments.size(), colourAttachments.data());
+        glDeleteTextures((GLsizei)colourAttachments.size(), colourAttachments.data());
         glDeleteTextures(1, &depthAttachment);
     }
 
@@ -137,8 +137,8 @@ namespace AnEngine {
 
         //   glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID);
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
-        glReadPixels(from.x, from.y, size.x, size.y, Utils::GLformat(format), GL_INT,
-                     pixels.data());
+        glReadPixels((GLsizei)from.x, (GLsizei)from.y, (GLsizei)size.x, (GLsizei)size.y,
+                     Utils::GLformat(format), GL_INT, pixels.data());
         //    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
         return pixels;
@@ -156,7 +156,7 @@ namespace AnEngine {
     void OpenGLFrameBuffer::reconstruct() {
         if (rendererID != 0) {
             glDeleteFramebuffers(1, &rendererID);
-            glDeleteTextures(colourAttachments.size(), colourAttachments.data());
+            glDeleteTextures((GLsizei)colourAttachments.size(), colourAttachments.data());
             glDeleteTextures(1, &depthAttachment);
 
             colourAttachments.clear();
@@ -174,7 +174,7 @@ namespace AnEngine {
             colourAttachments.resize(colourAttachmentSpecs.size());
 
             Utils::CreateTextures(isMultisampled, colourAttachments.data(),
-                                  colourAttachments.size());
+                                  (uint32_t)colourAttachments.size());
 
             for (uint32_t i = 0; i < colourAttachments.size(); i++) {
                 Utils::BindTexture(isMultisampled, colourAttachments[i]);
@@ -237,7 +237,7 @@ namespace AnEngine {
                 GL_COLOR_ATTACHMENT27, GL_COLOR_ATTACHMENT28, GL_COLOR_ATTACHMENT29,
                 GL_COLOR_ATTACHMENT30, GL_COLOR_ATTACHMENT31};
 
-            glDrawBuffers(colourAttachments.size(), buffers);
+            glDrawBuffers((GLsizei)colourAttachments.size(), buffers);
         } else if (colourAttachments.empty()) {
             // Only depth buffer
             glDrawBuffer(GL_NONE);

@@ -32,8 +32,9 @@ namespace AnEngine {
         virtual void destroyEntity(Entity& entity) override;
         virtual void onResize(uint32_t width, uint32_t height) override;
 
-        void onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera);
-        void onUpdateRuntime(TimeStep deltaTime);
+        virtual void onUpdateEditor(TimeStep deltaTime,
+                                    const Ref<EditorCamera>& camera) override;
+        virtual void onUpdateRuntime(TimeStep deltaTime) override;
 
         Entity getPrimaryCamera();
 

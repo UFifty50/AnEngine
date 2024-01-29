@@ -20,7 +20,9 @@ namespace AnEngine {
         return nullptr;
     }
 
-    Ref<Texture2D> Texture2D::create(const std::string& path) {
+    // Ref<Texture2D> Texture2D::create(const std::string& path) { create(fs::path(path)); }
+
+    Ref<Texture2D> Texture2D::create(const fs::path& path) {
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
                 return MakeRef<OpenGLTexture2D>(path);

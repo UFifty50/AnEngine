@@ -248,7 +248,7 @@ namespace AnEngine {
         for (auto&& [shaderType, spirvCode] : openglSPRIV) {
             GLuint shaderID = shaderIDs.emplace_back(glCreateShader(shaderType));
             glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirvCode.data(),
-                           spirvCode.size() * sizeof(uint32_t));
+                           (GLsizei)spirvCode.size() * sizeof(uint32_t));
             glSpecializeShader(shaderID, "main", 0, nullptr, nullptr);
             glAttachShader(program, shaderID);
         }
@@ -293,9 +293,9 @@ namespace AnEngine {
 
         for (const auto& res : resources.uniform_buffers) {
             const auto& bufferType = compiler.get_type(res.base_type_id);
-            uint32_t bufferSize = compiler.get_declared_struct_size(bufferType);
-            uint32_t binding = compiler.get_decoration(res.id, spv::DecorationBinding);
-            uint32_t memberCount = bufferType.member_types.size();
+            size_t bufferSize = compiler.get_declared_struct_size(bufferType);
+            size_t binding = compiler.get_decoration(res.id, spv::DecorationBinding);
+            size_t memberCount = bufferType.member_types.size();
 
             AE_CORE_TRACE("  {0}", res.name);
             AE_CORE_TRACE("    Size = {0}", bufferSize);
@@ -423,7 +423,7 @@ namespace AnEngine {
             glUniform1i(location, slot);
         } else if (uniform.type() == typeid(std::array<Sampler2D, maxTextureSlots>)) {
             auto samplerArray = std::any_cast<std::array<Sampler2D, maxTextureSlots>>(uniform);
-            int32_t data[maxTextureSlots];
+            int32_t data[maxTextureSlots]{};
 
             for (uint32_t i = 0; i < maxTextureSlots; i++) {
                 data[i] = samplerArray[i].slot;

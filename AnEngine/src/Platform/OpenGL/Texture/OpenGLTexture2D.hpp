@@ -3,15 +3,19 @@
 
 #include <glad/glad.h>
 
+#include <filesystem>
+
 #include "File/InputFileStream.hpp"
 #include "Renderer/ShaderUniform.hpp"
 #include "Texture/Texture2D.hpp"
 
 
+namespace fs = std::filesystem;
+
 namespace AnEngine {
     class OpenGLTexture2D : public Texture2D {
     public:
-        OpenGLTexture2D(const std::string& path);
+        OpenGLTexture2D(const fs::path& path);
         OpenGLTexture2D(uint32_t width, uint32_t height);
         virtual ~OpenGLTexture2D();
 
@@ -26,9 +30,7 @@ namespace AnEngine {
             return pixelFormat;
         }
 
-        inline virtual Sampler2D getSampler() const override {
-            return Sampler2D{rendererID};
-        }
+        inline virtual Sampler2D getSampler() const override { return Sampler2D{rendererID}; }
         virtual void setData(void* data, uint32_t size) override;
 
         virtual void bind(uint32_t slot) const override;

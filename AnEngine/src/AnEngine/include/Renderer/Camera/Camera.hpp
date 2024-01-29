@@ -29,7 +29,9 @@ namespace AnEngine {
             }
         }
 
-        constexpr static ProjectionType fromFloat(int value) { return (T)value; }
+        constexpr static ProjectionType fromFloat(float value) {
+            return static_cast<T>(static_cast<int>(value));
+        }
 
         constexpr static ProjectionType fromString(const std::string& string) {
             if (string == "Perspective") {

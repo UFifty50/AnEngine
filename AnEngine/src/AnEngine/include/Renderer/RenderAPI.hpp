@@ -14,6 +14,7 @@ namespace AnEngine {
     class RenderAPI {
     public:
         enum API : uint8_t { NoAPI = 0, OpenGL, DirectX11, DirectX12, Vulkan };
+        enum Dimension : uint8_t { Dim2D = 0, Dim3D };
 
         inline static API getAPI() { return currAPI; }
         inline static void setAPI(RenderAPI::API api) { currAPI = api; }
@@ -38,8 +39,7 @@ namespace AnEngine {
         virtual ~RenderAPI() = default;
 
         virtual void init() = 0;
-        virtual void setViewport(uint32_t x, uint32_t y, uint32_t width,
-                                 uint32_t height) = 0;
+        virtual void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 
         virtual void clearColour(const glm::vec4& colour) = 0;
         virtual void clear() = 0;

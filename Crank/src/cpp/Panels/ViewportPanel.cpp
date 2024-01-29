@@ -17,8 +17,6 @@
 
 
 namespace AnEngine::Crank {
-    extern const fs::path baseAssetsDirectory;
-
     ViewportPanel::ViewportPanel(const std::string& name, const Ref<FrameBuffer>& fbuf,
                                  const Ref<EditorCamera>& editorCamera)
         : name(name),
@@ -102,7 +100,7 @@ namespace AnEngine::Crank {
                     ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
                 const wchar_t* path = (const wchar_t*)payload->Data;
 
-                if (!FileMenu::OpenScene(fs::path(baseAssetsDirectory) / path)) {
+                if (!FileMenu::OpenScene(fs::path(g_BaseAssetsDirectory) / path)) {
                     AE_CORE_ERROR(L"Couldn't load Scene {}", path);
                     return;
                 }

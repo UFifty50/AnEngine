@@ -11,6 +11,13 @@
 #include "entt/entt.hpp"
 
 
+/// TODO: Projects
+///       - Core Scene YAML
+///       - Directory structure
+///       - Every file item has a Meta file for its UUID
+///       - binary data is referenced by UUID
+
+
 namespace AnEngine {
     YAML::Emitter& operator<<(YAML::Emitter& outYAML, const glm::vec3 v) {
         outYAML << YAML::Flow;
@@ -21,6 +28,11 @@ namespace AnEngine {
     YAML::Emitter& operator<<(YAML::Emitter& outYAML, const glm::vec4 v) {
         outYAML << YAML::Flow;
         outYAML << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+        return outYAML;
+    }
+
+    YAML::Emitter& operator<<(YAML::Emitter& outYAML, const Ref<Texture2D> t) {
+        outYAML << "Not implemented";
         return outYAML;
     }
 
@@ -95,10 +107,10 @@ namespace AnEngine {
             }
 
             if (auto spriteRendererComponent = entity["SpriteRendererComponent"]) {
-                auto colour = spriteRendererComponent["Colour"].as<glm::vec4>();
+                auto material = spriteRendererComponent["Material"];
 
                 auto& sRC = deserialisedEntity.addComponent<SpriteRendererComponent>();
-                sRC.Colour = colour;
+                sRC.SpriteMaterial.colour = material["Colour"].as<glm::vec4>();
             }
 
             if (auto cameraComponent = entity["CameraComponent"]) {
@@ -187,7 +199,13 @@ namespace AnEngine {
             outYAML << YAML::BeginMap;
 
             auto& sRC = entity.getComponent<SpriteRendererComponent>();
-            outYAML << YAML::Key << "Colour" << YAML::Value << sRC.Colour;
+            // Unity uses YAML for materials, and each texture is just an ID for the assets
+            // manager to use
+            outYAML << YAML::Key << "Material" << YAML::BeginMap;
+            outYAML << YAML::Key << "Colour" << YAML::Value << sRC.SpriteMaterial.colour;
+            outYAML << YAML::Key << "Texture" << YAML::Value
+                    << sRC.SpriteMaterial.getTexture().value_or(nullptr);
+            outYAML << YAML::EndMap;
 
             outYAML << YAML::EndMap;
         }

@@ -5,16 +5,17 @@
 #include <filesystem>
 
 #include "Core/Log.hpp"
+#include "Globals.hpp"
 #include "Texture/Texture2D.hpp"
 
 
 namespace fs = std::filesystem;
 
 namespace AnEngine::Crank {
-    extern const fs::path baseAssetsDirectory = "assets";  // TODO: add projects
+    const fs::path g_BaseAssetsDirectory = "assets";  // TODO: add projects
 
     ContentBrowserPanel::ContentBrowserPanel(const std::string& name)
-        : name(name), currentPath(baseAssetsDirectory) {
+        : name(name), currentPath(g_BaseAssetsDirectory) {
         directoryIcon = Texture2D::create("builtins/icons/DirectoryIcon.png");
         fileIcon = Texture2D::create("builtins/icons/FileIcon.png");
     }
@@ -32,7 +33,7 @@ namespace AnEngine::Crank {
         }
 
 
-        if (currentPath != baseAssetsDirectory) {
+        if (currentPath != g_BaseAssetsDirectory) {
             if (ImGui::Button("<- Back")) {
                 currentPath = currentPath.parent_path();
             }
@@ -64,7 +65,7 @@ namespace AnEngine::Crank {
 
             for (auto& dirEnt : fs::directory_iterator(currentPath)) {
                 const fs::path path = dirEnt.path();
-                const fs::path relPath = fs::relative(path, baseAssetsDirectory);
+                const fs::path relPath = fs::relative(path, g_BaseAssetsDirectory);
                 const std::string relPathName = relPath.filename().string();
                 const Ref<Texture2D> icon =
                     dirEnt.is_directory() ? directoryIcon : fileIcon;
@@ -81,8 +82,8 @@ namespace AnEngine::Crank {
                     ImGui::SetDragDropPayload("CONTENTBROWSER_ITEM", itemPath,
                                               (wcslen(itemPath) + 1) * sizeof(wchar_t));
 
-                    ImGui::Image((void*)icon->getSampler().slot, {thumbSize, thumbSize},
-                                 {0, 1}, {1, 0});
+                    ImGui::Image((ImTextureID)icon->getSampler().slot,
+                                 {thumbSize, thumbSize}, {0, 1}, {1, 0});
 
                     ImGui::EndDragDropSource();
                 }

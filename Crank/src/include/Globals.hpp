@@ -23,6 +23,8 @@ namespace AnEngine::Crank {
     extern Ref<StatisticsPanel> gPanel_Statistics;
 
     extern Ref<FileMenu> gMenu_FileOps;
+
+    extern const fs::path g_BaseAssetsDirectory;
 };  // namespace AnEngine::Crank
 
 #endif

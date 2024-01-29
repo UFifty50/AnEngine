@@ -32,7 +32,7 @@ namespace AnEngine::Crank {
 
     private:
         void drawEntityNode(Entity entity);
-        void drawAddEntityUI();
+        //      void drawAddEntityUI();
 
         std::string name;
         Ref<Scene> currentScene;

@@ -17,7 +17,7 @@ namespace AnEngine::Crank {
 namespace AnEngine {
     Application* CreateApplication() {
         RenderAPI::setAPI(RenderAPI::OpenGL);
-        Application::Init("Crank - AnEngine");
+        Application::Init("Crank - AnEngine", RenderAPI::Dim2D);
         return new Crank::CrankApp();
     }
 }  // namespace AnEngine

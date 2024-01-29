@@ -82,7 +82,7 @@ namespace AnEngine {
                 auto [transform, sprite] =
                     spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
-                if ((uint32_t)entity > std::numeric_limits<int32_t>::max()) {
+                if ((uint32_t)entity > unsigned(std::numeric_limits<int32_t>::max())) {
                     AE_CORE_ASSERT(false, "Too many entities in scene :(     TODO: fixme");
                 }
 

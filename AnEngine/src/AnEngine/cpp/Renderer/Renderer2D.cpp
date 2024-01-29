@@ -184,7 +184,13 @@ namespace AnEngine {
     // Primitives
     void Renderer2D::drawSprite(const glm::mat4& transform,
                                 const SpriteRendererComponent& sprite, int32_t entityID) {
-        drawQuad(transform, sprite.Colour, entityID);
+        Material material = sprite.SpriteMaterial;
+
+        if (auto tex = material.getTexture()) {
+            drawQuad(transform, *tex, entityID);
+        } else {
+            drawQuad(transform, material.colour, entityID);
+        }
     }
 
     void Renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& colour,
@@ -253,6 +259,9 @@ namespace AnEngine {
         }
 
         if (textureIndex == 0.0f) {
+            AE_CORE_ASSERT(rendererData.textureSlotIndex < rendererData.maxTextureSlots,
+                           "Renderer2D::drawQuad() exceeded max texture slots per draw call!");
+
             textureIndex = (float)rendererData.textureSlotIndex;
             rendererData.textureSlots[rendererData.textureSlotIndex] = texture;
             rendererData.textureSlotIndex++;

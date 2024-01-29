@@ -1,5 +1,5 @@
-#ifndef RENDERER2D_HPP
-#define RENDERER2D_HPP
+#ifndef RENDERER3D_HPP
+#define RENDERER3D_HPP
 
 #include <glm/glm.hpp>
 
@@ -10,6 +10,7 @@
 #include "Renderer/Buffers/VertexBuffer.hpp"
 #include "Renderer/Camera/Camera.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
+#include "Renderer/Renderer.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/VertexArray.hpp"
 #include "Scene/Components.hpp"
@@ -18,7 +19,7 @@
 
 
 namespace AnEngine {
-    class Renderer2D {
+    class Renderer3D : public Renderer {
     public:
         struct QuadVertex {
             glm::vec3 position;
@@ -27,7 +28,6 @@ namespace AnEngine {
             float texIndex;
             float tilingFactor;
             glm::vec4 tint;
-            // ShaderUniformVector attributes;
 
             // Editor Specific
             uint32_t entityID;
@@ -39,19 +39,19 @@ namespace AnEngine {
             static const uint32_t maxIndices = maxQuads * 6;
             static const uint32_t maxTextureSlots = 32;  // TODO: Render Capabilities
 
-            Ref<VertexArray> quadVA;
-            Ref<VertexBuffer> quadVB;
+            Ref<VertexArray> VAO;
+            Ref<VertexBuffer> VBO;
             Ref<Texture2D> blankTexture;
             ShaderLibrary shaderLibrary;  // Ref<Shader> shader;
 
             uint32_t quadIndexCount = 0;
-            QuadVertex* quadVertexBufferBase = nullptr;
-            QuadVertex* quadVertexBufferPtr = nullptr;
+            QuadVertex* VBOBase = nullptr;
+            QuadVertex* VBOPtr = nullptr;
 
             std::array<Ref<Texture2D>, maxTextureSlots> textureSlots;
             uint8_t textureSlotIndex = 1;  // 0 = blank texture
 
-            glm::vec4 quadVertexPositions[4]{};
+            glm::vec4 quadVertexPositions[4];
 
             bool activeScene = false;
 
@@ -82,32 +82,14 @@ namespace AnEngine {
         static void init();
         static void shutdown();
 
-        static void beginScene(const EditorCamera2D& camera);
+        static void beginScene(const EditorCamera3D& camera);
         static void beginScene(const Scope<Camera>& camera, const glm::mat4& transform);
         static void endScene();
         static void flush();
 
         // Primitives
-        static void drawSprite(const glm::mat4& transform,
-                               const SpriteRendererComponent& sprite, int32_t entityID);
-
-        static void drawQuad(const glm::mat4& transform, const glm::vec4& colour,
-                             int32_t entityID = -1);
-        static void drawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
-                             int32_t entityID = -1,
-                             const ShaderUniformVector& attributes = {});
-
-
-        /*static void drawQuad(const glm::vec2& position, const glm::vec2& size, float
-        rotation, const glm::vec4& colour, const ShaderUniformVector& attributes = {});
-        static void drawQuad(const glm::vec3& position, const glm::vec2& size, float
-        rotation, const glm::vec4& colour, const ShaderUniformVector& attributes = {});
-
-        static void drawQuad(const glm::vec2& position, const glm::vec2& size, float
-        rotation, const Ref<Texture2D>& texture, const ShaderUniformVector& attributes =
-        {}); static void drawQuad(const glm::vec3& position, const glm::vec2& size, float
-        rotation, const Ref<Texture2D>& texture, const ShaderUniformVector& attributes =
-        {});*/
+        static void drawObject(const glm::mat4& transform,
+                               const ObjectRendererComponent& object, int32_t entityID);
 
         // Stats
         static Statistics& getStats() { return rendererStats; }
@@ -117,6 +99,6 @@ namespace AnEngine {
         static void endBatch();
         static void newBatch();
     };
-}  // namespace AnEngine
+};  // namespace AnEngine
 
 #endif

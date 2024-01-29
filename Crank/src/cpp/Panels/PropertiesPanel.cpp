@@ -7,6 +7,7 @@
 #include "imgui_internal.h"
 
 #include "Globals.hpp"
+#include "Panels/ContentBrowserPanel.hpp"
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
@@ -256,7 +257,46 @@ namespace AnEngine::Crank {
         drawComponent<SpriteRendererComponent>(
             "Sprite Renderer", entity, true,
             [](auto& component) {
-                ImGui::ColorEdit4("Colour", glm::value_ptr(component.Colour));
+                ImGui::ColorEdit4("Colour",
+                                  glm::value_ptr(component.SpriteMaterial.colour));
+
+                if (ImGui::BeginTable("##MaterialTable", 2)) {
+                    ImGui::TableSetupColumn("##MaterialView",
+                                            ImGuiTableColumnFlags_WidthFixed);
+                    ImGui::TableSetupColumn("##MaterialInfo");
+
+                    ImGui::TableNextRow();
+
+                    ImGui::TableSetColumnIndex(0);
+                    if (auto tex = component.SpriteMaterial.getTexture())
+                        ImGui::ImageButton("##E", (ImTextureID)(*tex)->getSampler().slot,
+                                           {50.0f, 50.0f}, {0, 1}, {1, 0});
+                    else
+                        ImGui::Button("##Texture", {50.0f, 50.0f});
+
+                    if (ImGui::BeginDragDropTarget()) {
+                        if (const ImGuiPayload* payload =
+                                ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
+                            const wchar_t* path = (const wchar_t*)payload->Data;
+
+                            component.SpriteMaterial.texture =
+                                Texture2D::create(g_BaseAssetsDirectory / path);
+                        }
+
+                        ImGui::EndDragDropTarget();
+                    }
+
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text("Placeholder Name");
+                    ImGui::SameLine();
+                    if (ImGui::Button("X")) component.SpriteMaterial.texture = nullptr;
+
+                    if (ImGui::TreeNodeEx("Shader")) ImGui::TreePop();
+                    ImGui::SameLine();
+                    ImGui::Button("Edit");
+
+                    ImGui::EndTable();
+                }
             },
             treeNodeFlags);
 
@@ -267,3 +307,7 @@ namespace AnEngine::Crank {
             treeNodeFlags);
     }
 }  // namespace AnEngine::Crank
+
+
+/// [image] [name] [close]
+///         [shader] [edit]

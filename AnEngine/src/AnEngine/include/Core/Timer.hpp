@@ -12,7 +12,7 @@ namespace AnEngine {
         void reset() { start = std::chrono::high_resolution_clock::now(); }
 
         float elapsedMs() {
-            return std::chrono::duration_cast<std::chrono::milliseconds>(
+            return (float)std::chrono::duration_cast<std::chrono::milliseconds>(
                        std::chrono::high_resolution_clock::now() - start)
                 .count();
         }

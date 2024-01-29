@@ -6,6 +6,7 @@
 #include "Events/Event.hpp"
 #include "File/InputFileStream.hpp"
 #include "ImGui/ImGuiLayer.hpp"
+#include "Renderer/RenderAPI.hpp"
 #include "Window.hpp"
 
 
@@ -46,7 +47,8 @@ namespace AnEngine {
 
         static Data applicationData;
 
-        static void Init(const std::string& name = "AnEngine");
+        static void Init(const std::string& name = "AnEngine",
+                         RenderAPI::Dimension dimensionality = RenderAPI::Dim2D);
         static int Run();
         static void Shutdown(int exitCode = 0);
 

@@ -10,7 +10,7 @@
 
 
 namespace AnEngine {
-    OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
+    OpenGLTexture2D::OpenGLTexture2D(const fs::path& path)
         : file(InputFileStream(path, std::ios::binary)) {
         AE_PROFILE_FUNCTION()
 
@@ -19,10 +19,9 @@ namespace AnEngine {
         stbi_set_flip_vertically_on_load(1);
         unsigned char* data = nullptr;
         {
-            AE_PROFILE_SCOPE(
-                "OpenGLTexture2D::OpenGLTexture2D(const std::string&)@stbi_load")
+            AE_PROFILE_SCOPE("OpenGLTexture2D::OpenGLTexture2D(const std::string&)@stbi_load")
 
-            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+            data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
         }
 
         AE_CORE_ASSERT(data, "Failed to load image!");
@@ -54,8 +53,7 @@ namespace AnEngine {
         this->height = height;
 
         glCreateTextures(GL_TEXTURE_2D, 1, &this->rendererID);
-        glTextureStorage2D(this->rendererID, 1, internalFormat, this->width,
-                           this->height);
+        glTextureStorage2D(this->rendererID, 1, internalFormat, this->width, this->height);
 
         glTextureParameteri(this->rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(this->rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -63,8 +61,8 @@ namespace AnEngine {
         glTextureParameteri(this->rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(this->rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-        glTextureSubImage2D(this->rendererID, 0, 0, 0, this->width, this->height,
-                            dataFormat, GL_UNSIGNED_BYTE, data);
+        glTextureSubImage2D(this->rendererID, 0, 0, 0, this->width, this->height, dataFormat,
+                            GL_UNSIGNED_BYTE, data);
 
         imageData = new uint8_t[width * height * ImageFormat::getBPP(pixelFormat)];
         *imageData = *data;
@@ -92,9 +90,8 @@ namespace AnEngine {
     OpenGLTexture2D::~OpenGLTexture2D() { glDeleteTextures(1, &this->rendererID); }
 
     void OpenGLTexture2D::setData(void* data, uint32_t size) {
-        AE_CORE_ASSERT(
-            size == this->width * this->height * ImageFormat::getBPP(pixelFormat),
-            "Data must be entire texture!");
+        AE_CORE_ASSERT(size == this->width * this->height * ImageFormat::getBPP(pixelFormat),
+                       "Data must be entire texture!");
 
         if (imageData != nullptr) *imageData = *(uint8_t*)data;
 
@@ -111,8 +108,8 @@ namespace AnEngine {
                 break;
         }
 
-        glTextureSubImage2D(this->rendererID, 0, 0, 0, this->width, this->height,
-                            dataFormat, GL_UNSIGNED_BYTE, data);
+        glTextureSubImage2D(this->rendererID, 0, 0, 0, this->width, this->height, dataFormat,
+                            GL_UNSIGNED_BYTE, data);
     }
 
     void OpenGLTexture2D::bind(uint32_t slot) const {

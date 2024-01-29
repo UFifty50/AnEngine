@@ -40,7 +40,7 @@ namespace AnEngine::Crank {
         friend class Panel;
 
     private:
-        Ref<EditorCamera2D> editorCam2D;
+        Ref<EditorCamera2D> editorCam3D;
         Ref<FrameBuffer> frameBuffer;
 
 

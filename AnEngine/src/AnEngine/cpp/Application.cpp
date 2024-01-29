@@ -8,6 +8,8 @@
 #include "Events/ApplicationEvent.hpp"
 #include "Renderer/RenderAPI.hpp"
 #include "Renderer/Renderer.hpp"
+#include "Renderer/Renderer2D.hpp"
+#include "Renderer/Renderer3D.hpp"
 #include "Time/Time.hpp"
 #include "Time/TimeStep.hpp"
 #include "Window.hpp"
@@ -16,7 +18,7 @@
 namespace AnEngine {
     Application::Data Application::applicationData;
 
-    void Application::Init(const std::string& name) {
+    void Application::Init(const std::string& name, RenderAPI::Dimension dimensionality) {
         AE_PROFILE_FUNCTION()
 
         AE_CORE_ASSERT(!applicationData.initialized, "Application already exists!");
@@ -37,8 +39,17 @@ namespace AnEngine {
         applicationData.window = Scope<Window>(Window::create(WindowProperties(name)));
         applicationData.window->setEventCallback(&Application::onEvent);
 
-        Renderer::init();
         Random::init();
+
+        Renderer::init();
+        switch (dimensionality) {
+            using enum RenderAPI::Dimension;
+
+            case Dim2D:
+                Renderer2D::init();
+            case Dim3D:
+                Renderer3D::init();
+        }
 
         applicationData.imGuiLayer = MakeRef<ImGuiLayer>();
         pushOverlay(applicationData.imGuiLayer);

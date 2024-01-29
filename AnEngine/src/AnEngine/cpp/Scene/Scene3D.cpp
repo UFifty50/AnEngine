@@ -5,7 +5,7 @@
 #include "Scene/Scene3D.hpp"
 
 #include "Renderer/Camera/EditorCamera.hpp"
-#include "Renderer/Renderer.hpp"
+#include "Renderer/Renderer3D.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
 
@@ -21,19 +21,20 @@ namespace AnEngine {
     void Scene3D::destroyEntity(Entity& entity) { this->entityRegistry.destroy(entity); }
 
     void Scene3D::onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) {
-        //    Renderer::beginScene(*camera);
+        Ref<EditorCamera3D> camera3D = std::static_pointer_cast<EditorCamera3D>(camera);
+        Renderer3D::beginScene(*camera3D);
 
-        auto spriteGroup =
-            this->entityRegistry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+        auto objectGroup =
+            this->entityRegistry.group<TransformComponent>(entt::get<ObjectRendererComponent>);
 
-        for (auto entity : spriteGroup) {
-            auto [transform, sprite] =
-                spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
+        for (auto entity : objectGroup) {
+            auto [transform, object] =
+                objectGroup.get<TransformComponent, ObjectRendererComponent>(entity);
 
-            //      Renderer::drawObject((glm::mat4)transform, sprite, (uint32_t)entity);
+            Renderer3D::drawObject((glm::mat4)transform, object, (uint32_t)entity);
         }
 
-        Renderer::endScene();
+        Renderer3D::endScene();
     }
 
     void Scene3D::onUpdateRuntime(TimeStep deltaTime) {
@@ -55,7 +56,7 @@ namespace AnEngine {
             nsc.Instance->onUpdate(deltaTime);
         });
 
-        Camera* mainCamera = nullptr;
+        Scope<Camera> mainCamera = nullptr;
         glm::mat4 mainCameraTransform;
 
         auto cameraView = this->entityRegistry.view<TransformComponent, CameraComponent>();
@@ -63,31 +64,30 @@ namespace AnEngine {
             auto [transform, camera] =
                 cameraView.get<TransformComponent, CameraComponent>(entity);
             if (camera.Primary) {
-                mainCamera = &camera.Camera;
+                mainCamera.reset(&camera.Camera);
                 mainCameraTransform = (glm::mat4)transform;
                 break;
             }
         }
 
         if (mainCamera) {
-            //     Renderer::beginScene(mainCamera->getProjectionMatrix(),
-            //     mainCameraTransform);
+            Renderer3D::beginScene(std::move(mainCamera), mainCameraTransform);
 
-            auto spriteGroup = this->entityRegistry.group<TransformComponent>(
-                entt::get<SpriteRendererComponent>);
+            auto objectGroup = this->entityRegistry.group<TransformComponent>(
+                entt::get<ObjectRendererComponent>);
 
-            for (auto entity : spriteGroup) {
-                auto [transform, sprite] =
-                    spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
+            for (auto entity : objectGroup) {
+                auto [transform, object] =
+                    objectGroup.get<TransformComponent, ObjectRendererComponent>(entity);
 
-                if ((uint32_t)entity > std::numeric_limits<int32_t>::max()) {
+                if ((uint32_t)entity > unsigned(std::numeric_limits<int32_t>::max())) {
                     AE_CORE_ASSERT(false, "Too many entities in scene :(     TODO: fixme");
                 }
 
-                //        Renderer::drawObject((glm::mat4)transform, sprite, (int32_t)entity);
+                Renderer3D::drawObject((glm::mat4)transform, object, (int32_t)entity);
             }
 
-            Renderer::endScene();
+            Renderer3D::endScene();
         }
     }
 

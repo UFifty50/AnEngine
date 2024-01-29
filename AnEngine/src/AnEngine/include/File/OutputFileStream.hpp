@@ -17,7 +17,7 @@ namespace AnEngine {
                          std::ios_base::openmode type = std::ios::binary)
             : OutputFileStream(path.string(), type) {}
 
-        OutputFileStream() : path(""), name(""), extension("") {}
+        OutputFileStream() : path(""), name(""), extension(""), iMode() {}
 
         virtual ~OutputFileStream() override {
             if (stream.is_open()) this->close();
