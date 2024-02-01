@@ -29,13 +29,5 @@
     #include <signal.h>
     #include <unistd.h>
 #endif
-//
-// #include "Core/Core.hpp"
-// #include "Core/Log.hpp"
-// #include "Events/ApplicationEvent.hpp"
-// #include "Events/KeyEvent.hpp"
-// #include "Events/MouseEvent.hpp"
-// #include "Profiling/InstrumentationTimer.hpp"
-// #include "Profiling/Instrumentor.hpp"
 
 #endif

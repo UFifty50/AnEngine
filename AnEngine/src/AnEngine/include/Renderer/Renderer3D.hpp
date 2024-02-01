@@ -65,10 +65,11 @@ namespace AnEngine {
         struct Statistics {
             uint32_t draws = 0;
             uint32_t quadCount = 0;
+            uint32_t materialsUsed = 0;
             float lastFrameTime = 0.0f;
 
             void reset() {
-                draws = quadCount = 0;
+                draws = quadCount = materialsUsed = 0;
                 lastFrameTime = 0.0f;
             }
             uint32_t getTotalVertexCount() { return quadCount * 4; }

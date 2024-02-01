@@ -4,7 +4,7 @@
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec4 ColourIn;
 layout(location = 2) in vec2 TexCoordIn;
-layout(location = 3) in float TexIndexIn;
+layout(location = 3) in int TexIndexIn;
 layout(location = 4) in float TilingFactorIn;
 layout(location = 5) in vec4 TintIn;
 layout(location = 6) in int EntityIDin;
@@ -18,7 +18,7 @@ layout(std140, binding = 0) uniform Camera {
 struct VertexOutput {
     vec4 Colour;
     vec2 TexCoord;
-    float TexIndex;
+    int TexIndex;
     float TilingFactor;
     vec4 Tint;
 };
@@ -48,12 +48,12 @@ layout(location = 1) out int colour2;
 struct VertexOutput {
     vec4 Colour;
     vec2 TexCoord;
-    float TexIndex;
+    int TexIndex;
     float TilingFactor;
     vec4 Tint;
 };
 
-layout(location = 0) in VertexOutput Input;
+layout(location = 0) in flat VertexOutput Input;
 layout(location = 5) in flat int EntityID;
 
 layout(binding = 0) uniform sampler2D textureSamplers[32];
@@ -61,7 +61,7 @@ layout(binding = 0) uniform sampler2D textureSamplers[32];
 
 void main() {
     // maybe int switch() or if() for texture index
-    vec4 texColour = Input.Colour * Input.Tint * texture(textureSamplers[int(Input.TexIndex)], Input.TexCoord);
+    vec4 texColour = Input.Colour * Input.Tint * texture(textureSamplers[Input.TexIndex], Input.TexCoord);
     if(texColour.a < 0.05)
         discard;
 

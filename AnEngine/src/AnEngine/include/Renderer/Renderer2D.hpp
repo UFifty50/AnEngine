@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 
+#include <map>
 #include <memory>
 #include <type_traits>
 
@@ -24,34 +25,40 @@ namespace AnEngine {
             glm::vec3 position;
             glm::vec4 colour;
             glm::vec2 texCoord;
-            float texIndex;
+            uint32_t albedoIndex;
             float tilingFactor;
             glm::vec4 tint;
-            // ShaderUniformVector attributes;
 
             // Editor Specific
             uint32_t entityID;
         };
 
-        struct Storage {
+        struct MaterialBatch {
             static const uint32_t maxQuads = 100'000;
             static const uint32_t maxVertices = maxQuads * 4;
             static const uint32_t maxIndices = maxQuads * 6;
             static const uint32_t maxTextureSlots = 32;  // TODO: Render Capabilities
 
-            Ref<VertexArray> quadVA;
-            Ref<VertexBuffer> quadVB;
-            Ref<Texture2D> blankTexture;
-            ShaderLibrary shaderLibrary;  // Ref<Shader> shader;
-
-            uint32_t quadIndexCount = 0;
-            QuadVertex* quadVertexBufferBase = nullptr;
-            QuadVertex* quadVertexBufferPtr = nullptr;
-
             std::array<Ref<Texture2D>, maxTextureSlots> textureSlots;
             uint8_t textureSlotIndex = 1;  // 0 = blank texture
 
+            Ref<VertexArray> quadVAO;
+            Ref<VertexBuffer> quadVBO;
+            uint32_t indexCount = 0;
+
+            QuadVertex* quadVBOBase = nullptr;
+            QuadVertex* quadVBOPtr = nullptr;
+
+
+            ~MaterialBatch() { delete[] quadVBOBase; }
+        };
+
+        struct Storage {
+            std::map<Material, std::vector<Scope<MaterialBatch>>> materialBatches;
+            Material activeMaterial = Material("Empty");
             glm::vec4 quadVertexPositions[4]{};
+
+            Ref<Texture2D> blankTexture;
 
             bool activeScene = false;
 
@@ -64,11 +71,12 @@ namespace AnEngine {
 
         struct Statistics {
             uint32_t draws = 0;
+            uint32_t usedMaterials = 0;
             uint32_t quadCount = 0;
             float lastFrameTime = 0.0f;
 
             void reset() {
-                draws = quadCount = 0;
+                draws = quadCount = usedMaterials = 0;
                 lastFrameTime = 0.0f;
             }
             uint32_t getTotalVertexCount() { return quadCount * 4; }
@@ -82,10 +90,11 @@ namespace AnEngine {
         static void init();
         static void shutdown();
 
+        static void newMaterialBatch(const Material& material);
+
         static void beginScene(const EditorCamera2D& camera);
         static void beginScene(const Scope<Camera>& camera, const glm::mat4& transform);
         static void endScene();
-        static void flush();
 
         // Primitives
         static void drawSprite(const glm::mat4& transform,
@@ -98,24 +107,17 @@ namespace AnEngine {
                              const ShaderUniformVector& attributes = {});
 
 
-        /*static void drawQuad(const glm::vec2& position, const glm::vec2& size, float
-        rotation, const glm::vec4& colour, const ShaderUniformVector& attributes = {});
-        static void drawQuad(const glm::vec3& position, const glm::vec2& size, float
-        rotation, const glm::vec4& colour, const ShaderUniformVector& attributes = {});
-
-        static void drawQuad(const glm::vec2& position, const glm::vec2& size, float
-        rotation, const Ref<Texture2D>& texture, const ShaderUniformVector& attributes =
-        {}); static void drawQuad(const glm::vec3& position, const glm::vec2& size, float
-        rotation, const Ref<Texture2D>& texture, const ShaderUniformVector& attributes =
-        {});*/
-
         // Stats
         static Statistics& getStats() { return rendererStats; }
         static void resetStats() { rendererStats.reset(); }
 
     private:
-        static void endBatch();
         static void newBatch();
+        static void endActiveBatch();
+        static void flushActiveBatch();
+
+        static void endAllBatches();
+        static void flushAllBatches();
     };
 }  // namespace AnEngine
 

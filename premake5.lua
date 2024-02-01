@@ -71,7 +71,8 @@ project "AnEngine"
     }
 
     defines {
-        "YAML_CPP_STATIC_DEFINE"
+        "YAML_CPP_STATIC_DEFINE",
+        "AE_ENGINECORE"
     }
 
     links {
@@ -223,7 +224,8 @@ project "Crank"
     }
 
     defines {
-        "YAML_CPP_STATIC_DEFINE"
+        "YAML_CPP_STATIC_DEFINE",
+        "AE_CRANKUI"
     }
 
     postbuildcommands {

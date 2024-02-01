@@ -9,8 +9,7 @@
 
 
 namespace AnEngine {
-    Ref<Shader> Shader::create(const std::string& mixedShaderPath,
-                               const std::string& name) {
+    Ref<Shader> Shader::create(const std::string& mixedShaderPath, const std::string& name) {
         InputFileStream mixedShaderStream(mixedShaderPath, std::ios::binary);
 
         switch (RenderAPI::getAPI()) {
@@ -57,6 +56,8 @@ namespace AnEngine {
 
     Ref<Shader> ShaderLibrary::load(const std::string& name,
                                     const std::string& mixedShaderPath) {
+        if (shaders.find(name) != shaders.end()) return shaders[name];
+
         auto shader = Shader::create(mixedShaderPath);
         add(name, shader);
         return shader;

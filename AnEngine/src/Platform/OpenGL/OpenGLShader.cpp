@@ -311,7 +311,7 @@ namespace AnEngine {
     void OpenGLShader::uploadUniform(const std::string& name, std::any uniform) {
         AE_PROFILE_FUNCTION()
 
-        const uint32_t maxTextureSlots = Renderer2D::rendererData.maxTextureSlots;
+        const uint32_t maxTextureSlots = Renderer2D::MaterialBatch::maxTextureSlots;
 
         GLint location = glGetUniformLocation(rendererID, name.c_str());
         if (location == -1) {

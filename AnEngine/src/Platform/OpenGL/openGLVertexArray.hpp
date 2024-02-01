@@ -15,12 +15,13 @@ namespace AnEngine {
         OpenGLVertexArray();
         virtual ~OpenGLVertexArray();
 
-        inline virtual void bind() const override {
+        virtual void bind() const override {
             AE_PROFILE_FUNCTION()
 
             glBindVertexArray(this->rendererID);
         }
-        inline virtual void unBind() const override {
+
+        virtual void unBind() const override {
             AE_PROFILE_FUNCTION()
 
             glBindVertexArray(0);
@@ -29,11 +30,11 @@ namespace AnEngine {
         virtual void addVertexBuffer(const Ref<VertexBuffer>& layout) override;
         virtual void setIndexBuffer(const Ref<IndexBuffer>& layout) override;
 
-        inline virtual const std::vector<Ref<VertexBuffer>>& getVertexBuffers()
-            const override {
+        virtual const std::vector<Ref<VertexBuffer>>& getVertexBuffers() const override {
             return this->vertexBuffers;
         }
-        inline virtual const Ref<IndexBuffer>& getIndexBuffer() const override {
+
+        virtual const Ref<IndexBuffer>& getIndexBuffer() const override {
             return this->indexBuffer;
         }
 

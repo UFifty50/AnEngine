@@ -141,8 +141,8 @@ namespace AnEngine::Crank {
         // if (dockSpace->isViewportFocused())
         editorCam3D->onUpdate(deltaTime);
 
-        Renderer3D::resetStats();
-        Renderer3D::getStats().lastFrameTime = deltaTime.getMilliseconds();
+        Renderer2D::resetStats();
+        Renderer2D::getStats().lastFrameTime = deltaTime.getMilliseconds();
 
         frameBuffer->bind();
         RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1.0f});

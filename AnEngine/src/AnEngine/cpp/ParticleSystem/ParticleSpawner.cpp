@@ -87,8 +87,8 @@ namespace AnEngine {
     void ParticleSpawner::emit(Ref<Camera> camera) {
         if (!enabled) return;
 
-        Renderer2D::beginScene(camera->getProjectionMatrix(),
-                               camera->getProjectionMatrix());
+        // Renderer2D::beginScene(camera->getProjectionMatrix(),
+        //                        camera->getProjectionMatrix());
 
         for (auto& particle : activeParticles) {
             if (!particle.isAlive()) {
