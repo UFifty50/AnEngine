@@ -15,7 +15,7 @@ namespace AnEngine {
         // TODO: uuid_t uuid;
         glm::vec4 colour{1.0f};
         Ref<Texture2D> texture{nullptr};
-        std::string temporary;
+        bool isNull;
         // TODO: Ref<Texture2D> Albedo{nullptr};
         // TODO: Ref<Texture2D> Normal{nullptr};
         // TODO: Ref<Texture2D> Specular{nullptr};
@@ -24,7 +24,7 @@ namespace AnEngine {
 
 
         Material() = default;
-        Material(const std::string& temporary) : temporary(temporary) {}
+        Material(nullptr_t) : isNull(true) {}
         ~Material() = default;
 
         std::optional<Ref<Texture2D>> getTexture() {
@@ -36,7 +36,7 @@ namespace AnEngine {
 
         // TODO: use UUID
         bool operator==(const Material& other) const {
-            if (temporary == "Empty" || other.temporary == "Empty") return false;
+            if (isNull || other.isNull) return false;
 
             if ((texture && !other.texture) || (!texture && other.texture))
                 return false;

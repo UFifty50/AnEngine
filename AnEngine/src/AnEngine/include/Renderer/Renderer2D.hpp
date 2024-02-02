@@ -47,21 +47,17 @@ namespace AnEngine {
             uint32_t indexCount = 0;
 
             std::vector<QuadVertex> quadVBOVec;
-            // maybe fixed-size vector with push back?
-            // that way we only fill the correct number of quads, instead of maxVertices
         };
 
         struct MatList {
             MatList* next;
-            bool hasNext;
 
             Material material;
             std::vector<MaterialBatch> batches;
 
-            MatList() : next(nullptr), hasNext(false), material("Empty") {}
-            MatList(const Material& material)
-                : next(nullptr), hasNext(false), material(material) {
-                batches.emplace_back();
+            MatList() : next(nullptr), material(nullptr) {}
+            MatList(const Material& material) : next(nullptr), material(material) {
+                //       batches.emplace_back();
             }
 
             ~MatList() {
@@ -132,32 +128,37 @@ namespace AnEngine {
             typedef std::pair<Material, std::vector<MaterialBatch>> value_type;
             class iterator {
             public:
-                iterator(MatList* ptr) : ptr(ptr) {}
+                iterator(MatList* ptr = nullptr) : ptr(ptr) {}
+
+                operator bool() const { return ptr != nullptr; }
+                bool operator==(const iterator& other) const { return ptr == other.ptr; }
+                value_type operator*() const {
+#define E(e) e
+                    return {ptr->material, ptr->batches};
+                }
+
                 iterator operator++() {
                     ptr = ptr->next;
                     return *this;
                 }
+
                 iterator operator++(int) {
-                    iterator tmp = *this;
-                    ++(*this);
+                    iterator tmp(*this);
+                    ++ptr;
                     return tmp;
                 }
-                bool operator==(const iterator& other) const { return ptr == other.ptr; }
-                value_type operator*() const { return {ptr->material, ptr->batches}; }
 
             private:
                 MatList* ptr;
             };
 
-            iterator begin() {
-                return material.temporary != "Empty" ? iterator(this) : iterator(nullptr);
-            }
+            iterator begin() { return !material.isNull ? iterator(this) : iterator(nullptr); }
             iterator end() { return iterator(nullptr); }
         };
 
         struct Storage {
             MatList* materialBatchesHead;
-            Material activeMaterial = Material("Empty");
+            Material activeMaterial = Material(nullptr);
 
             glm::vec4 quadVertexPositions[4]{};
             std::array<uint32_t, MaterialBatch::maxIndices> quadIndices;

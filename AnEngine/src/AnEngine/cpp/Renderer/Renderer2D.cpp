@@ -100,7 +100,12 @@ namespace AnEngine {
 
             {
                 AE_PROFILE_SCOPE("Add material batch")
-                (*rendererData.materialBatchesHead)[material].push_back(batch);
+                if (rendererData.materialBatchesHead->material.isNull) {
+                    rendererData.materialBatchesHead->material = material;
+                    rendererData.materialBatchesHead->batches.push_back(batch);
+                } else {
+                    (*rendererData.materialBatchesHead)[material].push_back(batch);
+                }
             }
 
             g_ShaderLibrary.load("QuadShader", "builtins/assets/shaders/quad.glsl");
@@ -150,7 +155,7 @@ namespace AnEngine {
                        "Renderer2D::shutdown() called with active scene!");
 
         delete rendererData.materialBatchesHead;
-        rendererData.activeMaterial = Material("Empty");
+        rendererData.activeMaterial = Material(nullptr);
 
         //   rendererData.textureSlotIndex = 1;
     }
@@ -173,7 +178,7 @@ namespace AnEngine {
         }
 
         rendererStats.usedMaterials = (uint32_t)rendererData.materialBatchesHead->size();
-        rendererData.activeMaterial = Material("Empty");
+        rendererData.activeMaterial = Material(nullptr);
 
         rendererData.activeScene = false;
     }
