@@ -20,18 +20,24 @@
 
 namespace AnEngine {
     YAML::Emitter& operator<<(YAML::Emitter& outYAML, const glm::vec3 v) {
+        AE_PROFILE_FUNCTION()
+
         outYAML << YAML::Flow;
         outYAML << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
         return outYAML;
     }
 
     YAML::Emitter& operator<<(YAML::Emitter& outYAML, const glm::vec4 v) {
+        AE_PROFILE_FUNCTION()
+
         outYAML << YAML::Flow;
         outYAML << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
         return outYAML;
     }
 
     YAML::Emitter& operator<<(YAML::Emitter& outYAML, const Ref<Texture2D> t) {
+        AE_PROFILE_FUNCTION()
+
         outYAML << "Not implemented";
         return outYAML;
     }
@@ -39,6 +45,8 @@ namespace AnEngine {
     SceneSerialiser::SceneSerialiser(const Ref<Scene>& scene) : scene(scene) {}
 
     void SceneSerialiser::serialise(const std::string& path) {
+        AE_PROFILE_FUNCTION()
+
         YAML::Emitter outYAML;
         outYAML << YAML::BeginMap;
         outYAML << YAML::Key << "Scene";
@@ -61,10 +69,14 @@ namespace AnEngine {
     }
 
     void SceneSerialiser::serialiseBinary(const std::string& path) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(false, "Not Implemented");
     }
 
     bool SceneSerialiser::deserialise(const std::string& path) {
+        AE_PROFILE_FUNCTION()
+
         YAML::Node data = YAML::LoadFile(path);
         try {
             if (!data["Scene"]) return false;
@@ -159,11 +171,15 @@ namespace AnEngine {
     }
 
     bool SceneSerialiser::deserialiseBinary(const std::string& path) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(false, "Not Implemented");
         return false;
     }
 
     void SceneSerialiser::serialiseEntity(YAML::Emitter& outYAML, Entity entity) {
+        AE_PROFILE_FUNCTION()
+
         outYAML << YAML::BeginMap;
         outYAML << YAML::Key << "Entity";
         outYAML << YAML::Value << "12837192831273";  // TODO: unique entity ID

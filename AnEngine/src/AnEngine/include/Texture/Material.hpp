@@ -36,7 +36,7 @@ namespace AnEngine {
 
         // TODO: use UUID
         bool operator==(const Material& other) const {
-            if (temporary == "Empty") return false;
+            if (temporary == "Empty" || other.temporary == "Empty") return false;
 
             if ((texture && !other.texture) || (!texture && other.texture))
                 return false;

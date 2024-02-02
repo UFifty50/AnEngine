@@ -32,6 +32,8 @@ namespace AnEngine {
         static void CreateCacheDirectory() { fs::create_directories(GetCacheDirectory()); }
 
         static shaderc_shader_kind ShaderCType(GLenum type) {
+            AE_PROFILE_FUNCTION()
+
             switch (type) {
                 case GL_VERTEX_SHADER:
                     return shaderc_glsl_vertex_shader;
@@ -49,6 +51,8 @@ namespace AnEngine {
         }
 
         static std::string GLStringType(GLenum type) {
+            AE_PROFILE_FUNCTION()
+
             switch (type) {
                 case GL_VERTEX_SHADER:
                     return "GL_VERTEX_SHADER";
@@ -67,6 +71,8 @@ namespace AnEngine {
 
         // GL Shader Cache from GL Shader stage
         static std::string GLShaderGLCacheExtension(GLenum shaderType) {
+            AE_PROFILE_FUNCTION()
+
             switch (shaderType) {
                 case GL_VERTEX_SHADER:
                     return ".glcache.glvert";
@@ -81,6 +87,8 @@ namespace AnEngine {
 
         // VK Shader Cache from GL Shader stage
         static std::string GLShaderVKCacheExtension(GLenum shaderType) {
+            AE_PROFILE_FUNCTION()
+
             switch (shaderType) {
                 case GL_VERTEX_SHADER:
                     return ".vkcache.glvert";
@@ -96,6 +104,8 @@ namespace AnEngine {
 
     OpenGLShader::OpenGLShader(InputFileStream& mixedShaderStream,
                                const std::string& shaderName) {
+        AE_PROFILE_FUNCTION()
+
         if (!mixedShaderStream.is_open()) {
             AE_CORE_CRITICAL("Cannot compile as {0} is not open.",
                              mixedShaderStream.getFilePath());
@@ -242,6 +252,8 @@ namespace AnEngine {
     }
 
     GLuint OpenGLShader::createProgram() {
+        AE_PROFILE_FUNCTION()
+
         GLuint program = glCreateProgram();
 
         std::vector<GLuint> shaderIDs;
@@ -281,6 +293,8 @@ namespace AnEngine {
     }
 
     void OpenGLShader::reflect(GLenum shaderType, const std::vector<uint32_t>& spirvCode) {
+        AE_PROFILE_FUNCTION()
+
         spirv_cross::Compiler compiler(spirvCode);
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
@@ -442,6 +456,8 @@ namespace AnEngine {
         : mixedShaderSrc(mixedShaderSrc), shaderType(GL_FALSE) {}
 
     void ShaderParser::parse() {
+        AE_PROFILE_FUNCTION()
+
         std::string line;
         std::stringstream ss(mixedShaderSrc);
 
@@ -491,6 +507,8 @@ namespace AnEngine {
     }
 
     std::unordered_map<GLenum, std::string> ShaderParser::getShaders() const {
+        AE_PROFILE_FUNCTION()
+
         return shaders;
     }
 }  // namespace AnEngine

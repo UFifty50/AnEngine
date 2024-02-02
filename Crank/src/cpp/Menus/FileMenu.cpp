@@ -16,6 +16,8 @@
 
 namespace AnEngine::Crank {
     void FileMenu::renderMenu() {
+        AE_PROFILE_FUNCTION()
+
         if (ImGui::MenuItem("New Scene", "Ctrl+N")) {
             NewScene();
         }
@@ -41,6 +43,8 @@ namespace AnEngine::Crank {
     }
 
     void FileMenu::NewScene() {
+        AE_PROFILE_FUNCTION()
+
         g_ActiveScene = MakeRef<Scene2D>();
         g_ActiveScene->onResize((uint32_t)g_DockSpace->getViewportSize().x,
                                 (uint32_t)g_DockSpace->getViewportSize().y);
@@ -48,6 +52,8 @@ namespace AnEngine::Crank {
     }
 
     bool FileMenu::OpenScene(const fs::path& path) {
+        AE_PROFILE_FUNCTION()
+
         if (!fs::exists(path)) {
             AE_CORE_WARN("File does not exist!");
             return false;
@@ -66,6 +72,8 @@ namespace AnEngine::Crank {
     }
 
     bool FileMenu::OpenSceneMenu() {
+        AE_PROFILE_FUNCTION()
+
         if (auto path = Dialogues::OpenFileDialogue(
                 "CrankEngine Scene (*.aescene)\0*.aescene\0")) {
             return OpenScene(*path);
@@ -75,6 +83,8 @@ namespace AnEngine::Crank {
     }
 
     void FileMenu::SaveActiveScene() {
+        AE_PROFILE_FUNCTION()
+
         if (auto path = Dialogues::SaveFileDialogue(
                 "CrankEngine Scene (*.aescene)\0 *.aescene\0")) {
             SceneSerialiser serialiser(g_ActiveScene);
@@ -83,6 +93,8 @@ namespace AnEngine::Crank {
     }
 
     void FileMenu::SaveScene(const Ref<Scene>& scene) {
+        AE_PROFILE_FUNCTION()
+
         if (auto path = Dialogues::SaveFileDialogue(
                 "CrankEngine Scene (*.aescene)\0 *.aescene\0")) {
             SceneSerialiser serialiser(scene);

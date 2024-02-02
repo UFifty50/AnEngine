@@ -12,7 +12,7 @@ namespace AnEngine {
         uint32_t count;
 
     public:
-        OpenGLIndexBuffer(const Scope<uint32_t[]>& indices, uint32_t count);
+        OpenGLIndexBuffer(const uint32_t const* indices, uint32_t count);
         virtual ~OpenGLIndexBuffer();
 
         virtual uint32_t getCount() const override;

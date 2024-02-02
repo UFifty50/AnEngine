@@ -12,6 +12,8 @@
 
 namespace AnEngine {
     Entity& Scene2D::createEntity(const std::string& name) {
+        AE_PROFILE_FUNCTION()
+
         Entity e = {this->entityRegistry.create(), this};
         e.addComponent<TransformComponent>();
         auto& tag = e.addComponent<TagComponent>(name.empty() ? "Entity" : name);
@@ -21,6 +23,8 @@ namespace AnEngine {
     void Scene2D::destroyEntity(Entity& entity) { this->entityRegistry.destroy(entity); }
 
     void Scene2D::onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(!camera->isPerspective(), "2D EditorCamera must be orthographic!");
 
         Ref<EditorCamera2D> camera2D = std::static_pointer_cast<EditorCamera2D>(camera);
@@ -40,6 +44,8 @@ namespace AnEngine {
     }
 
     void Scene2D::onUpdateRuntime(TimeStep deltaTime) {
+        AE_PROFILE_FUNCTION()
+
         this->entityRegistry.view<NativeScriptComponent>().each([=](const auto entity,
                                                                     auto& nsc) {
             // TODO: Move to onScenePlay functiom
@@ -94,6 +100,8 @@ namespace AnEngine {
     }
 
     void Scene2D::onResize(uint32_t width, uint32_t height) {
+        AE_PROFILE_FUNCTION()
+
         this->viewportWidth = width;
         this->viewportHeight = height;
 
@@ -107,6 +115,8 @@ namespace AnEngine {
     }
 
     Entity Scene2D::getPrimaryCamera() {
+        AE_PROFILE_FUNCTION()
+
         auto view = this->entityRegistry.view<CameraComponent>();
         for (auto entity : view) {
             const auto& cameraComponent = view.get<CameraComponent>(entity);
@@ -118,6 +128,8 @@ namespace AnEngine {
     }
 
     void Scene2D::onComponentAdded(Entity& e, Component& component) {
+        AE_PROFILE_FUNCTION()
+
         switch (component.getID()) {
             case CAMERA_COMPONENT_ID: {
                 if (this->viewportWidth <= 0 || this->viewportHeight <= 0) return;

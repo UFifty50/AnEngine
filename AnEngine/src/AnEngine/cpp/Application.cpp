@@ -56,16 +56,22 @@ namespace AnEngine {
     }
 
     void Application::pushLayer(Ref<Layer> layer) {
+        AE_PROFILE_FUNCTION()
+
         applicationData.layerStack.pushLayer(layer);
         layer->onAttach();
     }
 
     void Application::pushOverlay(Ref<Layer> overlay) {
+        AE_PROFILE_FUNCTION()
+
         applicationData.layerStack.pushOverlay(overlay);
         overlay->onAttach();
     }
 
     void Application::onEvent(Event& e) {
+        AE_PROFILE_FUNCTION()
+
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
         dispatcher.dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::onWindowResize));
@@ -78,11 +84,15 @@ namespace AnEngine {
     }
 
     bool Application::onWindowClose(WindowCloseEvent& closeEvent) {
+        AE_PROFILE_FUNCTION()
+
         applicationData.running = false;
         return true;
     }
 
     bool Application::onWindowResize(WindowResizeEvent& resizeEvent) {
+        AE_PROFILE_FUNCTION()
+
         if (resizeEvent.getWidth() == 0 || resizeEvent.getHeight() == 0) {
             applicationData.minimized = true;
             return false;
@@ -96,6 +106,8 @@ namespace AnEngine {
     }
 
     int Application::Run() {
+        AE_PROFILE_FUNCTION()
+
         if (!applicationData.initialized) {
             std::stringstream msg;
             msg << "AnEngine::Application::Init() needs to be called after "

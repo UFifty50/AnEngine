@@ -12,6 +12,8 @@
 
 namespace AnEngine {
     EditorCamera3D::EditorCamera3D(CameraSpec3D spec) {
+        AE_PROFILE_FUNCTION()
+
         projectionType = spec.type;
         aspectRatio = spec.aspectRatio;
 
@@ -39,11 +41,14 @@ namespace AnEngine {
     }
 
     void EditorCamera3D::changeProjectionType(ProjectionType type) {
+        AE_PROFILE_FUNCTION()
+
         projectionType = type;
         updateProjectionMatrix();
     }
 
     void EditorCamera3D::onUpdate(TimeStep deltaTime) {
+        AE_PROFILE_FUNCTION()
         const glm::vec2& mouse = {Input::getMouseX(), Input::getMouseY()};
         glm::vec2 delta = (mouse - initialMousePosition) * 0.003f;
         initialMousePosition = mouse;
@@ -58,12 +63,16 @@ namespace AnEngine {
     }
 
     void EditorCamera3D::onEvent(Event& e) {
+        AE_PROFILE_FUNCTION()
+
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<MouseScrolledEvent>(
             BIND_EVENT_FN(EditorCamera3D::onMouseScrolled));
     }
 
     void EditorCamera3D::updateProjectionMatrix() {
+        AE_PROFILE_FUNCTION()
+
         aspectRatio = viewportWidth / viewportHeight;
 
         switch (projectionType) {
@@ -88,6 +97,8 @@ namespace AnEngine {
     }
 
     void EditorCamera3D::updateViewMatrix() {
+        AE_PROFILE_FUNCTION()
+
         if (!isPerspective()) yaw = pitch = 0.0f;  // locks the cameras rotation
         position = calculatePosition();
         glm::quat orientation = getOrientation();
@@ -96,6 +107,8 @@ namespace AnEngine {
     }
 
     glm::vec3 EditorCamera3D::getDirection(Direction direction) const {
+        AE_PROFILE_FUNCTION()
+
         switch (direction) {
             using enum Direction;
 
@@ -117,10 +130,14 @@ namespace AnEngine {
     }
 
     glm::quat EditorCamera3D::getOrientation() const {
+        AE_PROFILE_FUNCTION()
+
         return glm::quat(glm::vec3(-pitch, -yaw, 0.0f));
     }
 
     bool EditorCamera3D::onMouseScrolled(MouseScrolledEvent& e) {
+        AE_PROFILE_FUNCTION()
+
         float delta = e.getYOffset() * 0.1f;
         mouseZoom(delta);
         updateViewMatrix();
@@ -128,18 +145,24 @@ namespace AnEngine {
     }
 
     void EditorCamera3D::mousePan(const glm::vec2& delta) {
+        AE_PROFILE_FUNCTION()
+
         auto [xSpeed, ySpeed] = getPanSpeed();
         focalPoint += -getDirection(Direction::RIGHT) * delta.x * xSpeed * distance;
         focalPoint += getDirection(Direction::UP) * delta.y * ySpeed * distance;
     }
 
     void EditorCamera3D::mouseRotate(const glm::vec2& delta) {
+        AE_PROFILE_FUNCTION()
+
         float yawSign = getDirection(Direction::UP).y < 0 ? -1.0f : 1.0f;
         yaw += yawSign * delta.x * getRotationSpeed();
         pitch += delta.y * getRotationSpeed();
     }
 
     void EditorCamera3D::mouseZoom(float delta) {
+        AE_PROFILE_FUNCTION()
+
         distance -= delta * getZoomSpeed();
 
         if (distance < 1.0f) {
@@ -149,10 +172,14 @@ namespace AnEngine {
     }
 
     glm::vec3 EditorCamera3D::calculatePosition() const {
+        AE_PROFILE_FUNCTION()
+
         return focalPoint - getDirection(Direction::FORWARD) * distance;
     }
 
     std::pair<float, float> EditorCamera3D::getPanSpeed() const {
+        AE_PROFILE_FUNCTION()
+
         float x = std::min(viewportWidth / 1000.0f, 2.4f);
         float y = std::min(viewportHeight / 1000.0f, 2.4f);
 
@@ -165,6 +192,8 @@ namespace AnEngine {
     float EditorCamera3D::getRotationSpeed() const { return 0.8f; }
 
     float EditorCamera3D::getZoomSpeed() const {
+        AE_PROFILE_FUNCTION()
+
         float dist = std::max(distance * 0.2f, 0.0f);
         return std::min(dist * dist, 100.0f);
     }
@@ -178,6 +207,8 @@ namespace AnEngine {
 
 
     EditorCamera2D::EditorCamera2D(CameraSpec2D spec) {
+        AE_PROFILE_FUNCTION()
+
         projectionType = ProjectionType::Orthographic;
         aspectRatio = spec.aspectRatio;
 
@@ -193,6 +224,8 @@ namespace AnEngine {
     }
 
     void EditorCamera2D::onUpdate(TimeStep deltaTime) {
+        AE_PROFILE_FUNCTION()
+
         const glm::vec2& mouse = {Input::getMouseX(), Input::getMouseY()};
         glm::vec2 delta = (mouse - initialMousePosition) * 0.003f;
         initialMousePosition = mouse;
@@ -205,12 +238,16 @@ namespace AnEngine {
     }
 
     void EditorCamera2D::onEvent(Event& e) {
+        AE_PROFILE_FUNCTION()
+
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<MouseScrolledEvent>(
             BIND_EVENT_FN(EditorCamera2D::onMouseScrolled));
     }
 
     void EditorCamera2D::updateProjectionMatrix() {
+        AE_PROFILE_FUNCTION()
+
         aspectRatio = viewportWidth / viewportHeight;
 
         float left = -orthoSettings.size * aspectRatio * 0.5f;
@@ -226,12 +263,16 @@ namespace AnEngine {
     }
 
     void EditorCamera2D::updateViewMatrix() {
+        AE_PROFILE_FUNCTION()
+
         position = calculatePosition();
         viewMatrix = glm::translate(glm::mat4(1.0f), position) * glm::mat4(1.0f);
         viewMatrix = glm::inverse(viewMatrix);
     }
 
     bool EditorCamera2D::onMouseScrolled(MouseScrolledEvent& e) {
+        AE_PROFILE_FUNCTION()
+
         float delta = e.getYOffset() * 0.1f;
         mouseZoom(delta);
         updateViewMatrix();
@@ -239,12 +280,16 @@ namespace AnEngine {
     }
 
     void EditorCamera2D::mousePan(const glm::vec2& delta) {
+        AE_PROFILE_FUNCTION()
+
         auto [xSpeed, ySpeed] = getPanSpeed();
         focalPoint.x += -delta.x * xSpeed * orthoSettings.size;
         focalPoint.y += delta.y * ySpeed * orthoSettings.size;
     }
 
     void EditorCamera2D::mouseZoom(float delta) {
+        AE_PROFILE_FUNCTION()
+
         orthoSettings.size -= delta * getZoomSpeed();
 
         if (orthoSettings.size < 1.0f) {
@@ -255,10 +300,14 @@ namespace AnEngine {
     }
 
     glm::vec3 EditorCamera2D::calculatePosition() const {
+        AE_PROFILE_FUNCTION()
+
         return focalPoint + glm::vec3(0.0f, 0.0f, orthoSettings.size);
     }
 
     std::pair<float, float> EditorCamera2D::getPanSpeed() const {
+        AE_PROFILE_FUNCTION()
+
         float x = std::min(viewportWidth / 1000.0f, 2.4f);
         float y = std::min(viewportHeight / 1000.0f, 2.4f);
 
@@ -269,6 +318,8 @@ namespace AnEngine {
     }
 
     float EditorCamera2D::getZoomSpeed() const {
+        AE_PROFILE_FUNCTION()
+
         float dist = std::max(orthoSettings.size / 2, 0.0f);
         return std::min(dist * dist, 100.0f);
     }

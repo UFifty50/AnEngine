@@ -12,6 +12,8 @@
 namespace AnEngine {
     SceneCamera::SceneCamera() { recalculateProjection(); }
     SceneCamera::SceneCamera(CameraSpec3D spec) {
+        AE_PROFILE_FUNCTION()
+
         projectionType = spec.type;
         isPerspective = spec.type == ProjectionType::Perspective;
         aspectRatio = spec.aspectRatio;
@@ -38,6 +40,8 @@ namespace AnEngine {
     }
 
     void SceneCamera::updateSpec(CameraSpec3D::Feild feild, float value) {
+        AE_PROFILE_FUNCTION()
+
         switch (feild) {
             using enum CameraSpec3D::Feild;
 
@@ -79,6 +83,8 @@ namespace AnEngine {
     }
 
     void SceneCamera::setViewportSize(uint32_t width, uint32_t height) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(width > 0 && height > 0, "Invalid viewport width or height!");
 
         aspectRatio = (float)width / (float)height;
@@ -86,6 +92,8 @@ namespace AnEngine {
     }
 
     void SceneCamera::recalculateProjection() {
+        AE_PROFILE_FUNCTION()
+
         if (projectionType == ProjectionType::Orthographic) {
             float left = -orthoSettings.size * aspectRatio * 0.5f;
             float right = -left;

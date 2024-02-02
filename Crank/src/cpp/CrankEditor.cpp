@@ -153,13 +153,17 @@ namespace AnEngine::Crank {
         g_ActiveScene->onUpdateEditor(deltaTime, editorCam3D);
         // activeScene->onUpdateRuntime(deltaTime);
 
-        auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
-        if (g_DockSpace->isMouseInViewport()) {
-            int32_t pixel = frameBuffer->readPixels(1, {mouseX, mouseY}, {1, 1},
-                                                    FrameBufferTexFormat::RED_INTEGER)[0];
-            hoveredEntity =
-                pixel == -1 ? Entity() : Entity{(entt::entity)pixel, g_ActiveScene.get()};
-            gPanel_Statistics->setHoveredEntity(hoveredEntity);
+        {
+            AE_PROFILE_SCOPE("hovering");
+            auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
+            if (g_DockSpace->isMouseInViewport()) {
+                int32_t pixel = frameBuffer->readPixels(
+                    1, {mouseX, mouseY}, {1, 1}, FrameBufferTexFormat::RED_INTEGER)[0];
+                hoveredEntity = pixel == -1
+                                    ? Entity()
+                                    : Entity{(entt::entity)pixel, g_ActiveScene.get()};
+                gPanel_Statistics->setHoveredEntity(hoveredEntity);
+            }
         }
 
         frameBuffer->unBind();

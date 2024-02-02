@@ -30,19 +30,46 @@ namespace AnEngine {
         uint32_t whiteTextureData = 0xffffffff;
         rendererData.blankTexture->setData(&whiteTextureData, sizeof(uint32_t));
 
+        uint32_t offset = 0;
+        for (uint32_t i = 0; i < MaterialBatch::maxIndices; i += 6) {
+            rendererData.quadIndices[(size_t)i + 0] = offset + 0;
+            rendererData.quadIndices[(size_t)i + 1] = offset + 1;
+            rendererData.quadIndices[(size_t)i + 2] = offset + 2;
+
+            rendererData.quadIndices[(size_t)i + 3] = offset + 2;
+            rendererData.quadIndices[(size_t)i + 4] = offset + 3;
+            rendererData.quadIndices[(size_t)i + 5] = offset + 0;
+
+            offset += 4;
+        }
+
+        rendererData.quadVertexPositions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
+        rendererData.quadVertexPositions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
+        rendererData.quadVertexPositions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
+        rendererData.quadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
+
         rendererData.cameraUniformBuffer =
             UniformBuffer::Create(sizeof(Renderer2D::Storage::CameraData), 0);
+
+        rendererData.materialBatchesHead = new MatList();
     }
 
 
     void Renderer2D::newMaterialBatch(const Material& material) {
         AE_PROFILE_FUNCTION()
 
-        rendererData.materialBatches[material].push_back(MakeScope<MaterialBatch>());
-        const Scope<MaterialBatch>& batch = rendererData.materialBatches[material].back();
+        MaterialBatch batch;
+        {
+            AE_PROFILE_SCOPE("AAAAAAAAAAAAAA")
+            // batch.quadVBOVec.reserve(MaterialBatch::maxVertices);
+            //     batch.quadVBOVec.resize(MaterialBatch::maxVertices);
+        } {
+            AE_PROFILE_SCOPE("Create material batch")
 
-        batch->quadVAO = VertexArray::create();
-        batch->quadVBO = VertexBuffer::create(MaterialBatch::maxVertices * sizeof(QuadVertex));
+            batch.quadVAO = VertexArray::create();
+            batch.quadVBO =
+                VertexBuffer::create(MaterialBatch::maxVertices * sizeof(QuadVertex));
+        }
 
         {
             AE_PROFILE_SCOPE("Indicie buffer stuff")
@@ -52,53 +79,29 @@ namespace AnEngine {
                 {ShaderDataType::Float, "TilingFactorIn"}, {ShaderDataType::Vec4, "TintIn"},
                 {ShaderDataType::Int, "EntityID"}};
 
-            batch->quadVBO->setLayout(layout);
-            batch->quadVAO->addVertexBuffer(batch->quadVBO);
+            batch.quadVBO->setLayout(layout);
+            batch.quadVAO->addVertexBuffer(batch.quadVBO);
 
-
-            Scope<uint32_t[]> quadIndices = MakeScope<uint32_t[]>(MaterialBatch::maxIndices);
-            uint32_t offset = 0;
-
-            // TODO: THIS IS SLOW
-            for (uint32_t i = 0; i < MaterialBatch::maxIndices; i += 6) {
-                quadIndices[(size_t)i + 0] = offset + 0;
-                quadIndices[(size_t)i + 1] = offset + 1;
-                quadIndices[(size_t)i + 2] = offset + 2;
-
-                quadIndices[(size_t)i + 3] = offset + 2;
-                quadIndices[(size_t)i + 4] = offset + 3;
-                quadIndices[(size_t)i + 5] = offset + 0;
-
-                offset += 4;
-            }
-
-            Ref<IndexBuffer> quadIBO =
-                IndexBuffer::create(quadIndices, MaterialBatch::maxIndices);
-            batch->quadVAO->setIndexBuffer(quadIBO);
+            Ref<IndexBuffer> quadIBO = IndexBuffer::create(rendererData.quadIndices.data(),
+                                                           MaterialBatch::maxIndices);
+            batch.quadVAO->setIndexBuffer(quadIBO);
         }
 
 
         {
             AE_PROFILE_SCOPE("Other stuff") {
                 AE_PROFILE_SCOPE("Quad vertex buffer")
-                // TODO:  THIS IS SLOW
-                batch->quadVBOBase = new QuadVertex[MaterialBatch::maxVertices];
-                batch->quadVBOPtr = batch->quadVBOBase;
-                batch->indexCount = 0;
+                batch.indexCount = 0;
 
                 // Set texture slot 0 to blank texture
-                batch->textureSlots[0] = rendererData.blankTexture;
-                batch->textureSlotIndex = 1;
+                batch.textureSlots[0] = rendererData.blankTexture;
+                batch.textureSlotIndex = 1;
             }
 
-
-            rendererData.quadVertexPositions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
-            rendererData.quadVertexPositions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
-            rendererData.quadVertexPositions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
-            rendererData.quadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
-
-
-            rendererData.activeMaterial = material;
+            {
+                AE_PROFILE_SCOPE("Add material batch")
+                (*rendererData.materialBatchesHead)[material].push_back(batch);
+            }
 
             g_ShaderLibrary.load("QuadShader", "builtins/assets/shaders/quad.glsl");
         }
@@ -141,10 +144,12 @@ namespace AnEngine {
     }
 
     void Renderer2D::shutdown() {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(!rendererData.activeScene,
                        "Renderer2D::shutdown() called with active scene!");
 
-        rendererData.materialBatches.clear();
+        delete rendererData.materialBatchesHead;
         rendererData.activeMaterial = Material("Empty");
 
         //   rendererData.textureSlotIndex = 1;
@@ -161,17 +166,20 @@ namespace AnEngine {
         endAllBatches();
         flushAllBatches();
 
-        rendererStats.usedMaterials = (uint32_t)rendererData.materialBatches.size();
         {
             AE_PROFILE_SCOPE("Clear material batches")
-            rendererData.materialBatches.clear();
+            rendererData.materialBatchesHead->clearUnused();
+            rendererData.materialBatchesHead->resetBatches();
         }
+
+        rendererStats.usedMaterials = (uint32_t)rendererData.materialBatchesHead->size();
         rendererData.activeMaterial = Material("Empty");
 
         rendererData.activeScene = false;
     }
 
     void Renderer2D::newBatch() {
+        AE_PROFILE_FUNCTION()
         endActiveBatch();
         flushActiveBatch();
 
@@ -179,35 +187,37 @@ namespace AnEngine {
     }
 
     void Renderer2D::endActiveBatch() {
-        const Scope<MaterialBatch>& batch =
-            rendererData.materialBatches[rendererData.activeMaterial].back();
+        AE_PROFILE_FUNCTION()
 
-        uint32_t dataSize =
-            (uint32_t)((uint8_t*)batch->quadVBOPtr - (uint8_t*)batch->quadVBOBase);
-        batch->quadVBO->setData(batch->quadVBOBase, dataSize);
+        MaterialBatch& batch =
+            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterial);
+
+        uint32_t dataSize = batch.quadVBOVec.size() * sizeof(QuadVertex);
+        batch.quadVBO->setData(batch.quadVBOVec.data(), dataSize);
     }
 
     void Renderer2D::flushActiveBatch() {
         AE_PROFILE_FUNCTION()
 
-        const Scope<MaterialBatch>& batch =
-            rendererData.materialBatches[rendererData.activeMaterial].back();
-
-        // Bind textures
-        for (uint32_t i = 0; i < batch->textureSlotIndex; i++) {
-            batch->textureSlots[i]->bind(i);
-        }
+        MaterialBatch& batch =
+            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterial);
 
         // TODO: Bind the materials shader instead of ours
         g_ShaderLibrary.get("QuadShader")->bind();
-        RenderCommandQueue::drawIndexed(batch->quadVAO, batch->indexCount);
+
+        // Bind textures
+        for (uint32_t i = 0; i < batch.textureSlotIndex; i++) {
+            batch.textureSlots[i]->bind(i);
+        }
+
+        RenderCommandQueue::drawIndexed(batch.quadVAO, batch.indexCount);
         rendererStats.draws++;
     }
 
     void Renderer2D::endAllBatches() {
         AE_PROFILE_FUNCTION()
 
-        for (auto& [material, batches] : rendererData.materialBatches) {
+        for (const auto& [material, batches] : *rendererData.materialBatchesHead) {
             rendererData.activeMaterial = material;
             endActiveBatch();
         }
@@ -216,7 +226,7 @@ namespace AnEngine {
     void Renderer2D::flushAllBatches() {
         AE_PROFILE_FUNCTION()
 
-        for (auto& [material, batch] : rendererData.materialBatches) {
+        for (const auto& [material, batch] : *rendererData.materialBatchesHead) {
             rendererData.activeMaterial = material;
             flushActiveBatch();
         }
@@ -226,9 +236,13 @@ namespace AnEngine {
     // Primitives
     void Renderer2D::drawSprite(const glm::mat4& transform,
                                 const SpriteRendererComponent& sprite, int32_t entityID) {
+        AE_PROFILE_FUNCTION()
+
         if (rendererData.activeMaterial != sprite.SpriteMaterial &&
-            !rendererData.materialBatches.contains(sprite.SpriteMaterial))
+            !rendererData.materialBatchesHead->contains(sprite.SpriteMaterial))
             newMaterialBatch(sprite.SpriteMaterial);
+
+        rendererData.activeMaterial = sprite.SpriteMaterial;
 
         if (auto tex = rendererData.activeMaterial.getTexture()) {
             drawQuad(transform, *tex, entityID);
@@ -246,10 +260,10 @@ namespace AnEngine {
             return;
         }
 
-        const Scope<MaterialBatch>& batch =
-            rendererData.materialBatches[rendererData.activeMaterial].back();
+        MaterialBatch& batch =
+            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterial);
 
-        if (batch->indexCount >= MaterialBatch::maxIndices) {
+        if (batch.indexCount >= MaterialBatch::maxIndices) {
             newBatch();
         }
 
@@ -265,17 +279,19 @@ namespace AnEngine {
         };
 
         for (uint32_t i = 0; i < 4; i++) {
-            batch->quadVBOPtr->position = transform * rendererData.quadVertexPositions[i];
-            batch->quadVBOPtr->colour = colour;
-            batch->quadVBOPtr->texCoord = texCoords[i];
-            batch->quadVBOPtr->albedoIndex = texIndex;
-            batch->quadVBOPtr->tilingFactor = tilingFactor;
-            batch->quadVBOPtr->tint = tint;
-            batch->quadVBOPtr->entityID = entityID;
-            batch->quadVBOPtr++;
+            QuadVertex v;
+            v.position = transform * rendererData.quadVertexPositions[i];
+            v.colour = colour;
+            v.texCoord = texCoords[i];
+            v.albedoIndex = texIndex;
+            v.tilingFactor = tilingFactor;
+            v.tint = tint;
+            v.entityID = entityID;
+
+            batch.quadVBOVec.push_back(v);
         }
 
-        batch->indexCount += 6;
+        batch.indexCount += 6;
         rendererStats.quadCount++;
     }
 
@@ -288,31 +304,31 @@ namespace AnEngine {
             return;
         }
 
-        const Scope<MaterialBatch>& batch =
-            rendererData.materialBatches[rendererData.activeMaterial].back();
+        MaterialBatch& batch =
+            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterial);
 
-        if (batch->indexCount >= MaterialBatch::maxIndices ||
-            batch->textureSlotIndex >= MaterialBatch::maxTextureSlots) {
+        if (batch.indexCount >= MaterialBatch::maxIndices ||
+            batch.textureSlotIndex >= MaterialBatch::maxTextureSlots) {
             newBatch();
         }
 
         constexpr glm::vec4 colour(1.0f);
         uint32_t textureIndex = 0;
 
-        for (uint32_t i = 1; i < batch->textureSlotIndex; i++) {
-            if (batch->textureSlots[i]->getSampler() == texture->getSampler()) {
+        for (uint32_t i = 1; i < batch.textureSlotIndex; i++) {
+            if (batch.textureSlots[i]->getSampler() == texture->getSampler()) {
                 textureIndex = i;
                 break;
             }
         }
 
         if (textureIndex == 0.0f) {
-            AE_CORE_ASSERT(batch->textureSlotIndex < MaterialBatch::maxTextureSlots,
+            AE_CORE_ASSERT(batch.textureSlotIndex < MaterialBatch::maxTextureSlots,
                            "Renderer2D::drawQuad() exceeded max texture slots per draw call!");
 
-            textureIndex = batch->textureSlotIndex;
-            batch->textureSlots[batch->textureSlotIndex] = texture;
-            batch->textureSlotIndex++;
+            textureIndex = batch.textureSlotIndex;
+            batch.textureSlots[batch.textureSlotIndex] = texture;
+            batch.textureSlotIndex++;
         }
 
         float tilingFactor = attributes.getOr("tilingFactor", 1.0f);
@@ -327,17 +343,19 @@ namespace AnEngine {
         glm::mat4x2 texCoords = attributes.getOr("texCoords", coords);
 
         for (uint32_t i = 0; i < 4; i++) {
-            batch->quadVBOPtr->position = transform * rendererData.quadVertexPositions[i];
-            batch->quadVBOPtr->colour = colour;
-            batch->quadVBOPtr->texCoord = texCoords[i];
-            batch->quadVBOPtr->albedoIndex = textureIndex;
-            batch->quadVBOPtr->tilingFactor = tilingFactor;
-            batch->quadVBOPtr->tint = tint;
-            batch->quadVBOPtr->entityID = entityID;
-            batch->quadVBOPtr++;
+            QuadVertex v;
+            v.position = transform * rendererData.quadVertexPositions[i];
+            v.colour = colour;
+            v.texCoord = texCoords[i];
+            v.albedoIndex = textureIndex;
+            v.tilingFactor = tilingFactor;
+            v.tint = tint;
+            v.entityID = entityID;
+
+            batch.quadVBOVec.push_back(v);
         }
 
-        batch->indexCount += 6;
+        batch.indexCount += 6;
         rendererStats.quadCount++;
     }
 }  // namespace AnEngine

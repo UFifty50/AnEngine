@@ -7,6 +7,8 @@
 
 namespace AnEngine {
     void OpenGLRenderAPI::init() {
+        AE_PROFILE_FUNCTION()
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -18,10 +20,14 @@ namespace AnEngine {
 
     void OpenGLRenderAPI::setViewport(uint32_t x, uint32_t y, uint32_t width,
                                       uint32_t height) {
+        AE_PROFILE_FUNCTION()
+
         glViewport(x, y, width, height);
     }
 
     void OpenGLRenderAPI::clearColour(const glm::vec4& colour) {
+        AE_PROFILE_FUNCTION()
+
         glClearColor(colour.r, colour.g, colour.b, colour.a);
     }
 
@@ -29,6 +35,8 @@ namespace AnEngine {
 
     void OpenGLRenderAPI::drawIndexed(const Ref<VertexArray>& vertexArray,
                                       uint32_t indexCount) {
+        AE_PROFILE_FUNCTION()
+
         vertexArray->bind();
 
         //   uint32_t count = indexCount ? indexCount :

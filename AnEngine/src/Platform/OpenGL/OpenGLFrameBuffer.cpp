@@ -10,20 +10,28 @@ namespace AnEngine {
 
     namespace Utils {
         static GLenum TextureTarget(bool isMultisampled) {
+            AE_PROFILE_FUNCTION()
+
             return isMultisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
         }
 
         static void CreateTextures(bool isMultisampled, RenderID* outID, uint32_t count) {
+            AE_PROFILE_FUNCTION()
+
             glCreateTextures(TextureTarget(isMultisampled), count, outID);
         }
 
         static void BindTexture(bool isMultisampled, RenderID id) {
+            AE_PROFILE_FUNCTION()
+
             glBindTexture(TextureTarget(isMultisampled), id);
         }
 
         static void AttachColourTexture(RenderID id, uint32_t samples, GLenum glFormat,
                                         GLenum format, uint32_t width, uint32_t height,
                                         uint32_t index) {
+            AE_PROFILE_FUNCTION()
+
             bool isMultisampled = samples > 1;
 
             if (isMultisampled) {
@@ -47,6 +55,8 @@ namespace AnEngine {
 
         static void AttachDepthTexture(RenderID id, uint32_t samples, GLenum format,
                                        GLenum type, uint32_t width, uint32_t height) {
+            AE_PROFILE_FUNCTION()
+
             bool isMultisampled = samples > 1;
 
             if (isMultisampled) {
@@ -66,6 +76,8 @@ namespace AnEngine {
         }
 
         static GLenum GLformat(FrameBufferTexFormat format) {
+            AE_PROFILE_FUNCTION()
+
             switch (format) {
                 case FrameBufferTexFormat::RGBA8:
                     return GL_RGBA;
@@ -78,6 +90,8 @@ namespace AnEngine {
         }
 
         static GLenum GLformatType(FrameBufferTexFormat format) {
+            AE_PROFILE_FUNCTION()
+
             switch (format) {
                 case FrameBufferTexFormat::RGBA8:
                     return GL_UNSIGNED_BYTE;
@@ -91,6 +105,8 @@ namespace AnEngine {
 
         // return size of the format in bytes
         static uint32_t GLsizeOf(FrameBufferTexFormat format) {
+            AE_PROFILE_FUNCTION()
+
             switch (format) {
                 case FrameBufferTexFormat::RGBA8:
                     return 4;
@@ -105,6 +121,8 @@ namespace AnEngine {
     }  // namespace Utils
 
     OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpec& spec) : specification(spec) {
+        AE_PROFILE_FUNCTION()
+
         for (const auto& attachmentSpec : specification.Attachments.Attachments) {
             if (attachmentSpec.texFormat.isDepth())
                 depthAttachmentSpec = attachmentSpec;
@@ -116,6 +134,8 @@ namespace AnEngine {
     }
 
     OpenGLFrameBuffer::~OpenGLFrameBuffer() {
+        AE_PROFILE_FUNCTION()
+
         glDeleteFramebuffers(1, &rendererID);
         glDeleteTextures((GLsizei)colourAttachments.size(), colourAttachments.data());
         glDeleteTextures(1, &depthAttachment);
@@ -124,6 +144,8 @@ namespace AnEngine {
     std::vector<int32_t> OpenGLFrameBuffer::readPixels(uint32_t attachmentIndex,
                                                        glm::vec2 from, glm::vec2 size,
                                                        FrameBufferTexFormat format) const {
+        AE_PROFILE_FUNCTION()
+
         // clang-format off
         AE_CORE_ASSERT(attachmentIndex < colourAttachments.size(), "Index out of range!");
         AE_CORE_ASSERT(from.x >= 0 && from.x <= (int)specification.Width, "from.x out of range!");
@@ -146,6 +168,8 @@ namespace AnEngine {
 
 
     void OpenGLFrameBuffer::clearColourAttachment(uint32_t attachmentIndex, int32_t value) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(attachmentIndex < colourAttachments.size(), "Index out of range!");
 
         auto& spec = colourAttachmentSpecs[attachmentIndex];
@@ -154,6 +178,8 @@ namespace AnEngine {
     }
 
     void OpenGLFrameBuffer::reconstruct() {
+        AE_PROFILE_FUNCTION()
+
         if (rendererID != 0) {
             glDeleteFramebuffers(1, &rendererID);
             glDeleteTextures((GLsizei)colourAttachments.size(), colourAttachments.data());
@@ -250,6 +276,8 @@ namespace AnEngine {
     }
 
     void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height) {
+        AE_PROFILE_FUNCTION()
+
         if ((width <= 0 || height <= 0) ||
             (width >= MaxFrameBufferSize || height >= MaxFrameBufferSize)) {
             AE_CORE_WARN("Attempted to resize framebuffer to {0}, {1}", width, height);
@@ -262,6 +290,8 @@ namespace AnEngine {
     }
 
     void OpenGLFrameBuffer::bind() const {
+        AE_PROFILE_FUNCTION()
+
         glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
         glViewport(0, 0, specification.Width, specification.Height);
     }

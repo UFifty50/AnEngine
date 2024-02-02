@@ -21,6 +21,8 @@ namespace AnEngine::Crank {
     PropertiesPanel::PropertiesPanel(const std::string& name) : name(name) {}
 
     void PropertiesPanel::render() {
+        AE_PROFILE_FUNCTION()
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {370.0f, 10.0f});
 
         Entity selectedEntity = gPanel_SceneHierarchy->getSelectedEntity();
@@ -87,6 +89,8 @@ namespace AnEngine::Crank {
 
     void PropertiesPanel::drawVec3Controller(const std::string& label, glm::vec3& values,
                                              float resetValue) {
+        AE_PROFILE_FUNCTION()
+
         ImGuiIO& io = ImGui::GetIO();
         auto& boldFont = io.Fonts->Fonts[1];
 
@@ -170,6 +174,8 @@ namespace AnEngine::Crank {
     }
 
     void PropertiesPanel::drawComponents(Entity entity) {
+        AE_PROFILE_FUNCTION()
+
         const ImGuiTreeNodeFlags treeNodeFlags =
             ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap |
             ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Framed |

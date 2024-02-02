@@ -6,6 +6,7 @@
 #include <array>
 #include <optional>
 
+#include "Core/Core.hpp"
 #include "Maths/Maths.hpp"
 
 
@@ -13,6 +14,8 @@ namespace AnEngine {
     // returns optional of [translation, rotation, scale]
     std::optional<std::array<glm::vec3, 3>> Maths::decomposeTranslation(
         const glm::mat4& transform) {
+        AE_PROFILE_FUNCTION()
+
         // From glm::decompose in matrix_decompose.inl
 
         glm::mat4 localMatrix(transform);

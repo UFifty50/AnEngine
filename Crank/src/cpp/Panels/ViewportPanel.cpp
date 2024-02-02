@@ -27,6 +27,8 @@ namespace AnEngine::Crank {
           rotateSnap(0.0f) {}
 
     ImGuiWindowFlags ViewportPanel::beforeRender() {
+        AE_PROFILE_FUNCTION()
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{5, 5});
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{0.1f, 0.1f, 0.1f, 1.0f});
 
@@ -38,6 +40,8 @@ namespace AnEngine::Crank {
     }
 
     void ViewportPanel::render() {
+        AE_PROFILE_FUNCTION()
+
         static uint32_t fbID = 0;
         g_DockSpace->updateViewportInfo(true, true);
 
@@ -173,6 +177,8 @@ namespace AnEngine::Crank {
     }
 
     void ViewportPanel::afterRender() {
+        AE_PROFILE_FUNCTION()
+
         ImGui::PopStyleVar();
         ImGui::PopStyleColor();
     }

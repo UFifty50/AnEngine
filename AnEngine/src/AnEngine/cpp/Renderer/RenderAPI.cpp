@@ -34,6 +34,8 @@ namespace AnEngine {
     } */
 
     std::ostream& operator<<(std::ostream& os, const RenderAPI::API& api) {
+        AE_PROFILE_FUNCTION()
+
         switch (api) {
             case RenderAPI::NoAPI:
                 return os << "NoAPI";

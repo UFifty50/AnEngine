@@ -6,11 +6,13 @@
 
 
 namespace AnEngine {
-    OpenGLIndexBuffer::OpenGLIndexBuffer(const Scope<uint32_t[]>& indices, uint32_t count)
+    OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t const* indices, uint32_t count)
         : count(count) {
+        AE_PROFILE_FUNCTION()
+
         glCreateBuffers(1, &rendererID);
         glBindBuffer(GL_ARRAY_BUFFER, rendererID);
-        glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32_t), indices.get(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
     }
     OpenGLIndexBuffer::~OpenGLIndexBuffer() { glDeleteBuffers(1, &rendererID); }
 
@@ -21,6 +23,7 @@ namespace AnEngine {
     }
     void OpenGLIndexBuffer::unBind() const {
         AE_PROFILE_FUNCTION()
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 

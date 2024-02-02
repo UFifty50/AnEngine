@@ -10,6 +10,8 @@
 
 namespace AnEngine {
     Ref<Shader> Shader::create(const std::string& mixedShaderPath, const std::string& name) {
+        AE_PROFILE_FUNCTION()
+
         InputFileStream mixedShaderStream(mixedShaderPath, std::ios::binary);
 
         switch (RenderAPI::getAPI()) {
@@ -39,16 +41,22 @@ namespace AnEngine {
 
 
     void ShaderLibrary::add(const Ref<Shader>& shader) {
+        AE_PROFILE_FUNCTION()
+
         auto& name = shader->getName();
         add(name, shader);
     }
 
     void ShaderLibrary::add(const std::string& name, const Ref<Shader>& shader) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(shaders.find(name) == shaders.end(), "Shader already exists!");
         shaders[name] = shader;
     }
 
     Ref<Shader> ShaderLibrary::load(const std::string& mixedShaderPath) {
+        AE_PROFILE_FUNCTION()
+
         auto shader = Shader::create(mixedShaderPath);
         add(shader);
         return shader;
@@ -56,6 +64,8 @@ namespace AnEngine {
 
     Ref<Shader> ShaderLibrary::load(const std::string& name,
                                     const std::string& mixedShaderPath) {
+        AE_PROFILE_FUNCTION()
+
         if (shaders.find(name) != shaders.end()) return shaders[name];
 
         auto shader = Shader::create(mixedShaderPath);
@@ -64,15 +74,21 @@ namespace AnEngine {
     }
 
     Ref<Shader> ShaderLibrary::get(const std::string& name) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(shaders.find(name) != shaders.end(), "Shader not found!");
         return shaders[name];
     }
 
     std::unordered_map<std::string, Ref<Shader>>::iterator ShaderLibrary::begin() {
+        AE_PROFILE_FUNCTION()
+
         return shaders.begin();
     }
 
     std::unordered_map<std::string, Ref<Shader>>::iterator ShaderLibrary::end() {
+        AE_PROFILE_FUNCTION()
+
         return shaders.end();
     }
 }  // namespace AnEngine

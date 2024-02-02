@@ -12,6 +12,8 @@
 
 namespace AnEngine {
     OpenGLContext::OpenGLContext(GLFWwindow* winPtr) : winPtr(winPtr) {
+        AE_PROFILE_FUNCTION()
+
         AE_CORE_ASSERT(winPtr, "Window pointer is null!");
     }
 
@@ -27,13 +29,11 @@ namespace AnEngine {
         AE_CORE_DEBUG("  Vendor: {0}", (char*)glGetString(GL_VENDOR));
         AE_CORE_DEBUG("  Renderer: {0}", (char*)glGetString(GL_RENDERER));
         AE_CORE_DEBUG("  Version: {0}", (char*)glGetString(GL_VERSION));
-        AE_CORE_DEBUG("  GLSL Version: {0}",
-                      (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+        AE_CORE_DEBUG("  GLSL Version: {0}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
         AE_CORE_DEBUG("Current RenderAPI: {0}", RenderAPI::getAPIName());
 
-        AE_CORE_ASSERT(
-            GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
-            "AnEngine requires at least OpenGL version 4.5!");
+        AE_CORE_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5),
+                       "AnEngine requires at least OpenGL version 4.5!");
     }
 
     void OpenGLContext::swapBuffers() {

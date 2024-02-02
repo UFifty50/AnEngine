@@ -5,6 +5,8 @@
 
 namespace AnEngine::Crank {
     void StatisticsPanel::render() {
+        AE_PROFILE_FUNCTION()
+
         ImGui::Text("Editor Stats:");
         ImGui::Text("Hovered Entity: %s",
                     hoveredEntity.hasComponent<TagComponent>()

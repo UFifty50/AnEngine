@@ -46,17 +46,121 @@ namespace AnEngine {
             Ref<VertexBuffer> quadVBO;
             uint32_t indexCount = 0;
 
-            QuadVertex* quadVBOBase = nullptr;
-            QuadVertex* quadVBOPtr = nullptr;
+            std::vector<QuadVertex> quadVBOVec;
+            // maybe fixed-size vector with push back?
+            // that way we only fill the correct number of quads, instead of maxVertices
+        };
 
+        struct MatList {
+            MatList* next;
+            bool hasNext;
 
-            ~MaterialBatch() { delete[] quadVBOBase; }
+            Material material;
+            std::vector<MaterialBatch> batches;
+
+            MatList() : next(nullptr), hasNext(false), material("Empty") {}
+            MatList(const Material& material)
+                : next(nullptr), hasNext(false), material(material) {
+                batches.emplace_back();
+            }
+
+            ~MatList() {
+                if (next != nullptr) delete next;
+            }
+
+            std::vector<MaterialBatch>& operator[](const Material& material) {
+                if (this->material == material)
+                    return this->batches;
+                else if (next != nullptr)
+                    return (*next)[material];
+                else {
+                    next = new MatList(material);
+                    return next->batches;
+                }
+            }
+
+            MaterialBatch& getBatch(const Material& material) {
+                if (this->material == material)
+                    return this->batches.back();
+                else if (next != nullptr)
+                    return next->getBatch(material);
+                else
+                    AE_CORE_ASSERT(false, "MaterialBatch not found.");
+            }
+
+            void clearUnused() {
+                if (next != nullptr) {
+                    if (next->batches.empty()) {
+                        MatList* temp = next;
+                        next = next->next;
+                        temp->next = nullptr;
+                        delete temp;
+                    } else {
+                        next->clearUnused();
+                    }
+                }
+            }
+
+            bool contains(const Material& material) {
+                if (this->material == material)
+                    return true;
+                else if (next != nullptr)
+                    return next->contains(material);
+                else
+                    return false;
+            }
+
+            uint32_t size() {
+                if (next != nullptr)
+                    return next->size() + batches.size();
+                else
+                    return batches.size();
+            }
+
+            void resetBatches() {
+                for (auto& batch : batches) {
+                    batch.quadVBOVec.clear();
+                    batch.indexCount = 0;
+                }
+
+                if (next != nullptr) {
+                    next->resetBatches();
+                }
+            }
+
+            // iterator that returs [material, batches] pairs
+            typedef std::pair<Material, std::vector<MaterialBatch>> value_type;
+            class iterator {
+            public:
+                iterator(MatList* ptr) : ptr(ptr) {}
+                iterator operator++() {
+                    ptr = ptr->next;
+                    return *this;
+                }
+                iterator operator++(int) {
+                    iterator tmp = *this;
+                    ++(*this);
+                    return tmp;
+                }
+                bool operator==(const iterator& other) const { return ptr == other.ptr; }
+                value_type operator*() const { return {ptr->material, ptr->batches}; }
+
+            private:
+                MatList* ptr;
+            };
+
+            iterator begin() {
+                return material.temporary != "Empty" ? iterator(this) : iterator(nullptr);
+            }
+            iterator end() { return iterator(nullptr); }
         };
 
         struct Storage {
-            std::map<Material, std::vector<Scope<MaterialBatch>>> materialBatches;
+            MatList* materialBatchesHead;
             Material activeMaterial = Material("Empty");
+
             glm::vec4 quadVertexPositions[4]{};
+            std::array<uint32_t, MaterialBatch::maxIndices> quadIndices;
 
             Ref<Texture2D> blankTexture;
 

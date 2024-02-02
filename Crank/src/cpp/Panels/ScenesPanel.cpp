@@ -16,15 +16,21 @@
 
 namespace AnEngine::Crank {
     ScenesPanel::ScenesPanel(const std::string& name) : name(name) {
+        AE_PROFILE_FUNCTION()
+
         updateCurrentSceneFromActive();
     }
 
     void ScenesPanel::updateCurrentSceneFromActive() {
+        AE_PROFILE_FUNCTION()
+
         currentScene = g_ActiveScene;
         selectedEntity = {};  // TODO: set to uuid from file
     }
 
     void ScenesPanel::render() {
+        AE_PROFILE_FUNCTION()
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {200.0f, 10.0f});
 
         const float ItemSpacing = ImGui::GetStyle().ItemSpacing.x;
@@ -114,6 +120,8 @@ namespace AnEngine::Crank {
     }
 
     void ScenesPanel::drawEntityNode(Entity entity) {
+        AE_PROFILE_FUNCTION()
+
         auto& tag = entity.getComponent<TagComponent>().Tag;
         tag.resize(255);
 

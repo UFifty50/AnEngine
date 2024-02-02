@@ -12,6 +12,8 @@
 
 namespace AnEngine {
     Entity& Scene3D::createEntity(const std::string& name) {
+        AE_PROFILE_FUNCTION()
+
         Entity e = {this->entityRegistry.create(), this};
         e.addComponent<TransformComponent>();
         auto& tag = e.addComponent<TagComponent>(name.empty() ? "Entity" : name);
@@ -21,6 +23,8 @@ namespace AnEngine {
     void Scene3D::destroyEntity(Entity& entity) { this->entityRegistry.destroy(entity); }
 
     void Scene3D::onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) {
+        AE_PROFILE_FUNCTION()
+
         Ref<EditorCamera3D> camera3D = std::static_pointer_cast<EditorCamera3D>(camera);
         Renderer3D::beginScene(*camera3D);
 
@@ -38,6 +42,8 @@ namespace AnEngine {
     }
 
     void Scene3D::onUpdateRuntime(TimeStep deltaTime) {
+        AE_PROFILE_FUNCTION()
+
         this->entityRegistry.view<NativeScriptComponent>().each([=](const auto entity,
                                                                     auto& nsc) {
             // TODO: Move to onScenePlay functiom
@@ -92,6 +98,8 @@ namespace AnEngine {
     }
 
     void Scene3D::onResize(uint32_t width, uint32_t height) {
+        AE_PROFILE_FUNCTION()
+
         this->viewportWidth = width;
         this->viewportHeight = height;
 
@@ -105,6 +113,8 @@ namespace AnEngine {
     }
 
     Entity Scene3D::getPrimaryCamera() {
+        AE_PROFILE_FUNCTION()
+
         auto view = this->entityRegistry.view<CameraComponent>();
         for (auto entity : view) {
             const auto& cameraComponent = view.get<CameraComponent>(entity);
@@ -116,6 +126,8 @@ namespace AnEngine {
     }
 
     void Scene3D::onComponentAdded(Entity& e, Component& component) {
+        AE_PROFILE_FUNCTION()
+
         switch (component.getID()) {
             case CAMERA_COMPONENT_ID: {
                 if (this->viewportWidth <= 0 || this->viewportHeight <= 0) return;

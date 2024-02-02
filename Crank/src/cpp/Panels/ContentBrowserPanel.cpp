@@ -16,11 +16,15 @@ namespace AnEngine::Crank {
 
     ContentBrowserPanel::ContentBrowserPanel(const std::string& name)
         : name(name), currentPath(g_BaseAssetsDirectory) {
+        AE_PROFILE_FUNCTION()
+
         directoryIcon = Texture2D::create("builtins/icons/DirectoryIcon.png");
         fileIcon = Texture2D::create("builtins/icons/FileIcon.png");
     }
 
     void ContentBrowserPanel::render() {
+        AE_PROFILE_FUNCTION()
+
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("Settings")) {
                 ImGui::SliderFloat("Thumbnail Size", &thumbSize, 64.0f, 256.0f);
@@ -54,59 +58,64 @@ namespace AnEngine::Crank {
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0, 0, 0, 0});
 
-        if (ImGui::BeginTable("##Content", numCols)) {
-            for (int col = 0; col < numCols; col++) {
-                ImGui::TableSetupColumn(labelFromInt(col),
-                                        ImGuiTableColumnFlags_WidthFixed, cellSize);
+        {
+            AE_PROFILE_SCOPE("Table")
+
+            if (ImGui::BeginTable("##Content", numCols)) {
+                for (int col = 0; col < numCols; col++) {
+                    ImGui::TableSetupColumn(labelFromInt(col),
+                                            ImGuiTableColumnFlags_WidthFixed, cellSize);
+                }
+                ImGui::TableNextRow();
+
+                uint16_t column = 0;
+
+                for (auto& dirEnt : fs::directory_iterator(currentPath)) {
+                    const fs::path path = dirEnt.path();
+                    const fs::path relPath = fs::relative(path, g_BaseAssetsDirectory);
+                    const std::string relPathName = relPath.filename().string();
+                    const Ref<Texture2D> icon =
+                        dirEnt.is_directory() ? directoryIcon : fileIcon;
+
+                    ImGui::PushID(relPathName.c_str());
+
+                    ImGui::TableSetColumnIndex(column);
+                    ImGui::ImageButton(labelFromInt(column),
+                                       (ImTextureID)icon->getSampler().slot,
+                                       {thumbSize, thumbSize}, {0, 1}, {1, 0});
+
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+                        const wchar_t* itemPath = relPath.c_str();
+                        ImGui::SetDragDropPayload(
+                            "CONTENTBROWSER_ITEM", itemPath,
+                            (wcslen(itemPath) + 1) * sizeof(wchar_t));
+
+                        ImGui::Image((ImTextureID)icon->getSampler().slot,
+                                     {thumbSize, thumbSize}, {0, 1}, {1, 0});
+
+                        ImGui::EndDragDropSource();
+                    }
+
+                    if (ImGui::IsItemHovered() &&
+                        ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                        currentPath = currentPath / path.filename();
+                    }
+
+                    ImGui::TextWrapped(relPathName.c_str());
+
+                    if (column < (numCols - 1)) {
+                        column++;
+                    } else {
+                        column = 0;
+                        ImGui::TableNextRow();
+                    }
+
+
+                    ImGui::PopID();
+                }
+
+                ImGui::EndTable();
             }
-            ImGui::TableNextRow();
-
-            uint16_t column = 0;
-
-            for (auto& dirEnt : fs::directory_iterator(currentPath)) {
-                const fs::path path = dirEnt.path();
-                const fs::path relPath = fs::relative(path, g_BaseAssetsDirectory);
-                const std::string relPathName = relPath.filename().string();
-                const Ref<Texture2D> icon =
-                    dirEnt.is_directory() ? directoryIcon : fileIcon;
-
-                ImGui::PushID(relPathName.c_str());
-
-                ImGui::TableSetColumnIndex(column);
-                ImGui::ImageButton(labelFromInt(column),
-                                   (ImTextureID)icon->getSampler().slot,
-                                   {thumbSize, thumbSize}, {0, 1}, {1, 0});
-
-                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-                    const wchar_t* itemPath = relPath.c_str();
-                    ImGui::SetDragDropPayload("CONTENTBROWSER_ITEM", itemPath,
-                                              (wcslen(itemPath) + 1) * sizeof(wchar_t));
-
-                    ImGui::Image((ImTextureID)icon->getSampler().slot,
-                                 {thumbSize, thumbSize}, {0, 1}, {1, 0});
-
-                    ImGui::EndDragDropSource();
-                }
-
-                if (ImGui::IsItemHovered() &&
-                    ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                    currentPath = currentPath / path.filename();
-                }
-
-                ImGui::TextWrapped(relPathName.c_str());
-
-                if (column < (numCols - 1)) {
-                    column++;
-                } else {
-                    column = 0;
-                    ImGui::TableNextRow();
-                }
-
-
-                ImGui::PopID();
-            }
-
-            ImGui::EndTable();
         }
 
         ImGui::PopStyleColor();

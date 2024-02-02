@@ -34,6 +34,8 @@ namespace AnEngine {
     }
 
     Ref<VertexBuffer> VertexBuffer::create(std::vector<float> vertices) {
+        AE_PROFILE_FUNCTION()
+
         float* verts = new float[vertices.size() + 1];
         for (uint32_t i = 0; i < (uint32_t)vertices.size(); i++) {
             verts[i] = vertices[i];
@@ -43,6 +45,8 @@ namespace AnEngine {
 
     template <uint32_t _Size>
     Ref<VertexBuffer> VertexBuffer::create(std::array<float, _Size> vertices) {
+        AE_PROFILE_FUNCTION()
+
         float* verts = new float[_Size + 1];
         for (uint32_t i = 0; i < vertices.size(); i++) {
             verts[i] = vertices[i];

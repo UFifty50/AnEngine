@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include "Core/Core.hpp"
 #include "Core/Log.hpp"
 
 

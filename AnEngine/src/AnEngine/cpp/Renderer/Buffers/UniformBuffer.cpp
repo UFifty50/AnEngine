@@ -9,6 +9,8 @@
 
 namespace AnEngine {
     Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding) {
+        AE_PROFILE_FUNCTION()
+
         switch (RenderAPI::getAPI()) {
             case RenderAPI::OpenGL:
                 return std::make_shared<OpenGLUniformBuffer>(size, binding);

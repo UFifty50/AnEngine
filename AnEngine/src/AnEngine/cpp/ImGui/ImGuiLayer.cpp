@@ -23,6 +23,8 @@ namespace AnEngine {
     ImGuiLayer::~ImGuiLayer() = default;
 
     void ImGuiLayer::onAttach() {
+        AE_PROFILE_FUNCTION()
+
         // setup context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -33,9 +35,9 @@ namespace AnEngine {
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-        io.FontDefault = io.Fonts->AddFontFromFileTTF(
-            "assets/fonts/SometypeMono/SometypeMono-Medium.ttf",
-            Window::HighDPIScaleFactor * 16.0f);
+        io.FontDefault =
+            io.Fonts->AddFontFromFileTTF("assets/fonts/SometypeMono/SometypeMono-Medium.ttf",
+                                         Window::HighDPIScaleFactor * 16.0f);
         io.Fonts->AddFontFromFileTTF("assets/fonts/SometypeMono/SometypeMono-Bold.ttf",
                                      Window::HighDPIScaleFactor * 20.0f);
 
@@ -52,8 +54,7 @@ namespace AnEngine {
 
         useDarkThemeColours();
 
-        auto window =
-            static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
+        auto window = static_cast<GLFWwindow*>(Application::getWindow().getNativeWindow());
 
         // platform/renderer bindings
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -61,12 +62,16 @@ namespace AnEngine {
     }
 
     void ImGuiLayer::onDetach() {
+        AE_PROFILE_FUNCTION()
+
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
 
     void ImGuiLayer::onEvent(Event& event) {
+        AE_PROFILE_FUNCTION()
+
         if (!allowEvents) {
             ImGuiIO& io = ImGui::GetIO();
             event.handled |= event.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
@@ -76,6 +81,8 @@ namespace AnEngine {
     }
 
     void ImGuiLayer::begin() {
+        AE_PROFILE_FUNCTION()
+
         if (newConfigQueued) {
             loadConfig(configPath);
             newConfigQueued = false;
@@ -88,6 +95,8 @@ namespace AnEngine {
     }
 
     void ImGuiLayer::end() {
+        AE_PROFILE_FUNCTION()
+
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize = ImVec2((float)Application::getWindow().getWidth(),
                                 (float)Application::getWindow().getHeight());

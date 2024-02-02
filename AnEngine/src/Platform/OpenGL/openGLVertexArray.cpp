@@ -15,6 +15,8 @@ namespace AnEngine {
     OpenGLVertexArray::~OpenGLVertexArray() { glDeleteVertexArrays(1, &rendererID); }
 
     void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) {
+        AE_PROFILE_FUNCTION()
+
         glBindVertexArray(this->rendererID);
         vertexBuffer->bind();
 
@@ -43,6 +45,8 @@ namespace AnEngine {
     }
 
     void OpenGLVertexArray::setIndexBuffer(const Ref<IndexBuffer>& indexBuffer) {
+        AE_PROFILE_FUNCTION()
+
         glBindVertexArray(this->rendererID);
         indexBuffer->bind();
 
@@ -50,6 +54,8 @@ namespace AnEngine {
     }
 
     static const GLenum toOpenGLBaseType(ShaderDataType::T type) {
+        AE_PROFILE_FUNCTION()
+
         // clang-format off
         switch (type) {
         case ShaderDataType::None:    return GL_NONE;
