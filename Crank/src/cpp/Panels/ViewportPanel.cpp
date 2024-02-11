@@ -102,10 +102,16 @@ namespace AnEngine::Crank {
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload =
                     ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
-                const wchar_t* path = (const wchar_t*)payload->Data;
+                const DropPayload* dropPayload = (const DropPayload*)payload->Data;
 
-                if (!FileMenu::OpenScene(fs::path(g_BaseAssetsDirectory) / path)) {
-                    AE_CORE_ERROR(L"Couldn't load Scene {}", path);
+                if (dropPayload->type != PayloadType::Scene) {
+                    AE_CORE_ERROR(L"{} is not a scene", dropPayload->path.c_str());
+                    return;
+                }
+
+                if (!FileMenu::OpenScene(fs::path(g_BaseAssetsDirectory) /
+                                         dropPayload->path)) {
+                    AE_CORE_ERROR(L"Couldn't load Scene {}", dropPayload->path.c_str());
                     return;
                 }
             }

@@ -9,6 +9,7 @@
 #include <functional>
 #include <string>
 
+#include "Core/UUID.hpp"
 #include "Renderer/Camera/SceneCamera.hpp"
 #include "Scene/ScriptableEntity.hpp"
 #include "Texture/Material.hpp"
@@ -16,17 +17,29 @@
 #include "Time/TimeStep.hpp"
 
 
-#define TRANSFORM_COMPONENT_ID 0
-#define OBJECTRENDERER_COMPONENT_ID 1
-#define SPRITERENDERER_COMPONENT_ID 2
-#define TAG_COMPONENT_ID 3
-#define CAMERA_COMPONENT_ID 4
-#define NATIVESCRIPT_COMPONENT_ID 5
+#define ID_COMPONENT_ID 0
+#define TAG_COMPONENT_ID 1
+#define CAMERA_COMPONENT_ID 2
+#define TRANSFORM_COMPONENT_ID 3
+#define OBJECTRENDERER_COMPONENT_ID 4
+#define SPRITERENDERER_COMPONENT_ID 5
+#define NATIVESCRIPT_COMPONENT_ID 6
 
 namespace AnEngine {
     struct Component {
         virtual ~Component() = default;
         constexpr virtual uint32_t getID() = 0;
+    };
+
+
+    struct IDComponent : Component {
+        UUID uuid;
+
+        IDComponent() = default;
+        IDComponent(UUID id) : uuid(id) {}
+        IDComponent(const IDComponent&) = default;
+
+        constexpr uint32_t getID() override { return ID_COMPONENT_ID; }
     };
 
     struct TransformComponent : Component {
@@ -57,11 +70,11 @@ namespace AnEngine {
     };
 
     struct SpriteRendererComponent : Component {
-        Material SpriteMaterial;
+        UUID materialUUID;
 
         SpriteRendererComponent() = default;
         SpriteRendererComponent(const SpriteRendererComponent&) = default;
-        SpriteRendererComponent(const Material& material) : SpriteMaterial(material) {}
+        SpriteRendererComponent(const UUID& material) : materialUUID(materialUUID) {}
 
         constexpr virtual uint32_t getID() override { return SPRITERENDERER_COMPONENT_ID; }
     };

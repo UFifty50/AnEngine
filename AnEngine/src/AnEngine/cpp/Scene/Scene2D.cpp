@@ -4,6 +4,7 @@
 
 #include "Scene/Scene2D.hpp"
 
+#include "Core/UUID.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Scene/Components.hpp"
@@ -15,6 +16,17 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         Entity e = {this->entityRegistry.create(), this};
+        e.addComponent<IDComponent>();
+        e.addComponent<TransformComponent>();
+        auto& tag = e.addComponent<TagComponent>(name.empty() ? "Entity" : name);
+        return e;
+    }
+
+    Entity& Scene2D::createEntityWithUUID(const std::string& name, UUID id) {
+        AE_PROFILE_FUNCTION()
+
+        Entity e = {this->entityRegistry.create(), this};
+        e.addComponent<IDComponent>(id);
         e.addComponent<TransformComponent>();
         auto& tag = e.addComponent<TagComponent>(name.empty() ? "Entity" : name);
         return e;
@@ -89,7 +101,7 @@ namespace AnEngine {
                     spriteGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 
                 if ((uint32_t)entity > unsigned(std::numeric_limits<int32_t>::max())) {
-                    AE_CORE_ASSERT(false, "Too many entities in scene :(     TODO: fixme");
+                    AE_CORE_ASSERT(false, "Too many entities in scene :(");  // TODO: fixme
                 }
 
                 Renderer2D::drawSprite((glm::mat4)transform, sprite, (int32_t)entity);

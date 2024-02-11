@@ -17,6 +17,7 @@ namespace AnEngine::Crank {
         void updateCurrentSceneFromActive();
         void setSelectedEntity(Entity entity) { selectedEntity = entity; }
         Entity getSelectedEntity() { return selectedEntity; }
+        bool isEntitySelected() { return selectedEntity; }
 
         virtual ImGuiWindowFlags beforeRender() override {
             //   ImGui::SetNextWindowSizeConstraints({200.0f, 0}, {INFINITY, INFINITY});

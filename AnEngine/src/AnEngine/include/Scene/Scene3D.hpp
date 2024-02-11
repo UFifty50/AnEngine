@@ -1,8 +1,10 @@
 #ifndef SCENE3D_HPP
 #define SCENE3D_HPP
 
+#define NOMINMAX
 #include <entt/entt.hpp>
 
+#include "Core/UUID.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
 #include "Scene/Scene.hpp"
 #include "Time/TimeStep.hpp"
@@ -29,6 +31,7 @@ namespace AnEngine {
         virtual bool is3D() const override { return true; }
 
         virtual Entity& createEntity(const std::string& name = "") override;
+        virtual Entity& createEntityWithUUID(const std::string& name, UUID id) override;
         virtual void destroyEntity(Entity& entity) override;
         virtual void onResize(uint32_t width, uint32_t height) override;
 

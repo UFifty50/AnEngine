@@ -28,15 +28,16 @@
 #include "Renderer/Renderer3D.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
+#include "Scene/Project/Project.hpp"
+#include "Scene/Project/SceneSerialiser.hpp"
 #include "Scene/Scene.hpp"
 #include "Scene/Scene2D.hpp"
 #include "Scene/Scene3D.hpp"
-#include "Scene/SceneSerialiser.hpp"
 #include "Scene/ScriptableEntity.hpp"
 
 
 namespace AnEngine::Crank {
-    Ref<Scene> g_ActiveScene;
+    Project g_ActiveProject;
 
     Ref<DockSpace> g_DockSpace;
 
@@ -113,8 +114,8 @@ namespace AnEngine::Crank {
 
         CommandLine cmdLine = Application::getCommandLine();
         if (cmdLine.hasArgs()) {
-            std::string sceneFilePath = cmdLine.args[0];
-            SceneSerialiser serialiser(g_ActiveScene);
+            std::string projectFilePath = cmdLine.args[0];
+            ProjectSerialiser serialiser(g_ActiveScene);
             try {
                 serialiser.deserialise(sceneFilePath);
             } catch (std::runtime_error& e) {
@@ -153,18 +154,15 @@ namespace AnEngine::Crank {
         g_ActiveScene->onUpdateEditor(deltaTime, editorCam3D);
         // activeScene->onUpdateRuntime(deltaTime);
 
-        {
-            AE_PROFILE_SCOPE("hovering");
-            auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
-            if (g_DockSpace->isMouseInViewport()) {
-                int32_t pixel = frameBuffer->readPixels(
-                    1, {mouseX, mouseY}, {1, 1}, FrameBufferTexFormat::RED_INTEGER)[0];
-                hoveredEntity = pixel == -1
-                                    ? Entity()
-                                    : Entity{(entt::entity)pixel, g_ActiveScene.get()};
-                gPanel_Statistics->setHoveredEntity(hoveredEntity);
-            }
+        auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
+        if (g_DockSpace->isMouseInViewport()) {
+            int32_t pixel = frameBuffer->readPixels(1, {mouseX, mouseY}, {1, 1},
+                                                    FrameBufferTexFormat::RED_INTEGER)[0];
+            hoveredEntity =
+                pixel == -1 ? Entity() : Entity{(entt::entity)pixel, g_ActiveScene.get()};
+            gPanel_Statistics->setHoveredEntity(hoveredEntity);
         }
+
 
         frameBuffer->unBind();
     }

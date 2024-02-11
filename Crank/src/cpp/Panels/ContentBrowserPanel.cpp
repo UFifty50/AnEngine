@@ -6,26 +6,44 @@
 
 #include "Core/Log.hpp"
 #include "Globals.hpp"
+#include "Scene/Project/ProjectSerialiser.hpp"
 #include "Texture/Texture2D.hpp"
 
 
 namespace fs = std::filesystem;
 
 namespace AnEngine::Crank {
-    const fs::path g_BaseAssetsDirectory = "assets";  // TODO: add projects
+    // TODO: add projects <-- working on this
+    const fs::path g_BaseAssetsDirectory = "assets";
 
     ContentBrowserPanel::ContentBrowserPanel(const std::string& name)
         : name(name), currentPath(g_BaseAssetsDirectory) {
         AE_PROFILE_FUNCTION()
 
-        directoryIcon = Texture2D::create("builtins/icons/DirectoryIcon.png");
         fileIcon = Texture2D::create("builtins/icons/FileIcon.png");
+        materialIcon = Texture2D::create("builtins/icons/MaterialIcon.png");
+        directoryIcon = Texture2D::create("builtins/icons/DirectoryIcon.png");
     }
 
     void ContentBrowserPanel::render() {
         AE_PROFILE_FUNCTION()
 
         if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("+")) {
+                if (ImGui::MenuItem("New Directory")) {
+                    fs::create_directory(currentPath / "New Directory");
+                }
+                if (ImGui::MenuItem("New Material")) {
+                    Material newMat;
+                    std::string newMatPath =
+                        (currentPath / "New Material.aematl").string();
+                    ProjectSerialiser::serialiseMaterial(newMatPath, newMat);
+                }
+                if (ImGui::MenuItem("New Texture")) {
+                    AE_CORE_INFO("Create Texture");
+                }
+                ImGui::EndMenu();
+            }
             if (ImGui::BeginMenu("Settings")) {
                 ImGui::SliderFloat("Thumbnail Size", &thumbSize, 64.0f, 256.0f);
                 ImGui::SliderFloat("Padding", &paddingWidth, 0.0f, 32.0f);
@@ -74,8 +92,15 @@ namespace AnEngine::Crank {
                     const fs::path path = dirEnt.path();
                     const fs::path relPath = fs::relative(path, g_BaseAssetsDirectory);
                     const std::string relPathName = relPath.filename().string();
-                    const Ref<Texture2D> icon =
-                        dirEnt.is_directory() ? directoryIcon : fileIcon;
+
+                    Ref<Texture2D> icon;
+                    if (dirEnt.is_directory()) {
+                        icon = directoryIcon;
+                    } else if (relPath.extension() == ".aematl") {  // TODO: ASSET MANAGER
+                        icon = materialIcon;
+                    } else {
+                        icon = fileIcon;
+                    }
 
                     ImGui::PushID(relPathName.c_str());
 
@@ -85,10 +110,15 @@ namespace AnEngine::Crank {
                                        {thumbSize, thumbSize}, {0, 1}, {1, 0});
 
                     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-                        const wchar_t* itemPath = relPath.c_str();
-                        ImGui::SetDragDropPayload(
-                            "CONTENTBROWSER_ITEM", itemPath,
-                            (wcslen(itemPath) + 1) * sizeof(wchar_t));
+                        const PayloadType type =
+                            path.extension() == ".aematl"    ? PayloadType::Material
+                            : path.extension() == ".aescene" ? PayloadType::Scene
+                                                             : PayloadType::Texture;
+
+                        const DropPayload* payload = new DropPayload{path, type};
+
+                        ImGui::SetDragDropPayload("CONTENTBROWSER_ITEM", payload,
+                                                  sizeof(DropPayload));
 
                         ImGui::Image((ImTextureID)icon->getSampler().slot,
                                      {thumbSize, thumbSize}, {0, 1}, {1, 0});
@@ -98,7 +128,13 @@ namespace AnEngine::Crank {
 
                     if (ImGui::IsItemHovered() &&
                         ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                        currentPath = currentPath / path.filename();
+                        if (dirEnt.is_regular_file()) {
+                            selectedItem = dirEnt.path();
+                            AE_CORE_INFO("Selected: {}", selectedItem.string());
+                        } else if (dirEnt.is_directory()) {
+                            currentPath = dirEnt;
+                            AE_CORE_INFO("Entered Directory: {}", currentPath.string());
+                        }
                     }
 
                     ImGui::TextWrapped(relPathName.c_str());

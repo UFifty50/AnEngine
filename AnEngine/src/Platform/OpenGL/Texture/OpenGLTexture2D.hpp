@@ -39,6 +39,8 @@ namespace AnEngine {
             return rendererID == ((OpenGLTexture2D&)other).rendererID;
         }
 
+        virtual fs::path getPath() const override { return file.getFilePath(); }
+
         //  Ref<Texture> getSubImage(glm::vec2 coords, glm::vec2 size) const;
 
     private:

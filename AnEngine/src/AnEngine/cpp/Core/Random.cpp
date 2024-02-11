@@ -6,4 +6,5 @@
 
 namespace AnEngine {
     std::mt19937 Random::engine;
-}
+    std::mt19937_64 Random::engine64;
+}  // namespace AnEngine

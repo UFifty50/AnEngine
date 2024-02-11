@@ -1,6 +1,7 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
+#define NOMINMAX
 #include <entt/entt.hpp>
 
 // #include "Scene/Components.hpp"

@@ -73,7 +73,7 @@ namespace AnEngine {
             float far = 1000.0f;
         } perspectiveSettings;
 
-        friend class SceneSerialiser;
+        friend class ProjectSerialiser;
     };
 }  // namespace AnEngine
 

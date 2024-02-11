@@ -6,25 +6,29 @@
 #include <yaml-cpp/yaml.h>
 
 #include "Core/Core.hpp"
+#include "Core/UUID.hpp"
 #include "Scene/Entity.hpp"
+#include "Scene/Project/Project.hpp"
 #include "Scene/Scene.hpp"
+#include "Texture/Material.hpp"
 
 
 namespace AnEngine {
-    class SceneSerialiser {
+    class ProjectSerialiser {
     public:
-        SceneSerialiser(const Ref<Scene>& scene);
+        static Project openProject(const fs::path& path = "");
 
-        void serialise(const std::string& path);
-        void serialiseBinary(const std::string& path);
+        static void serialiseProject(const Project& project, const fs::path& path = "");
+        static Project deserialiseProject(const fs::path& path = "");
 
-        bool deserialise(const std::string& path);
-        bool deserialiseBinary(const std::string& path);
+        static void serialiseScene(const std::string& path, const Ref<Scene>& scene);
+        static bool deserialiseScene(const std::string& path, const Ref<Scene>& scene);
+
+        static void serialiseMaterial(const std::string& path, Material material);
+        static Material deserialiseMaterial(const fs::path& path);
 
     private:
-        void serialiseEntity(YAML::Emitter& outYAML, Entity entity);
-
-        Ref<Scene> scene;
+        static void serialiseEntity(YAML::Emitter& outYAML, Entity entity);
     };
 };  // namespace AnEngine
 
@@ -72,6 +76,25 @@ namespace YAML {
             return true;
         }
     };
+
+    /*template <>
+    struct convert<AnEngine::UUID> {
+        static Node encode(const AnEngine::UUID& rhs) {
+            Node node;
+            node.push_back((std::string)rhs);
+
+            return node;
+        }
+
+        static bool decode(const Node& node, AnEngine::UUID& rhs) {
+            if (!node.IsScalar()) return false;
+
+            rhs.id[0] = std::stoi(node.as<std::string>().substr(0, 8), nullptr, 16);
+            rhs.id[1] = std::stoi(node.as<std::string>().substr(10, 8), nullptr, 16);
+
+            return true;
+        }
+    };*/
 };  // namespace YAML
 
 

@@ -12,6 +12,15 @@
 namespace fs = std::filesystem;
 
 namespace AnEngine::Crank {
+    enum class PayloadType { Scene, Texture, Material };
+
+    struct DropPayload {
+        const fs::path path;
+        const PayloadType type;
+
+        ~DropPayload() = default;
+    };
+
     class ContentBrowserPanel : public Panel {
     public:
         ContentBrowserPanel(const std::string& name);
@@ -30,12 +39,17 @@ namespace AnEngine::Crank {
 
         virtual std::string getName() override { return name; }
 
+        bool isItemSelected() { return selectedItem != ""; }
+        fs::path getSelectedItem() { return selectedItem; }
+
     private:
         std::string name;
         fs::path currentPath;
+        fs::path selectedItem;
 
-        Ref<Texture2D> directoryIcon;
         Ref<Texture2D> fileIcon;
+        Ref<Texture2D> materialIcon;
+        Ref<Texture2D> directoryIcon;
 
         float thumbSize = 120.0f;
         float paddingWidth = 5.0f;

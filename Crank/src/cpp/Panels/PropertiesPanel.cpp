@@ -11,6 +11,7 @@
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
+#include "Scene/SceneSerialiser.hpp"
 #include "Scene/ScriptableEntity.hpp"
 
 
@@ -25,7 +26,33 @@ namespace AnEngine::Crank {
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {370.0f, 10.0f});
 
-        Entity selectedEntity = gPanel_SceneHierarchy->getSelectedEntity();
+        if (gPanel_ContentBrowser->isItemSelected())
+            selectedItem = gPanel_ContentBrowser->getSelectedItem();
+        if (gPanel_SceneHierarchy->getSelectedEntity())
+            selectedItem = gPanel_SceneHierarchy->getSelectedEntity();
+
+        if (!selectedItem.has_value()) {
+            ImGui::Text("Select an entity to view its properties");
+        } else if (selectedItem.type() == typeid(Entity)) {
+            if (selectedMaterial) {
+                SceneSerialiser::serialiseMaterial(selectedMaterialPath.string(),
+                                                   *selectedMaterial);
+                selectedMaterial.reset();
+            }
+            entityProperties();
+        } else if (selectedItem.type() == typeid(fs::path)) {
+            materialProperties();
+        }
+
+
+        AE_CORE_INFO("type: {0}", selectedItem.type().name());
+
+
+        ImGui::PopStyleVar();
+    }
+
+    void PropertiesPanel::entityProperties() {
+        Entity selectedEntity = std::any_cast<Entity>(selectedItem);
 
         if (selectedEntity) {
             if (selectedEntity.hasComponent<TagComponent>()) {
@@ -83,8 +110,63 @@ namespace AnEngine::Crank {
 
             ImGui::EndPopup();
         }
+    }
 
-        ImGui::PopStyleVar();
+    void PropertiesPanel::materialProperties() {
+        if (!selectedMaterial) {
+            selectedMaterialPath = std::any_cast<fs::path>(selectedItem);
+            selectedMaterial =
+        }
+
+        Material& activeMaterial = *selectedMaterial;
+
+        char buffer[256];
+        std::strncpy(buffer, activeMaterial.name.c_str(), sizeof(buffer));
+        if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
+            activeMaterial.name = buffer;
+        }
+
+        ImGui::ColorEdit4("Colour", glm::value_ptr(activeMaterial.colour));
+
+        if (ImGui::BeginTable("##MaterialTable", 2)) {
+            ImGui::TableSetupColumn("##MaterialView", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##MaterialInfo");
+
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            if (auto tex = activeMaterial.getTexture())
+                ImGui::ImageButton("##E", (ImTextureID)(*tex)->getSampler().slot,
+                                   {50.0f, 50.0f}, {0, 1}, {1, 0});
+            else
+                ImGui::Button("##Texture", {50.0f, 50.0f});
+
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload =
+                        ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
+                    const DropPayload* dropPayload = (const DropPayload*)payload->Data;
+
+                    switch (dropPayload->type) {
+                        case PayloadType::Texture:
+                            activeMaterial.texture = Texture2D::create(dropPayload->path);
+                    }
+
+                    // ImGui uses C free(), so we need to manually call the destructor
+                    dropPayload->~DropPayload();
+                }
+
+                ImGui::EndDragDropTarget();
+            }
+
+            ImGui::TableSetColumnIndex(1);
+            if (ImGui::Button("X")) activeMaterial.texture = nullptr;
+
+            if (ImGui::TreeNodeEx("Shader")) ImGui::TreePop();
+            ImGui::SameLine();
+            ImGui::Button("Edit");
+
+            ImGui::EndTable();
+        }
     }
 
     void PropertiesPanel::drawVec3Controller(const std::string& label, glm::vec3& values,
@@ -283,10 +365,18 @@ namespace AnEngine::Crank {
                     if (ImGui::BeginDragDropTarget()) {
                         if (const ImGuiPayload* payload =
                                 ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
-                            const wchar_t* path = (const wchar_t*)payload->Data;
+                            const DropPayload* dropPayload =
+                                (const DropPayload*)payload->Data;
 
-                            component.SpriteMaterial.texture =
-                                Texture2D::create(g_BaseAssetsDirectory / path);
+                            switch (dropPayload->type) {
+                                case PayloadType::Texture:  // TODO
+                                    break;
+                                case PayloadType::Material:
+                                    auto material = SceneSerialiser::deserialiseMaterial(
+                                        dropPayload->path);
+                                    component.SpriteMaterial = material;
+                                    break;
+                            }
                         }
 
                         ImGui::EndDragDropTarget();

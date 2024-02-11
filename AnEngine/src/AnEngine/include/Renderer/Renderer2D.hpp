@@ -52,34 +52,32 @@ namespace AnEngine {
         struct MatList {
             MatList* next;
 
-            Material material;
+            UUID materialUUID;
             std::vector<MaterialBatch> batches;
 
-            MatList() : next(nullptr), material(nullptr) {}
-            MatList(const Material& material) : next(nullptr), material(material) {
-                //       batches.emplace_back();
-            }
+            MatList() : next(nullptr), materialUUID(nullptr) {}
+            MatList(const UUID& materialUUID) : next(nullptr), materialUUID(materialUUID) {}
 
             ~MatList() {
                 if (next != nullptr) delete next;
             }
 
-            std::vector<MaterialBatch>& operator[](const Material& material) {
-                if (this->material == material)
+            std::vector<MaterialBatch>& operator[](const UUID& materialUUID) {
+                if (this->materialUUID == materialUUID)
                     return this->batches;
                 else if (next != nullptr)
-                    return (*next)[material];
+                    return (*next)[materialUUID];
                 else {
-                    next = new MatList(material);
+                    next = new MatList(materialUUID);
                     return next->batches;
                 }
             }
 
-            MaterialBatch& getBatch(const Material& material) {
-                if (this->material == material)
+            MaterialBatch& getBatch(const UUID& materialUUID) {
+                if (this->materialUUID == materialUUID)
                     return this->batches.back();
                 else if (next != nullptr)
-                    return next->getBatch(material);
+                    return next->getBatch(materialUUID);
                 else
                     AE_CORE_ASSERT(false, "MaterialBatch not found.");
             }
@@ -97,11 +95,11 @@ namespace AnEngine {
                 }
             }
 
-            bool contains(const Material& material) {
-                if (this->material == material)
+            bool contains(const UUID& materialUUID) {
+                if (this->materialUUID == materialUUID)
                     return true;
                 else if (next != nullptr)
-                    return next->contains(material);
+                    return next->contains(materialUUID);
                 else
                     return false;
             }
@@ -124,26 +122,26 @@ namespace AnEngine {
                 }
             }
 
-            // iterator that returs [material, batches] pairs
-            typedef std::pair<Material, std::vector<MaterialBatch>> value_type;
-            class iterator {
+            // iterator that returs [materialUUID, batches] pairs
+            class MatListIterator {
+                typedef std::pair<UUID, std::vector<MaterialBatch>> value_type;
+
             public:
-                iterator(MatList* ptr = nullptr) : ptr(ptr) {}
+                MatListIterator(MatList* ptr = nullptr) : ptr(ptr) {}
 
                 operator bool() const { return ptr != nullptr; }
-                bool operator==(const iterator& other) const { return ptr == other.ptr; }
-                value_type operator*() const {
-#define E(e) e
-                    return {ptr->material, ptr->batches};
+                bool operator==(const MatListIterator& other) const {
+                    return ptr == other.ptr;
                 }
+                value_type operator*() const { return {ptr->materialUUID, ptr->batches}; }
 
-                iterator operator++() {
+                MatListIterator operator++() {
                     ptr = ptr->next;
                     return *this;
                 }
 
-                iterator operator++(int) {
-                    iterator tmp(*this);
+                MatListIterator operator++(int) {
+                    MatListIterator tmp(*this);
                     ++ptr;
                     return tmp;
                 }
@@ -152,13 +150,16 @@ namespace AnEngine {
                 MatList* ptr;
             };
 
-            iterator begin() { return !material.isNull ? iterator(this) : iterator(nullptr); }
-            iterator end() { return iterator(nullptr); }
+            MatListIterator begin() {
+                return !materialUUID.isNull() ? MatListIterator(this)
+                                              : MatListIterator(nullptr);
+            }
+            MatListIterator end() { return MatListIterator(nullptr); }
         };
 
         struct Storage {
             MatList* materialBatchesHead;
-            Material activeMaterial = Material(nullptr);
+            UUID activeMaterialUUID = UUID(nullptr);  // null UUID
 
             glm::vec4 quadVertexPositions[4]{};
             std::array<uint32_t, MaterialBatch::maxIndices> quadIndices;
@@ -195,7 +196,7 @@ namespace AnEngine {
         static void init();
         static void shutdown();
 
-        static void newMaterialBatch(const Material& material);
+        static void newMaterialBatch(const UUID& materialUUID);
 
         static void beginScene(const EditorCamera2D& camera);
         static void beginScene(const Scope<Camera>& camera, const glm::mat4& transform);

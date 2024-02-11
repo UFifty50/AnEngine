@@ -1,6 +1,7 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
+#define NOMINMAX
 #include <entt/entt.hpp>
 
 #include <string>
@@ -25,8 +26,9 @@ namespace AnEngine {
         virtual const std::string& getName() const { return name; }
         virtual void setName(const std::string& newName) { name = newName; }
 
-        virtual void destroyEntity(Entity& entity) = 0;
         virtual Entity& createEntity(const std::string& name = "") = 0;
+        virtual Entity& createEntityWithUUID(const std::string& name, UUID id) = 0;
+        virtual void destroyEntity(Entity& entity) = 0;
         virtual void onResize(uint32_t width, uint32_t height) = 0;
 
         virtual void onUpdateEditor(TimeStep deltaTime, const Ref<EditorCamera>& camera) = 0;
@@ -43,7 +45,7 @@ namespace AnEngine {
 
 
         friend class Entity;
-        friend class SceneSerialiser;
+        friend class ProjectSerialiser;
     };
 };  // namespace AnEngine
 

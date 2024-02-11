@@ -4,6 +4,7 @@
 
 #include "Scene/Scene3D.hpp"
 
+#include "Core/UUID.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/Renderer3D.hpp"
 #include "Scene/Components.hpp"
@@ -15,6 +16,17 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         Entity e = {this->entityRegistry.create(), this};
+        e.addComponent<IDComponent>();
+        e.addComponent<TransformComponent>();
+        auto& tag = e.addComponent<TagComponent>(name.empty() ? "Entity" : name);
+        return e;
+    }
+
+    Entity& Scene3D::createEntityWithUUID(const std::string& name, UUID id) {
+        AE_PROFILE_FUNCTION()
+
+        Entity e = {this->entityRegistry.create(), this};
+        e.addComponent<IDComponent>(id);
         e.addComponent<TransformComponent>();
         auto& tag = e.addComponent<TagComponent>(name.empty() ? "Entity" : name);
         return e;

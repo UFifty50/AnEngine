@@ -1,6 +1,7 @@
 #ifndef AEPCH_HPP
 #define AEPCH_HPP
 
+
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -20,7 +21,8 @@
     #include <commdlg.h>
     #include <io.h>
 
-    #define NOMINMAX
+    #undef min
+    #undef max
     #undef near
     #undef far
 #elif defined(AE_LINUX)

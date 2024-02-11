@@ -13,11 +13,12 @@
 
 #include "Core/Core.hpp"
 #include "Renderer/Shader.hpp"
-#include "Scene/Scene.hpp"
+#include "Scene/Project/Project.hpp"
 
 
 namespace AnEngine {
     extern ShaderLibrary g_ShaderLibrary;
+    extern Project g_ActiveProject;
 
 #ifdef AE_CRANKUI
     namespace Crank {
@@ -31,7 +32,6 @@ namespace AnEngine {
         extern Ref<ContentBrowserPanel> gPanel_ContentBrowser;
         extern Ref<StatisticsPanel> gPanel_Statistics;
 
-        extern Ref<Scene> g_ActiveScene;
 
         extern const fs::path g_BaseAssetsDirectory;
     }  // namespace Crank

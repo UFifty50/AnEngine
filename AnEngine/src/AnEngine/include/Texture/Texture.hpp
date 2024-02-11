@@ -2,10 +2,13 @@
 #define TEXTURE_HPP
 
 #include <cstdint>
+#include <filesystem>
 #include <string>
 
 #include "Renderer/ShaderUniform.hpp"
 
+
+namespace fs = std::filesystem;
 
 namespace AnEngine {
     class ImageFormat {
@@ -75,6 +78,8 @@ namespace AnEngine {
 
         virtual Sampler2D getSampler() const = 0;
         virtual void setData(void* data, uint32_t size) = 0;
+
+        virtual fs::path getPath() const = 0;
 
         //     virtual Ref<Texture> getSubImage(glm::vec2 coords, glm::vec2 size) const =
         //     0;

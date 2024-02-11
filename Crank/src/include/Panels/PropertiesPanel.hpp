@@ -35,8 +35,13 @@ namespace AnEngine::Crank {
 
     private:
         std::string name;
+        std::any selectedItem;
+        std::optional<Material> selectedMaterial;
+        fs::path selectedMaterialPath;
 
 
+        void materialProperties();
+        void entityProperties();
         void drawComponents(Entity entity);
 
         template <typename T>
