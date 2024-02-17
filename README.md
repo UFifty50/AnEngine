@@ -21,7 +21,7 @@ Learning gameEngine-dev, roughly following [TheCherno's Game Engine series](http
 ## Requirements
 - gcc and g++ with versions >= 10
 - Premake v5 (see [Setup](#Setup))
-- Vulkan (The correct version will be installed by the Setup script)
+- Vulkan Toolchain (The correct version will be installed by the Setup script)
 
 
 ## Setup
