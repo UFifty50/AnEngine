@@ -58,6 +58,11 @@ namespace AnEngine::Crank {
             return false;
         }
 
+        if (!SceneSerialiser::isSceneFile(path.string())) {
+            AE_CORE_WARN("File is not a scene file!");
+            return false;
+        }
+
         NewScene();
         SceneSerialiser serialiser(g_ActiveScene);
         if (serialiser.deserialise(path.string())) return true;

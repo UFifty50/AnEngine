@@ -26,6 +26,16 @@ namespace AnEngine {
 
     SceneSerialiser::SceneSerialiser(const Ref<Scene>& scene) : scene(scene) {}
 
+    bool SceneSerialiser::isSceneFile(const std::string& path) {
+        YAML::Node data = YAML::LoadFile(path);
+        try {
+            if (!data["Scene"]) return false;
+        } catch (std::exception e) {
+            AE_CORE_ERROR("SceneSerialiser::deserialise: {0}", e.what());
+            return false;
+        }
+    }
+
     void SceneSerialiser::serialise(const std::string& path) {
         YAML::Emitter outYAML;
         outYAML << YAML::BeginMap;
@@ -56,91 +66,93 @@ namespace AnEngine {
         YAML::Node data = YAML::LoadFile(path);
         try {
             if (!data["Scene"]) return false;
+
+            std::string sceneName = data["Scene"].as<std::string>();
+            AE_CORE_TRACE("Deserialising scene '{0}'", sceneName);
+
+            auto entities = data["Entities"];
+            if (!entities) {
+                return false;
+            }
+
+            for (auto entity : entities) {
+                uint64_t uuid = entity["Entity"].as<uint64_t>();  // TODO: unique entity ID
+                std::string name;
+                auto tagComponent = entity["TagComponent"];
+
+                if (!tagComponent) {
+                    AE_CORE_WARN(
+                        "Entity with ID = {0} is invalid (no tag component), skipping", uuid);
+                    continue;
+                }
+
+                name = tagComponent["Tag"].as<std::string>();
+                Entity deserialisedEntity = scene->createEntity(name);
+
+                if (auto transformComponent = entity["TransformComponent"]) {
+                    auto position = transformComponent["Position"].as<glm::vec3>();
+                    auto rotation = transformComponent["Rotation"].as<glm::vec3>();
+                    auto scale = transformComponent["Scale"].as<glm::vec3>();
+
+                    auto& tc = deserialisedEntity.getComponent<TransformComponent>();
+                    tc.Position = position;
+                    tc.Rotation = rotation;
+                    tc.Scale = scale;
+                }
+
+                if (auto spriteRendererComponent = entity["SpriteRendererComponent"]) {
+                    auto colour = spriteRendererComponent["Colour"].as<glm::vec4>();
+
+                    auto& sRC = deserialisedEntity.addComponent<SpriteRendererComponent>();
+                    sRC.Colour = colour;
+                }
+
+                if (auto cameraComponent = entity["CameraComponent"]) {
+                    auto& cc = deserialisedEntity.addComponent<CameraComponent>();
+                    auto cameraProps = cameraComponent["Camera"];
+
+                    cc.Camera.isPerspective =
+                        cameraProps["ProjectionType"].as<std::string>() == "Perspective";
+
+
+                    if (cc.Camera.isPerspective) {
+                        cc.Camera.updateSpec(CameraSpec3D::Feild::FOVorSize,
+                                             cameraProps["FOV"].as<float>());
+                    } else {
+                        cc.Camera.updateSpec(CameraSpec3D::Feild::FOVorSize,
+                                             cameraProps["Size"].as<float>());
+                        cc.FixedAspectRatio =
+                            cameraProps["AspectRatioType"].as<std::string>() == "Fixed";
+                    }
+
+                    cc.Camera.updateSpec(CameraSpec3D::Feild::NearPlane,
+                                         cameraProps["NearPlane"].as<float>());
+                    cc.Camera.updateSpec(CameraSpec3D::Feild::FarPlane,
+                                         cameraProps["FarPlane"].as<float>());
+
+                    cc.Primary = cameraComponent["Primary"].as<bool>();
+                    cc.Camera.aspectRatio = cameraComponent["AspectRatio"].as<float>();
+
+                    cc.Camera.changeProjectionType(cc.Camera.isPerspective
+                                                       ? ProjectionType::Perspective
+                                                       : ProjectionType::Orthographic);
+                }
+
+                if (auto nativeScriptComponent = entity["NativeScriptComponent"]) {
+                    class temp : public ScriptableEntity {};
+
+                    std::string scriptName =
+                        nativeScriptComponent["ScriptName"].as<std::string>();
+                    auto& nSC =
+                        deserialisedEntity.addComponent<NativeScriptComponent>(scriptName);
+                    nSC.bind<temp>();
+                }
+
+                AE_CORE_TRACE("Deserialised entity with ID = {0}, name = {1}", uuid, name);
+            }
         } catch (std::exception e) {
             AE_CORE_ERROR("SceneSerialiser::deserialise: {0}", e.what());
             return false;
-        }
-
-        std::string sceneName = data["Scene"].as<std::string>();
-        AE_CORE_TRACE("Deserialising scene '{0}'", sceneName);
-
-        auto entities = data["Entities"];
-        if (!entities) {
-            return false;
-        }
-
-        for (auto entity : entities) {
-            uint64_t uuid = entity["Entity"].as<uint64_t>();  // TODO: unique entity ID
-            std::string name;
-            auto tagComponent = entity["TagComponent"];
-
-            if (!tagComponent) {
-                AE_CORE_WARN("Entity with ID = {0} is invalid (no tag component), skipping",
-                             uuid);
-                continue;
-            }
-
-            name = tagComponent["Tag"].as<std::string>();
-            Entity deserialisedEntity = scene->createEntity(name);
-
-            if (auto transformComponent = entity["TransformComponent"]) {
-                auto position = transformComponent["Position"].as<glm::vec3>();
-                auto rotation = transformComponent["Rotation"].as<glm::vec3>();
-                auto scale = transformComponent["Scale"].as<glm::vec3>();
-
-                auto& tc = deserialisedEntity.getComponent<TransformComponent>();
-                tc.Position = position;
-                tc.Rotation = rotation;
-                tc.Scale = scale;
-            }
-
-            if (auto spriteRendererComponent = entity["SpriteRendererComponent"]) {
-                auto colour = spriteRendererComponent["Colour"].as<glm::vec4>();
-
-                auto& sRC = deserialisedEntity.addComponent<SpriteRendererComponent>();
-                sRC.Colour = colour;
-            }
-
-            if (auto cameraComponent = entity["CameraComponent"]) {
-                auto& cc = deserialisedEntity.addComponent<CameraComponent>();
-                auto cameraProps = cameraComponent["Camera"];
-
-                cc.Camera.isPerspective =
-                    cameraProps["ProjectionType"].as<std::string>() == "Perspective";
-
-
-                if (cc.Camera.isPerspective) {
-                    cc.Camera.updateSpec(CameraSpec3D::Feild::FOVorSize,
-                                         cameraProps["FOV"].as<float>());
-                } else {
-                    cc.Camera.updateSpec(CameraSpec3D::Feild::FOVorSize,
-                                         cameraProps["Size"].as<float>());
-                    cc.FixedAspectRatio =
-                        cameraProps["AspectRatioType"].as<std::string>() == "Fixed";
-                }
-
-                cc.Camera.updateSpec(CameraSpec3D::Feild::NearPlane,
-                                     cameraProps["NearPlane"].as<float>());
-                cc.Camera.updateSpec(CameraSpec3D::Feild::FarPlane,
-                                     cameraProps["FarPlane"].as<float>());
-
-                cc.Primary = cameraComponent["Primary"].as<bool>();
-                cc.Camera.aspectRatio = cameraComponent["AspectRatio"].as<float>();
-
-                cc.Camera.changeProjectionType(cc.Camera.isPerspective
-                                                   ? ProjectionType::Perspective
-                                                   : ProjectionType::Orthographic);
-            }
-
-            if (auto nativeScriptComponent = entity["NativeScriptComponent"]) {
-                class temp : public ScriptableEntity {};
-
-                std::string scriptName = nativeScriptComponent["ScriptName"].as<std::string>();
-                auto& nSC = deserialisedEntity.addComponent<NativeScriptComponent>(scriptName);
-                nSC.bind<temp>();
-            }
-
-            AE_CORE_TRACE("Deserialised entity with ID = {0}, name = {1}", uuid, name);
         }
 
         return true;

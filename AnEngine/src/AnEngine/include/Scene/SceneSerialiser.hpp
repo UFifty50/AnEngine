@@ -15,6 +15,8 @@ namespace AnEngine {
     public:
         SceneSerialiser(const Ref<Scene>& scene);
 
+        static bool isSceneFile(const std::string& path);
+
         void serialise(const std::string& path);
         void serialiseBinary(const std::string& path);
 
