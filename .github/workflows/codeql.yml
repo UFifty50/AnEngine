@@ -71,7 +71,7 @@ jobs:
     #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
 
     - name: configure
-      run: vendor/premake/premake5 gmake2
+      run: python scripts/Setup.py
     
     - name: build
       run: make config=debug all
