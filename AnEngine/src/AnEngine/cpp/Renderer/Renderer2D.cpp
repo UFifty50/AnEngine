@@ -55,7 +55,7 @@ namespace AnEngine {
     }
 
 
-    void Renderer2D::newMaterialBatch(const UUID& materialUUID) {
+    void Renderer2D::newMaterialBatch(const Material& material) {
         AE_PROFILE_FUNCTION()
 
         MaterialBatch batch;
@@ -100,11 +100,11 @@ namespace AnEngine {
 
             {
                 AE_PROFILE_SCOPE("Add material batch")
-                if (rendererData.materialBatchesHead->materialUUID.isNull()) {
-                    rendererData.materialBatchesHead->materialUUID = materialUUID;
+                if (rendererData.materialBatchesHead->material.isNull()) {
+                    rendererData.materialBatchesHead->material = material;
                     rendererData.materialBatchesHead->batches.push_back(batch);
                 } else {
-                    (*rendererData.materialBatchesHead)[materialUUID].push_back(batch);
+                    (*rendererData.materialBatchesHead)[material].push_back(batch);
                 }
             }
 
@@ -155,7 +155,7 @@ namespace AnEngine {
                        "Renderer2D::shutdown() called with active scene!");
 
         delete rendererData.materialBatchesHead;
-        rendererData.activeMaterialUUID = UUID(nullptr);
+        //   rendererData.activeMaterial = AnEngine::UUID(nullptr);
 
         //   rendererData.textureSlotIndex = 1;
     }
@@ -178,7 +178,7 @@ namespace AnEngine {
         }
 
         rendererStats.usedMaterials = (uint32_t)rendererData.materialBatchesHead->size();
-        rendererData.activeMaterialUUID = UUID(nullptr);
+        rendererData.activeMaterial = Material(nullptr);
 
         rendererData.activeScene = false;
     }
@@ -188,14 +188,14 @@ namespace AnEngine {
         endActiveBatch();
         flushActiveBatch();
 
-        newMaterialBatch(rendererData.activeMaterialUUID);
+        newMaterialBatch(rendererData.activeMaterial);
     }
 
     void Renderer2D::endActiveBatch() {
         AE_PROFILE_FUNCTION()
 
         MaterialBatch& batch =
-            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterialUUID);
+            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterial);
 
         uint32_t dataSize = batch.quadVBOVec.size() * sizeof(QuadVertex);
         batch.quadVBO->setData(batch.quadVBOVec.data(), dataSize);
@@ -205,7 +205,7 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         MaterialBatch& batch =
-            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterialUUID);
+            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterial);
 
         // TODO: Bind the materials shader instead of ours
         g_ShaderLibrary.get("QuadShader")->bind();
@@ -222,8 +222,8 @@ namespace AnEngine {
     void Renderer2D::endAllBatches() {
         AE_PROFILE_FUNCTION()
 
-        for (const auto& [materialUUID, batches] : *rendererData.materialBatchesHead) {
-            rendererData.activeMaterialUUID = materialUUID;
+        for (const auto& [material, batches] : *rendererData.materialBatchesHead) {
+            rendererData.activeMaterial = material;
             endActiveBatch();
         }
     }
@@ -231,8 +231,8 @@ namespace AnEngine {
     void Renderer2D::flushAllBatches() {
         AE_PROFILE_FUNCTION()
 
-        for (const auto& [materialUUID, batch] : *rendererData.materialBatchesHead) {
-            rendererData.activeMaterialUUID = materialUUID;
+        for (const auto& [material, batch] : *rendererData.materialBatchesHead) {
+            rendererData.activeMaterial = material;
             flushActiveBatch();
         }
     }
@@ -243,17 +243,16 @@ namespace AnEngine {
                                 const SpriteRendererComponent& sprite, int32_t entityID) {
         AE_PROFILE_FUNCTION()
 
-        if (rendererData.activeMaterialUUID != sprite.materialUUID &&
-            !rendererData.materialBatchesHead->contains(sprite.materialUUID))
-            newMaterialBatch(sprite.materialUUID);
+        if (rendererData.activeMaterial != sprite.Mat &&
+            !rendererData.materialBatchesHead->contains(sprite.Mat))
+            newMaterialBatch(sprite.Mat);
 
-        rendererData.activeMaterialUUID = sprite.materialUUID;
-        const Material& mat = g_ActiveProject.loadMaterial(sprite.materialUUID);
+        rendererData.activeMaterial = sprite.Mat;
 
-        if (const auto& tex = mat.getTexture()) {
+        if (const auto& tex = sprite.Mat.getTexture()) {
             drawQuad(transform, *tex, entityID);
         } else {
-            drawQuad(transform, mat.colour, entityID);
+            drawQuad(transform, sprite.Mat.colour, entityID);
         }
     }
 
@@ -267,7 +266,7 @@ namespace AnEngine {
         }
 
         MaterialBatch& batch =
-            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterialUUID);
+            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterial);
 
         if (batch.indexCount >= MaterialBatch::maxIndices) {
             newBatch();
@@ -311,7 +310,7 @@ namespace AnEngine {
         }
 
         MaterialBatch& batch =
-            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterialUUID);
+            rendererData.materialBatchesHead->getBatch(rendererData.activeMaterial);
 
         if (batch.indexCount >= MaterialBatch::maxIndices ||
             batch.textureSlotIndex >= MaterialBatch::maxTextureSlots) {

@@ -69,7 +69,40 @@ namespace AnEngine {
         return outYAML;
     }
 
+    // example YAML project file
+    // name: "Crank"
+    // meta:
+    //   - author: "AnEngine"
+    //   - version: "0.0.1"
+    //   - created: "2021-10-01"
+    //   - saved: "2021-10-01"
+    //   - uuid: "ffffffff-ffffffff"
+    // root:
+    //   - files:
+    //       - name: "material.yml"
+    //         path: "materials/material.yml"
+    //         type: "Material"
+    //   - directories:
+    //       - name: "models"
+    //         files:
+    //           - name: "model.obj"
+    //             path: "models/model.obj"
+    //             type: "Model"
+    //       - name: "textures"
+    //         files:
+    //           - name: "texture.png"
+    //             path: "textures/texture.png"
+    //             type: "Texture"
+    //         directories:
+    //           - name: "normal"
+    //             files:
+    //               - name: "normal.png"
+    //                 path: "textures/normal/normal.png"
+    //                 type: "Texture"
+
     Project ProjectSerialiser::openProject(const fs::path& path) {
+        AE_PROFILE_FUNCTION()
+
         if (!fs::exists(path)) {
             AE_CORE_ERROR("Project path does not exist");
             return;
@@ -80,72 +113,71 @@ namespace AnEngine {
             return;
         }
 
-        std::vector<fs::path> materialPaths;
         Project project = ProjectSerialiser::deserialiseProject(path);
 
-        for (auto& dirEnt : fs::recursive_directory_iterator(path.parent_path())) {
-            if (dirEnt.path().extension() != ".meta") continue;
+        // Load materials
+        for (auto file : project.root) {
+            if (file.type != DirectoryEntry::File) continue;
 
-            Meta meta = Meta::fromYAML(dirEnt.path());
-            switch (meta.type) {
-                case FileType::Material:
-                    materialPaths.push_back(dirEnt.path());
-                    break;
-                case FileType::Scene:
-                    break;
-                case FileType::Model:
-                    break;
-                case FileType::Texture:
-                    break;
-                case FileType::Shader:
-                    break;
-                case FileType::Other:
-                    break;
-            }
+            File file = static_cast<File>(file);
+            if (file.type != FileType::Material) continue;
 
-            Directory currDir = project.root;
-            for (auto& part : dirEnt.path().relative_path()) {
-                if (fs::is_directory(dirEnt))
-                    currDir = currDir.directories[part.string()];
-                else
-                    currDir.files[meta.filename] = {meta.type, meta.filename, meta.path};
-            }
+            Material material = ProjectSerialiser::deserialiseMaterial(file.path);
+            project.materials[material.uuid] = material;
+
+            AE_CORE_TRACE("Loaded material '{0}' with UUID = {1}", material.name,
+                          (std::string)material.uuid);
         }
-
-        // for (auto& matPath : materialPaths) {
-        //     Material mat = ProjectSerialiser::deserialiseMaterial(matPath);
-        //     project.materials[mat.uuid] = mat;
-        // }
     }
 
-    void ProjectSerialiser::serialiseProject(const Project& project, const fs::path& path) {
-        std::ofstream file;
-        if (path == "")
-            file = std::ofstream(project.path);
-        else
-            file = std::ofstream(path);
-
-        YAML::Emitter out;
-        out << YAML::BeginMap;
-        out << YAML::Key << "name" << YAML::Value << project.name;
-        out << YAML::Key << "meta" << YAML::Value << YAML::BeginMap;
-        out << YAML::Key << "author" << YAML::Value << project.meta.author;
-        out << YAML::Key << "version" << YAML::Value << project.meta.version;
-        out << YAML::Key << "date" << YAML::Value << project.meta.date;
-        out << YAML::EndMap;
-        out << YAML::EndMap;
-
-        file << out.c_str();
-    }
+    void ProjectSerialiser::serialiseProject(const Project& project, const fs::path& path) {}
 
     Project ProjectSerialiser::deserialiseProject(const fs::path& path) {
-        auto data = YAML::LoadFile(path.string());
+        AE_PROFILE_FUNCTION()
 
         Project project;
+        YAML::Node data = YAML::LoadFile(path.string());
+
+        project.path = path;
         project.name = data["name"].as<std::string>();
-        project.meta.author = data["meta"]["author"].as<std::string>();
-        project.meta.version = data["meta"]["version"].as<std::string>();
-        project.meta.date = data["meta"]["date"].as<std::string>();
+        project.meta = data["meta"].as<Project::MetaData>();
+
+        auto root = data["root"];
+
+        std::function<void(const YAML::Node&, Directory&)> iterateDirectory =
+            [&](const YAML::Node& node, Directory& directory) {
+                auto files = node["files"];
+                auto directories = node["directories"];
+
+                for (auto file : files) {
+                    UUID uuid = file.first.as<UUID>();
+                    fs::path path = file.second["path"].as<std::string>();
+                    std::string name = file.second["name"].as<std::string>();
+                    std::string type = file.second["type"].as<std::string>();
+
+                    FileType fileType = FileType::Other;
+                    if (type == "Material") {
+                        fileType = FileType::Material;
+                    } else if (type == "Texture") {
+                        fileType = FileType::Texture;
+                    } else if (type == "Model") {
+                        fileType = FileType::Model;
+                    }
+
+                    directory.files.insert(File(uuid, name, fileType, path));
+                }
+
+                for (auto dir : directories) {
+                    UUID uuid = dir.first.as<UUID>();
+                    std::string name = dir.second["name"].as<std::string>();
+                    Directory subDir;
+                    iterateDirectory(dir.second, subDir);
+
+                    directory.directories.insert(subDir);
+                }
+            };
+
+        iterateDirectory(root, project.root);
 
         return project;
     }
@@ -224,11 +256,10 @@ namespace AnEngine {
                 auto material = spriteRendererComponent["Material"];
 
                 auto& sRC = deserialisedEntity.addComponent<SpriteRendererComponent>();
-                sRC.SpriteMaterial.colour = material["Colour"].as<glm::vec4>();
+                sRC.Mat.colour = material["Colour"].as<glm::vec4>();
 
                 if (material["Texture"].as<std::string>() != "None")
-                    sRC.SpriteMaterial.texture =
-                        Texture2D::create(material["Texture"].as<std::string>());
+                    sRC.Mat.texture = Texture2D::create(material["Texture"].as<std::string>());
             }
 
             if (auto cameraComponent = entity["CameraComponent"]) {
@@ -404,7 +435,7 @@ namespace AnEngine {
             auto& sRC = entity.getComponent<SpriteRendererComponent>();
             // Unity uses YAML for materials, and each texture is just an ID for the assets
             // manager to use
-            outYAML << YAML::Key << "Material" << YAML::Value << sRC.SpriteMaterial.uuid;
+            outYAML << YAML::Key << "Material" << YAML::Value << sRC.Mat.uuid;
             outYAML << YAML::EndMap;
 
             outYAML << YAML::EndMap;

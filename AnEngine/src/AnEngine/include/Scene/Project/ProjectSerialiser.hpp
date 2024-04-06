@@ -77,7 +77,7 @@ namespace YAML {
         }
     };
 
-    /*template <>
+    template <>
     struct convert<AnEngine::UUID> {
         static Node encode(const AnEngine::UUID& rhs) {
             Node node;
@@ -89,12 +89,37 @@ namespace YAML {
         static bool decode(const Node& node, AnEngine::UUID& rhs) {
             if (!node.IsScalar()) return false;
 
-            rhs.id[0] = std::stoi(node.as<std::string>().substr(0, 8), nullptr, 16);
-            rhs.id[1] = std::stoi(node.as<std::string>().substr(10, 8), nullptr, 16);
+            rhs = AnEngine::UUID::fromStr(node.as<std::string>());
 
             return true;
         }
-    };*/
+    };
+
+    template <>
+    struct convert<AnEngine::Project::MetaData> {
+        static Node encode(const AnEngine::Project::MetaData& rhs) {
+            Node node;
+            node["author"] = rhs.author;
+            node["version"] = rhs.version;
+            node["created"] = rhs.created;
+            node["saved"] = rhs.saved;
+            node["uuid"] = (std::string)rhs.uuid;
+
+            return node;
+        }
+
+        static bool decode(const Node& node, AnEngine::Project::MetaData& rhs) {
+            if (!node.IsMap()) return false;
+
+            rhs.author = node["author"].as<std::string>();
+            rhs.version = node["version"].as<std::string>();
+            rhs.created = node["created"].as<std::string>();
+            rhs.saved = node["saved"].as<std::string>();
+            rhs.uuid = node["uuid"].as<AnEngine::UUID>();
+
+            return true;
+        }
+    };
 };  // namespace YAML
 
 

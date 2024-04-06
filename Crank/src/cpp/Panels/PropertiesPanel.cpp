@@ -11,7 +11,7 @@
 #include "Panels/ScenesPanel.hpp"
 #include "Scene/Components.hpp"
 #include "Scene/Entity.hpp"
-#include "Scene/SceneSerialiser.hpp"
+#include "Scene/Project/ProjectSerialiser.hpp"
 #include "Scene/ScriptableEntity.hpp"
 
 
@@ -35,8 +35,8 @@ namespace AnEngine::Crank {
             ImGui::Text("Select an entity to view its properties");
         } else if (selectedItem.type() == typeid(Entity)) {
             if (selectedMaterial) {
-                SceneSerialiser::serialiseMaterial(selectedMaterialPath.string(),
-                                                   *selectedMaterial);
+                ProjectSerialiser::serialiseMaterial(selectedMaterialPath.string(),
+                                                     *selectedMaterial);
                 selectedMaterial.reset();
             }
             entityProperties();
@@ -116,6 +116,7 @@ namespace AnEngine::Crank {
         if (!selectedMaterial) {
             selectedMaterialPath = std::any_cast<fs::path>(selectedItem);
             selectedMaterial =
+                ProjectSerialiser::deserialiseMaterial(selectedMaterialPath);
         }
 
         Material& activeMaterial = *selectedMaterial;
@@ -342,59 +343,61 @@ namespace AnEngine::Crank {
             },
             treeNodeFlags);
 
-        drawComponent<SpriteRendererComponent>(
-            "Sprite Renderer", entity, true,
-            [](auto& component) {
-                ImGui::ColorEdit4("Colour",
-                                  glm::value_ptr(component.SpriteMaterial.colour));
+        // drawComponent<SpriteRendererComponent>(
+        //     "Sprite Renderer", entity, true,
+        //     [](auto& component) {
+        //         ImGui::ColorEdit4("Colour",
+        //                           glm::value_ptr(component.SpriteMaterial.colour));
 
-                if (ImGui::BeginTable("##MaterialTable", 2)) {
-                    ImGui::TableSetupColumn("##MaterialView",
-                                            ImGuiTableColumnFlags_WidthFixed);
-                    ImGui::TableSetupColumn("##MaterialInfo");
+        //        if (ImGui::BeginTable("##MaterialTable", 2)) {
+        //            ImGui::TableSetupColumn("##MaterialView",
+        //                                    ImGuiTableColumnFlags_WidthFixed);
+        //            ImGui::TableSetupColumn("##MaterialInfo");
 
-                    ImGui::TableNextRow();
+        //            ImGui::TableNextRow();
 
-                    ImGui::TableSetColumnIndex(0);
-                    if (auto tex = component.SpriteMaterial.getTexture())
-                        ImGui::ImageButton("##E", (ImTextureID)(*tex)->getSampler().slot,
-                                           {50.0f, 50.0f}, {0, 1}, {1, 0});
-                    else
-                        ImGui::Button("##Texture", {50.0f, 50.0f});
+        //            ImGui::TableSetColumnIndex(0);
+        //            if (auto tex = component.SpriteMaterial.getTexture())
+        //                ImGui::ImageButton("##E",
+        //                (ImTextureID)(*tex)->getSampler().slot,
+        //                                   {50.0f, 50.0f}, {0, 1}, {1, 0});
+        //            else
+        //                ImGui::Button("##Texture", {50.0f, 50.0f});
 
-                    if (ImGui::BeginDragDropTarget()) {
-                        if (const ImGuiPayload* payload =
-                                ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
-                            const DropPayload* dropPayload =
-                                (const DropPayload*)payload->Data;
+        //            if (ImGui::BeginDragDropTarget()) {
+        //                if (const ImGuiPayload* payload =
+        //                        ImGui::AcceptDragDropPayload("CONTENTBROWSER_ITEM")) {
+        //                    const DropPayload* dropPayload =
+        //                        (const DropPayload*)payload->Data;
 
-                            switch (dropPayload->type) {
-                                case PayloadType::Texture:  // TODO
-                                    break;
-                                case PayloadType::Material:
-                                    auto material = SceneSerialiser::deserialiseMaterial(
-                                        dropPayload->path);
-                                    component.SpriteMaterial = material;
-                                    break;
-                            }
-                        }
+        //                    switch (dropPayload->type) {
+        //                        case PayloadType::Texture:  // TODO
+        //                            break;
+        //                        case PayloadType::Material:
+        //                            auto material =
+        //                            SceneSerialiser::deserialiseMaterial(
+        //                                dropPayload->path);
+        //                            component.SpriteMaterial = material;
+        //                            break;
+        //                    }
+        //                }
 
-                        ImGui::EndDragDropTarget();
-                    }
+        //                ImGui::EndDragDropTarget();
+        //            }
 
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("Placeholder Name");
-                    ImGui::SameLine();
-                    if (ImGui::Button("X")) component.SpriteMaterial.texture = nullptr;
+        //            ImGui::TableSetColumnIndex(1);
+        //            ImGui::Text("Placeholder Name");
+        //            ImGui::SameLine();
+        //            if (ImGui::Button("X")) component.SpriteMaterial.texture = nullptr;
 
-                    if (ImGui::TreeNodeEx("Shader")) ImGui::TreePop();
-                    ImGui::SameLine();
-                    ImGui::Button("Edit");
+        //            if (ImGui::TreeNodeEx("Shader")) ImGui::TreePop();
+        //            ImGui::SameLine();
+        //            ImGui::Button("Edit");
 
-                    ImGui::EndTable();
-                }
-            },
-            treeNodeFlags);
+        //            ImGui::EndTable();
+        //        }
+        //    },
+        //    treeNodeFlags);
 
 
         drawComponent<NativeScriptComponent>(

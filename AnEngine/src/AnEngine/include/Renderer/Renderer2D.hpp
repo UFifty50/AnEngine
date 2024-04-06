@@ -51,33 +51,32 @@ namespace AnEngine {
 
         struct MatList {
             MatList* next;
-
-            UUID materialUUID;
+            Material material;
             std::vector<MaterialBatch> batches;
 
-            MatList() : next(nullptr), materialUUID(nullptr) {}
-            MatList(const UUID& materialUUID) : next(nullptr), materialUUID(materialUUID) {}
+            MatList() : next(nullptr), material(nullptr) {}
+            MatList(const Material& material) : next(nullptr), material(material) {}
 
             ~MatList() {
                 if (next != nullptr) delete next;
             }
 
-            std::vector<MaterialBatch>& operator[](const UUID& materialUUID) {
-                if (this->materialUUID == materialUUID)
+            std::vector<MaterialBatch>& operator[](const Material& material) {
+                if (this->material == material)
                     return this->batches;
                 else if (next != nullptr)
-                    return (*next)[materialUUID];
+                    return (*next)[material];
                 else {
-                    next = new MatList(materialUUID);
+                    next = new MatList(material);
                     return next->batches;
                 }
             }
 
-            MaterialBatch& getBatch(const UUID& materialUUID) {
-                if (this->materialUUID == materialUUID)
+            MaterialBatch& getBatch(const Material& material) {
+                if (this->material == material)
                     return this->batches.back();
                 else if (next != nullptr)
-                    return next->getBatch(materialUUID);
+                    return next->getBatch(material);
                 else
                     AE_CORE_ASSERT(false, "MaterialBatch not found.");
             }
@@ -95,11 +94,11 @@ namespace AnEngine {
                 }
             }
 
-            bool contains(const UUID& materialUUID) {
-                if (this->materialUUID == materialUUID)
+            bool contains(const Material& material) {
+                if (this->material == material)
                     return true;
                 else if (next != nullptr)
-                    return next->contains(materialUUID);
+                    return next->contains(material);
                 else
                     return false;
             }
@@ -122,9 +121,9 @@ namespace AnEngine {
                 }
             }
 
-            // iterator that returs [materialUUID, batches] pairs
+            // iterator that returs [material, batches] pairs
             class MatListIterator {
-                typedef std::pair<UUID, std::vector<MaterialBatch>> value_type;
+                typedef std::pair<Material, std::vector<MaterialBatch>> value_type;
 
             public:
                 MatListIterator(MatList* ptr = nullptr) : ptr(ptr) {}
@@ -133,7 +132,7 @@ namespace AnEngine {
                 bool operator==(const MatListIterator& other) const {
                     return ptr == other.ptr;
                 }
-                value_type operator*() const { return {ptr->materialUUID, ptr->batches}; }
+                value_type operator*() const { return {ptr->material, ptr->batches}; }
 
                 MatListIterator operator++() {
                     ptr = ptr->next;
@@ -151,15 +150,14 @@ namespace AnEngine {
             };
 
             MatListIterator begin() {
-                return !materialUUID.isNull() ? MatListIterator(this)
-                                              : MatListIterator(nullptr);
+                return !material.isNull() ? MatListIterator(this) : MatListIterator(nullptr);
             }
             MatListIterator end() { return MatListIterator(nullptr); }
         };
 
         struct Storage {
             MatList* materialBatchesHead;
-            UUID activeMaterialUUID = UUID(nullptr);  // null UUID
+            Material activeMaterial = Material(nullptr);
 
             glm::vec4 quadVertexPositions[4]{};
             std::array<uint32_t, MaterialBatch::maxIndices> quadIndices;
@@ -196,7 +194,7 @@ namespace AnEngine {
         static void init();
         static void shutdown();
 
-        static void newMaterialBatch(const UUID& materialUUID);
+        static void newMaterialBatch(const Material& material);
 
         static void beginScene(const EditorCamera2D& camera);
         static void beginScene(const Scope<Camera>& camera, const glm::mat4& transform);

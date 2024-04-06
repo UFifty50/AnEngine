@@ -9,19 +9,20 @@
     #include "Panels/ScenesPanel.hpp"
     #include "Panels/StatisticsPanel.hpp"
     #include "Panels/ViewportPanel.hpp"
+    #include "Scene/Project/Project.hpp"
 #endif
 
 #include "Core/Core.hpp"
 #include "Renderer/Shader.hpp"
-#include "Scene/Project/Project.hpp"
 
 
 namespace AnEngine {
     extern ShaderLibrary g_ShaderLibrary;
-    extern Project g_ActiveProject;
 
 #ifdef AE_CRANKUI
     namespace Crank {
+        extern Project g_ActiveProject;
+
         extern Ref<DockSpace> g_DockSpace;
 
         extern Ref<FileMenu> gMenu_FileOps;

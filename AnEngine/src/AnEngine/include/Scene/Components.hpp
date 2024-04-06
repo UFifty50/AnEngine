@@ -70,11 +70,11 @@ namespace AnEngine {
     };
 
     struct SpriteRendererComponent : Component {
-        UUID materialUUID;
+        Material Mat;
 
         SpriteRendererComponent() = default;
         SpriteRendererComponent(const SpriteRendererComponent&) = default;
-        SpriteRendererComponent(const UUID& material) : materialUUID(materialUUID) {}
+        SpriteRendererComponent(const Material& material) : Mat(material) {}
 
         constexpr virtual uint32_t getID() override { return SPRITERENDERER_COMPONENT_ID; }
     };
