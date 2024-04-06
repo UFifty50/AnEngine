@@ -1,8 +1,9 @@
 [![wakatime](https://wakatime.com/badge/github/UFifty50/AnEngine.svg)](https://wakatime.com/badge/github/UFifty50/AnEngine)
 # AnEngine
-Learning gameEngine-dev using [TheCherno's Game Engine series](https://youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT)
+Learning gameEngine-dev, roughly following [TheCherno's Game Engine series](https://youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT) with my own modifications and extensions.
 
-- [AnEngine](#AnEngine)
+- [AnEngine](#anengine)
+  - [Requirements](#requirements) 
   - [Setup](#setup)
     - [Windows](#windows)
     - [Linux](#linux)
@@ -10,18 +11,33 @@ Learning gameEngine-dev using [TheCherno's Game Engine series](https://youtube.c
 - **AnEngine/**: The core engine.
 - **Crank/**: The engine UI.
 
+
+> [!NOTE]
+> Branch infomation:
+> - main: should compile and work, no major bugs (in theory, if you find any please open an issue!)
+> - dev: development, normally used for transferring my active work betweek devices. This may or may not compile, and will likely be riddled with bugs!
+
+
+## Requirements
+- gcc and g++ with versions >= 10
+- Premake v5 (see [Setup](#Setup))
+- Vulkan Toolchain (The correct version will be installed by the Setup script)
+
+
 ## Setup
-First clone the repository with `git clone --recursive <URL>`.
+First clone the repository with `git clone --recursive https://github.com/UFifty50/AnEngine`. (If you want the dev branch don't forget the `-b dev`!)
 > Note: If the repository has already been cloned non-recursively, use `git submodule update --init` to clone the necessary submodules.
 AnEngine uses the `Premake 5` build system. Follow [these](https://premake.github.io/download.html) instructions to install it.
 
 ###### _hint, there are x64 linux and windows binaries in the vendor/premake folder._
 
-## Windows
 
-AnEngine works best using Visual Studio 2022. To generate the `.sln` and `.vcxproj` files, run `premake vs2022` in the root directory of the repository.
+## Windows
+AnEngine works best using Visual Studio 2022. To generate the `.sln` and `.vcxproj` files, run the `Setup.py` script in the "scripts" directory.
+
 
 ## Linux
+# Linux is not currently working! The below instructions are for if you want to try anyways.
 
 AnEngine has extra dependencies on Linux. These development packages are needed:
 - `libxcursor`
@@ -30,14 +46,11 @@ AnEngine has extra dependencies on Linux. These development packages are needed:
 - `libxi`
 - `libglew`
 
-AnEngine also requires versions of gcc and g++ that support C++20 (gcc and g++ >= 10).
-
 On apt-based distros, these can be installed by running:
-
 `sudo apt install libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglew-dev`
 
 AnEngine can then be configured and compiled with:
 ```bash
-premake5 gmake2
+python scripts/Setup.py
 make
 ```
