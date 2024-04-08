@@ -1,21 +1,32 @@
 #include "aepch.hpp"
 
-#include "Scene/Project/Project.hpp"
+#include "Project/Project.hpp"
+
+#include "Project/Resources/Scene/Scene2D.hpp"
+#include "Project/Resources/Scene/Scene3D.hpp"
 
 
 namespace AnEngine {
-    // if material exists in materials uuid map, return it
-    // otherwise, load it from the directory structure at `root`
-    /*const Material& Project::loadMaterial(const UUID& uuid) const {
-        if (materials.contains(uuid)) return materials.at(uuid);
+    Project Project::newProject(bool is3D) {
+        Project project = Project();
+        project.is3D = is3D;
+        return project;
+    }
 
-        for (const auto& [files, directories] : root) {
-            for (const auto& [name, file] : files) {
-                if (file.type == FileType::Material) {
-                    Meta meta = Meta::fromYAML(file.path);
-                    materials[meta.] = Material(meta);
-                }
+    // if `isScene3D` is not provided, use the project's default
+    Resource Project::newScene(std::optional<bool> isScene3D) {
+        Resource sceneRes;
+        if (isScene3D.has_value()) {
+            if (*isScene3D) {
+                sceneRes = Scene3D::create("");
+                resources[sceneRes.uuid] = sceneRes;
             }
+        } else {
+            sceneRes = Scene2D::create("");
+            resources[sceneRes.uuid] = sceneRes;
         }
-    }*/
+
+        activeSceneID = sceneRes.uuid;
+        return sceneRes;
+    }
 };  // namespace AnEngine

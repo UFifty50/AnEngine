@@ -8,7 +8,8 @@
 #include "Dockspace.hpp"
 #include "Menus/Menu.hpp"
 #include "Panels/ScenesPanel.hpp"
-#include "Scene/Scene.hpp"
+#include "Project/Resource.hpp"
+#include "Project/Resources/Scene/Scene.hpp"
 
 
 namespace fs = std::filesystem;
@@ -25,14 +26,21 @@ namespace AnEngine::Crank {
 
         virtual std::string getMenuName() override { return name; }
 
+        // -- Projects --
+        static void NewProject();
 
+        static bool OpenProjectMenu();
+        static void OpenProject(const fs::path& path);
+
+        static void SaveProject();
+
+        // -- Scenes --
         static void NewScene();
 
         static bool OpenSceneMenu();
         static bool OpenScene(const fs::path& path);
 
         static void SaveActiveScene();
-        static void SaveScene(const Ref<Scene>& scene);
 
     private:
         std::string name;

@@ -7,14 +7,13 @@
 
 #include "Core/Core.hpp"
 #include "Core/UUID.hpp"
+#include "Project/Resource.hpp"
 #include "Renderer/Shader.hpp"
 #include "Texture/Texture2D.hpp"
 
 
 namespace AnEngine {
-    struct Material {
-        UUID uuid;
-        std::string name;
+    struct Material : Resource {
         glm::vec4 colour{1.0f};
         Ref<Texture2D> texture{nullptr};
         // TODO: Ref<Texture2D> Albedo{nullptr};
@@ -24,9 +23,11 @@ namespace AnEngine {
         // TODO: Ref<Shader> shader{nullptr};
 
 
-        Material(std::string name = "Unnamed Material") : uuid(), name(name) {}
-        Material(std::string name, UUID uuid) : uuid(uuid), name(name) {}
-        Material(nullptr_t) : uuid(nullptr), name("") {}
+        Material(std::string name = "Unnamed Material")
+            : Resource{Resource::Type::Material, {}, name} {}
+        Material(std::string name, AnEngine::UUID uuid)
+            : Resource{Resource::Type::Material, uuid, name} {}
+        Material(nullptr_t) : Resource{Resource::Type::Material, nullptr, ""} {}
         ~Material() = default;
 
         std::optional<Ref<Texture2D>> getTexture() const {

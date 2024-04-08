@@ -5,8 +5,9 @@
 #include <entt/entt.hpp>
 
 #include "Core/UUID.hpp"
+#include "Project/Resource.hpp"
+#include "Project/Resources/Scene/Scene.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
-#include "Scene/Scene.hpp"
 #include "Time/TimeStep.hpp"
 
 
@@ -17,18 +18,23 @@ namespace AnEngine {
         class ScenesPanel;
     };
 
-    class Scene3D : public Scene {
+    class Scene3D : public Scene, public Resource {
     public:
-        Scene3D() = default;
-        Scene3D(std::string name) { this->name = name; }
         ~Scene3D() = default;
 
-        void clear() {
-            this->name = "";
+        static Resource create(const std::string& name = "") {
+            return static_cast<Resource>(Scene3D(name));
+        }
+
+        void empty() {
+            Resource::name = "";
             entityRegistry.clear();
         }
 
         virtual bool is3D() const override { return true; }
+
+        virtual const std::string& getName() const override { return Resource::name; }
+        virtual void setName(const std::string& newName) override { Resource::name = newName; }
 
         virtual Entity& createEntity(const std::string& name = "") override;
         virtual Entity& createEntityWithUUID(const std::string& name, UUID id) override;
@@ -42,6 +48,8 @@ namespace AnEngine {
         Entity getPrimaryCamera();
 
     private:
+        Scene3D(const std::string& name = "") : Resource{Resource::Type::Scene3D, {}, name} {}
+
         virtual void onComponentAdded(Entity& e, Component& component) override;
     };
 }  // namespace AnEngine

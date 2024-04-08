@@ -10,11 +10,11 @@
 
 #include "Core/UUID.hpp"
 #include "Globals.hpp"
-#include "Scene/Components.hpp"
-#include "Scene/Entity.hpp"
-#include "Scene/Project/Project.hpp"
-#include "Scene/Project/ProjectSerialiser.hpp"
-#include "Texture/Material.hpp"
+#include "Project/Project.hpp"
+#include "Project/ProjectSerialiser.hpp"
+#include "Project/Resources/Material.hpp"
+#include "Project/Resources/Scene/Components.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
 #include "Texture/Texture2D.hpp"
 
 /// TODO: Projects
@@ -117,18 +117,27 @@ namespace AnEngine {
 
         // Load materials
         for (auto file : project.root) {
-            if (file.type != DirectoryEntry::File) continue;
+            if (file.entryType != DirectoryEntry::File) continue;
 
             File file = static_cast<File>(file);
             if (file.type != FileType::Material) continue;
 
-            Material material = ProjectSerialiser::deserialiseMaterial(file.path);
-            project.materials[material.uuid] = material;
+            Resource res = ProjectSerialiser::openResource(file.path);
+            project.resources[res.uuid] = res;
 
-            AE_CORE_TRACE("Loaded material '{0}' with UUID = {1}", material.name,
-                          (std::string)material.uuid);
+            AE_CORE_TRACE("Loaded resource '{0}' with UUID = {1}", res.name,
+                          (std::string)res.uuid);
         }
     }
+
+    void ProjectSerialiser::saveProject(const Project& project, const fs::path& path) {}
+
+    Resource ProjectSerialiser::openResource(const fs::path& path) {
+        // call deserialiseResource
+    }
+
+    void ProjectSerialiser::saveResource(const Resource& resource, const fs::path& path) {}
+
 
     void ProjectSerialiser::serialiseProject(const Project& project, const fs::path& path) {}
 
@@ -294,11 +303,12 @@ namespace AnEngine {
             }
 
             if (auto nativeScriptComponent = entity["NativeScriptComponent"]) {
-                class temp : public ScriptableEntity {};
+                // class temp : public ScriptableEntity {};
 
-                std::string scriptName = nativeScriptComponent["ScriptName"].as<std::string>();
-                auto& nSC = deserialisedEntity.addComponent<NativeScriptComponent>(scriptName);
-                nSC.bind<temp>();
+                // std::string scriptName =
+                // nativeScriptComponent["ScriptName"].as<std::string>(); auto& nSC =
+                // deserialisedEntity.addComponent<NativeScriptComponent>(scriptName);
+                // nSC.bind<temp>();
             }
 
             AE_CORE_TRACE("Deserialised entity with name = {0}, ID = {1}", name,

@@ -2,6 +2,7 @@
 #define PROJECT_HPP
 
 #include <filesystem>
+#include <optional>
 #include <queue>
 #include <string>
 #include <unordered_map>
@@ -9,7 +10,11 @@
 #include "yaml-cpp/yaml.h"
 
 #include "Core/UUID.hpp"
-#include "Texture/Material.hpp"
+#include "Project/Resource.hpp"
+#include "Project/Resources/Material.hpp"
+#include "Project/Resources/Scene/Scene.hpp"
+#include "Project/Resources/Scene/Scene2D.hpp"
+#include "Project/Resources/Scene/Scene3D.hpp"
 
 
 namespace fs = std::filesystem;
@@ -19,7 +24,7 @@ namespace AnEngine {
     enum class FileType { Other, Material, Model, Texture, Shader, Scene };
 
     struct FileSystemItem {
-        DirectoryEntry type;
+        DirectoryEntry entryType;
         AnEngine::UUID uuid;
         std::string name;
     };
@@ -90,11 +95,60 @@ namespace AnEngine {
 
     class Project {
     public:
-        Project() = default;
+        static Project newProject(bool is3D);
+
+        Resource newScene(std::optional<bool> is3D = std::nullopt);
+
+        template <typename S>
+        std::remove_cvref_t<S>& getActiveScene() {
+            Resource& scene = resources.at(activeSceneID);
+            if (scene.type == Resource::Type::Scene3D)
+                return static_cast<std::remove_cvref_t<S>&>(scene);
+            else
+                return static_cast<std::remove_cvref_t<S>&>(scene);
+        }
+
+        bool isPathInProject(const fs::path& path) {
+            for (auto dirEnt : root) {
+                if (dirEnt.entryType == DirectoryEntry::File) {
+                    File f = *static_cast<File*>(&dirEnt);
+                    if (fs::equivalent(f.path, path)) return true;
+                }
+            }
+        }
+
+        void loadResourcePath(const fs::path& path) {
+            // must load files from within project
+        }
+
+        // template <typename S>
+        // const S getScene(AnEngine::UUID uuid) const {
+        //     Resource scene = resources.at(uuid);
+        //     if (scene.type == Resource::Type::Scene3D)
+        //         return static_cast<Scene3D>(scene);
+        //     else
+        //         return static_cast<Scene2D>(scene);
+        // }
+
+        // template <typename S>
+        // const S getScene(std::string name) const {
+        //     for (auto& [_, resource] : resources) {
+        //         if (resource.name == name) {
+        //             if (resource.type == Resource::Type::Scene3D)
+        //                 return static_cast<Scene3D>(resource);
+        //             else
+        //                 return static_cast<Scene2D>(resource);
+        //         }
+        //     }
+        // }
+
 
     private:
+        Project() = default;
+
         std::string name;
         fs::path path;
+        bool is3D;
 
         struct MetaData {
             std::string author;
@@ -104,7 +158,9 @@ namespace AnEngine {
             AnEngine::UUID uuid;
         } meta;
 
-        std::unordered_map<UUID, Material> materials;
+        std::unordered_map<AnEngine::UUID, Resource> resources;
+        AnEngine::UUID activeSceneID;
+
         Directory root;
 
         friend class ProjectSerialiser;

@@ -7,6 +7,7 @@
 #include <string>
 
 #include "Core/Core.hpp"
+#include "Project/Resource.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
 
 
@@ -23,8 +24,8 @@ namespace AnEngine {
 
         entt::registry& getRegistry() { return entityRegistry; }
 
-        virtual const std::string& getName() const { return name; }
-        virtual void setName(const std::string& newName) { name = newName; }
+        virtual const std::string& getName() const = 0;
+        virtual void setName(const std::string& newName) = 0;
 
         virtual Entity& createEntity(const std::string& name = "") = 0;
         virtual Entity& createEntityWithUUID(const std::string& name, UUID id) = 0;
@@ -37,7 +38,6 @@ namespace AnEngine {
     protected:
         virtual void onComponentAdded(Entity& e, Component& component) = 0;
 
-        std::string name = "Unnamed Scene";
         entt::registry entityRegistry;
 
         uint32_t viewportWidth = 0;

@@ -9,7 +9,7 @@
     #include "Panels/ScenesPanel.hpp"
     #include "Panels/StatisticsPanel.hpp"
     #include "Panels/ViewportPanel.hpp"
-    #include "Scene/Project/Project.hpp"
+    #include "Project/Project.hpp"
 #endif
 
 #include "Core/Core.hpp"

@@ -7,17 +7,22 @@
 
 #include "Core/Core.hpp"
 #include "Core/UUID.hpp"
-#include "Scene/Entity.hpp"
-#include "Scene/Project/Project.hpp"
-#include "Scene/Scene.hpp"
-#include "Texture/Material.hpp"
+#include "Project/Project.hpp"
+#include "Project/Resources/Material.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
+#include "Project/Resources/Scene/Scene.hpp"
 
 
 namespace AnEngine {
     class ProjectSerialiser {
     public:
-        static Project openProject(const fs::path& path = "");
+        static Project openProject(const fs::path& path);
+        static void saveProject(const Project& project, const fs::path& path = "");
 
+        static Resource openResource(const fs::path& path);
+        static void saveResource(const Resource& resource, const fs::path& path = "");
+
+    private:
         static void serialiseProject(const Project& project, const fs::path& path = "");
         static Project deserialiseProject(const fs::path& path = "");
 
@@ -27,7 +32,6 @@ namespace AnEngine {
         static void serialiseMaterial(const std::string& path, Material material);
         static Material deserialiseMaterial(const fs::path& path);
 
-    private:
         static void serialiseEntity(YAML::Emitter& outYAML, Entity entity);
     };
 };  // namespace AnEngine
