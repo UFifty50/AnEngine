@@ -10,9 +10,9 @@
 #include <string>
 
 #include "Core/UUID.hpp"
+#include "Project/Resources/Material.hpp"
+#include "Project/Resources/Scene/ScriptableEntity.hpp"
 #include "Renderer/Camera/SceneCamera.hpp"
-#include "Scene/ScriptableEntity.hpp"
-#include "Texture/Material.hpp"
 #include "Texture/Texture2D.hpp"
 #include "Time/TimeStep.hpp"
 

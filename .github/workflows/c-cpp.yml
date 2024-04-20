@@ -1,4 +1,4 @@
-name: C++ manual trigger (Dev branch)
+name: C++ manual trigger
 
 on:
   workflow_dispatch:
@@ -30,19 +30,19 @@ jobs:
       run: sudo apt update && sudo apt install -y libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libglew-dev gcc-12
 
     - name: configure
-      run: vendor/premake/premake5 gmake2
+      run: python scripts/Setup.py
 
     - name: build
       run: make config=debug all
 
     - name: package
-      run: tar -a -c -f AnEngine-dbg.linux.zip bin/Debug-linux-x86_64/Sandbox
+      run: tar -czvf CrankEngine-dbg_linux.tar.gz bin/Debug-linux-x86_64/Crank/
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: "AnEngine-dbg.linux"
-        path: "./AnEngine-dbg.linux.zip"
+        name: "CrankEngine-dbg.linux"
+        path: "./CrankEngine-dbg.linux.zip"
 
 
 
@@ -56,16 +56,16 @@ jobs:
         submodules: recursive
 
     - name: configure
-      run: vendor/premake/premake5.exe vs2022
+      run: python scripts/Setup.py
 
     - name: build
       run: msbuild
 
     - name: package
-      run: tar.exe -a -c -f AnEngine-dbg.windows.zip bin/Debug-windows-x86_64/Sandbox
+      run: zip -r CrankEngine-dbg_windows.zip bin/Debug-windows-x86_64/Crank/
 
     - name: upload
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: "AnEngine-dbg.windows"
-        path: "./AnEngine-dbg.windows.zip"
+        name: "CrankEngine-dbg.windows"
+        path: "./CrankEngine-dbg.windows.zip"

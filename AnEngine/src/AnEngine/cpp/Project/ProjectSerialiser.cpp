@@ -105,21 +105,22 @@ namespace AnEngine {
 
         if (!fs::exists(path)) {
             AE_CORE_ERROR("Project path does not exist");
-            return;
+            return Project();
         }
 
         if (!path.has_extension() || path.extension() != ".aeproj") {
             AE_CORE_ERROR("Project path is not a valid project file");
-            return;
+            return Project();
         }
 
         Project project = ProjectSerialiser::deserialiseProject(path);
 
         // Load materials
-        for (auto file : project.root) {
-            if (file.entryType != DirectoryEntry::File) continue;
+        for (DirectoryIterator f = project.root.begin(); f != project.root.end(); f++) {
+            auto& dirEnt = *f;
+            if (dirEnt.entryType != DirectoryEntry::File) continue;
 
-            File file = static_cast<File>(file);
+            File file = *static_cast<File*>(&dirEnt);
             if (file.type != FileType::Material) continue;
 
             Resource res = ProjectSerialiser::openResource(file.path);
@@ -128,12 +129,15 @@ namespace AnEngine {
             AE_CORE_TRACE("Loaded resource '{0}' with UUID = {1}", res.name,
                           (std::string)res.uuid);
         }
+
+        return project;
     }
 
     void ProjectSerialiser::saveProject(const Project& project, const fs::path& path) {}
 
     Resource ProjectSerialiser::openResource(const fs::path& path) {
         // call deserialiseResource
+        return Resource();
     }
 
     void ProjectSerialiser::saveResource(const Resource& resource, const fs::path& path) {}

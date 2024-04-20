@@ -6,6 +6,7 @@
 #include <memory>
 #include <type_traits>
 
+#include "Project/Resources/Scene/Components.hpp"
 #include "Renderer/Buffers/UniformBuffer.hpp"
 #include "Renderer/Buffers/VertexBuffer.hpp"
 #include "Renderer/Camera/Camera.hpp"
@@ -13,7 +14,6 @@
 #include "Renderer/Renderer.hpp"
 #include "Renderer/Shader.hpp"
 #include "Renderer/VertexArray.hpp"
-#include "Scene/Components.hpp"
 #include "Texture/Texture2D.hpp"
 #include "Time/TimeStep.hpp"
 

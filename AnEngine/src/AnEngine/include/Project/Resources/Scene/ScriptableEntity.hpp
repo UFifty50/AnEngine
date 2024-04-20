@@ -1,7 +1,7 @@
 #ifndef SCRIPTABLEENTITY_HPP
 #define SCRIPTABLEENTITY_HPP
 
-#include "Scene/Entity.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
 #include "Time/TimeStep.hpp"
 
 

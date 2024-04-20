@@ -32,6 +32,8 @@ namespace AnEngine {
         }
 
         virtual bool is3D() const override { return false; }
+        // virtual Ref<Scene> asScene() override { return Ref<Scene>(this); }
+        // TODO: does this work?
 
         virtual const std::string& getName() const override { return Resource::name; }
         virtual void setName(const std::string& newName) override { Resource::name = newName; }

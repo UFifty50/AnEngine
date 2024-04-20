@@ -23,17 +23,17 @@
 #include "Panels/ViewportPanel.hpp"
 #include "Project/Project.hpp"
 #include "Project/ProjectSerialiser.hpp"
+#include "Project/Resources/Scene/Components.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
+#include "Project/Resources/Scene/Scene.hpp"
+#include "Project/Resources/Scene/Scene2D.hpp"
+#include "Project/Resources/Scene/Scene3D.hpp"
+#include "Project/Resources/Scene/ScriptableEntity.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/Renderer3D.hpp"
-#include "Scene/Components.hpp"
-#include "Scene/Entity.hpp"
-#include "Scene/Scene.hpp"
-#include "Scene/Scene2D.hpp"
-#include "Scene/Scene3D.hpp"
-#include "Scene/ScriptableEntity.hpp"
 
 
 namespace AnEngine::Crank {
@@ -87,16 +87,17 @@ namespace AnEngine::Crank {
                             FrameBufferTexFormat::Depth};
         frameBuffer = FrameBuffer::create(spec);
 
-        g_ActiveScene = MakeRef<Scene2D>("Test Scene");
+        //     g_ActiveScene = MakeRef<Scene2D>("Test Scene");
+        g_ActiveProject = Project::newProject(false);
 
         CameraSpec2D camSpec{30.0f, 1.778f, 0.1f, 1000.0f};
-        editorCam3D = MakeRef<EditorCamera2D>(camSpec);
+        editorCam2D = MakeRef<EditorCamera2D>(camSpec);
 
         g_DockSpace = MakeRef<DockSpace>();
 
         gPanel_SceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene");
         gPanel_Properties = MakeRef<PropertiesPanel>("Properties");
-        gPanel_Viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam3D);
+        gPanel_Viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam2D);
         gPanel_ContentBrowser = MakeRef<ContentBrowserPanel>("Content Browser");
         gPanel_Statistics = MakeRef<StatisticsPanel>("Statistics");
 
@@ -113,7 +114,7 @@ namespace AnEngine::Crank {
 
 
         CommandLine cmdLine = Application::getCommandLine();
-        if (cmdLine.hasArgs()) {
+        /*if (cmdLine.hasArgs()) {
             std::string projectFilePath = cmdLine.args[0];
             ProjectSerialiser serialiser(g_ActiveScene);
             try {
@@ -121,7 +122,7 @@ namespace AnEngine::Crank {
             } catch (std::runtime_error& e) {
                 AE_CORE_ERROR("Failed to load scene file: {0}", e.what());
             }
-        }
+        }*/
     }
 
     void CrankEditor::onDetach() {}
@@ -134,13 +135,17 @@ namespace AnEngine::Crank {
             (fbSpec.Width != vpSize.x || fbSpec.Height != vpSize.y)) {
             frameBuffer->resize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
 
-            editorCam3D->setViewportSize(vpSize.x, vpSize.y);
+            editorCam2D->setViewportSize(vpSize.x, vpSize.y);
 
-            g_ActiveScene->onResize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
+            if (g_ActiveProject.hasActiveScene()) {
+                // g_ActiveScene->onResize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
+                g_ActiveProject.getActiveScene<Scene2D>().onResize((uint32_t)vpSize.x,
+                                                                   (uint32_t)vpSize.y);
+            }
         }
 
         // if (dockSpace->isViewportFocused())
-        editorCam3D->onUpdate(deltaTime);
+        editorCam2D->onUpdate(deltaTime);
 
         Renderer2D::resetStats();
         Renderer2D::getStats().lastFrameTime = deltaTime.getMilliseconds();
@@ -151,16 +156,24 @@ namespace AnEngine::Crank {
 
         frameBuffer->clearColourAttachment(1, -1);
 
-        g_ActiveScene->onUpdateEditor(deltaTime, editorCam3D);
-        // activeScene->onUpdateRuntime(deltaTime);
+        if (g_ActiveProject.hasActiveScene()) {
+            g_ActiveProject.getActiveScene<Scene2D>().onUpdateEditor(deltaTime,
+                                                                     editorCam2D);
+            // g_ActiveScene->onUpdateEditor(deltaTime, editorCam3D);
+            //  activeScene->onUpdateRuntime(deltaTime);
 
-        auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
-        if (g_DockSpace->isMouseInViewport()) {
-            int32_t pixel = frameBuffer->readPixels(1, {mouseX, mouseY}, {1, 1},
-                                                    FrameBufferTexFormat::RED_INTEGER)[0];
-            hoveredEntity =
-                pixel == -1 ? Entity() : Entity{(entt::entity)pixel, g_ActiveScene.get()};
-            gPanel_Statistics->setHoveredEntity(hoveredEntity);
+            auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
+            if (g_DockSpace->isMouseInViewport()) {
+                int32_t pixel = frameBuffer->readPixels(
+                    1, {mouseX, mouseY}, {1, 1}, FrameBufferTexFormat::RED_INTEGER)[0];
+                hoveredEntity =
+                    pixel == -1
+                        ? Entity()
+                        : Entity(
+                              (entt::entity)pixel,
+                              g_ActiveProject.getActiveScene<Scene2D>().asScene().get());
+                gPanel_Statistics->setHoveredEntity(hoveredEntity);
+            }
         }
 
 
@@ -170,7 +183,7 @@ namespace AnEngine::Crank {
     void CrankEditor::onImGuiRender() { g_DockSpace->render(); }
 
     void CrankEditor::onEvent(Event& event) {
-        editorCam3D->onEvent(event);
+        editorCam2D->onEvent(event);
 
         EventDispatcher dispatcher(event);
         dispatcher.dispatch<KeyPressedEvent>(BIND_EVENT_FN(CrankEditor::onKeyPressed));

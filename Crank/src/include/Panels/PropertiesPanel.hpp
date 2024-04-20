@@ -9,7 +9,7 @@
 
 #include "Panels/Panel.hpp"
 #include "Panels/ScenesPanel.hpp"
-#include "Scene/Entity.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
 
 
 namespace AnEngine::Crank {

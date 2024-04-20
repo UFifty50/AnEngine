@@ -6,7 +6,7 @@
 
 // #include "Scene/Components.hpp"
 #include "Core/Log.hpp"
-#include "Scene/Scene.hpp"
+#include "Project/Resources/Scene/Scene.hpp"
 
 
 namespace AnEngine {

@@ -2,13 +2,13 @@
 
 #include <glm/glm.hpp>
 
-#include "Scene/Scene2D.hpp"
+#include "Project/Resources/Scene/Scene2D.hpp"
 
 #include "Core/UUID.hpp"
+#include "Project/Resources/Scene/Components.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/Renderer2D.hpp"
-#include "Scene/Components.hpp"
-#include "Scene/Entity.hpp"
 
 
 namespace AnEngine {

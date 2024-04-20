@@ -9,10 +9,10 @@
 #include "Globals.hpp"
 #include "Panels/ContentBrowserPanel.hpp"
 #include "Panels/ScenesPanel.hpp"
-#include "Scene/Components.hpp"
-#include "Scene/Entity.hpp"
-#include "Scene/Project/ProjectSerialiser.hpp"
-#include "Scene/ScriptableEntity.hpp"
+#include "Project/ProjectSerialiser.hpp"
+#include "Project/Resources/Scene/Components.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
+#include "Project/Resources/Scene/ScriptableEntity.hpp"
 
 
 #define HASH(type) (void*)typeid(type).hash_code()
@@ -35,8 +35,10 @@ namespace AnEngine::Crank {
             ImGui::Text("Select an entity to view its properties");
         } else if (selectedItem.type() == typeid(Entity)) {
             if (selectedMaterial) {
-                ProjectSerialiser::serialiseMaterial(selectedMaterialPath.string(),
-                                                     *selectedMaterial);
+                /*       ProjectSerialiser::saveResource()
+                       ProjectSerialiser::serialiseMaterial(selectedMaterialPath.string(),
+                                                            *selectedMaterial);*/
+                // TODO: this shit
                 selectedMaterial.reset();
             }
             entityProperties();
@@ -115,8 +117,8 @@ namespace AnEngine::Crank {
     void PropertiesPanel::materialProperties() {
         if (!selectedMaterial) {
             selectedMaterialPath = std::any_cast<fs::path>(selectedItem);
-            selectedMaterial =
-                ProjectSerialiser::deserialiseMaterial(selectedMaterialPath);
+            //        selectedMaterial =
+            //            ProjectSerialiser::deserialiseMaterial(selectedMaterialPath);
         }
 
         Material& activeMaterial = *selectedMaterial;

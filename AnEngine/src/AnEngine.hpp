@@ -20,10 +20,10 @@
 #include "AnEngine/include/Renderer/VertexArray.hpp"
 
 // ---Scene and Entities---
-#include "AnEngine/include/Scene/Components.hpp"
-#include "AnEngine/include/Scene/Entity.hpp"
-#include "AnEngine/include/Scene/Scene.hpp"
-#include "AnEngine/include/Scene/ScriptableEntity.hpp"
+#include "AnEngine/include/Project/Resources/Scene/Components.hpp"
+#include "AnEngine/include/Project/Resources/Scene/Entity.hpp"
+#include "AnEngine/include/Project/Resources/Scene/Scene.hpp"
+#include "AnEngine/include/Project/Resources/Scene/ScriptableEntity.hpp"
 
 // ---Cameras---
 // #include "AnEngine/include/Renderer/Camera/OrthographicCamera.hpp"

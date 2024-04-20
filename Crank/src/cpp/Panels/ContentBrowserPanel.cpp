@@ -6,7 +6,7 @@
 
 #include "Core/Log.hpp"
 #include "Globals.hpp"
-#include "Scene/Project/ProjectSerialiser.hpp"
+#include "Project/ProjectSerialiser.hpp"
 #include "Texture/Texture2D.hpp"
 
 
@@ -32,12 +32,13 @@ namespace AnEngine::Crank {
             if (ImGui::BeginMenu("+")) {
                 if (ImGui::MenuItem("New Directory")) {
                     fs::create_directory(currentPath / "New Directory");
+                    // ProjectSerialiser::createDirectory(currentPath / "New Directory");
                 }
                 if (ImGui::MenuItem("New Material")) {
                     Material newMat;
                     std::string newMatPath =
                         (currentPath / "New Material.aematl").string();
-                    ProjectSerialiser::serialiseMaterial(newMatPath, newMat);
+                    ProjectSerialiser::saveResource(newMat, newMatPath);
                 }
                 if (ImGui::MenuItem("New Texture")) {
                     AE_CORE_INFO("Create Texture");

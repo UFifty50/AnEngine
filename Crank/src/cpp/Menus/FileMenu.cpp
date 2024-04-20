@@ -22,7 +22,7 @@ namespace AnEngine::Crank {
 
         if (ImGui::MenuItem("New Projct")) NewProject();
 
-        if (ImGui::MenuItem("Open Project")) OpenProject();
+        if (ImGui::MenuItem("Open Project")) OpenProjectMenu();
 
         if (ImGui::MenuItem("Save Project")) SaveProject();
 
@@ -89,10 +89,10 @@ namespace AnEngine::Crank {
     void FileMenu::SaveProject() {
         AE_PROFILE_FUNCTION()
 
-        if (g_ActiveProject) {
-            ProjectSerialiser serialiser(g_ActiveProject);
-            serialiser.serialise();
-        }
+        //  if (g_ActiveProject) {
+        //      ProjectSerialiser serialiser(g_ActiveProject);
+        //       serialiser.serialise();
+        // }
     }
 
     void FileMenu::NewScene() {
@@ -123,10 +123,10 @@ namespace AnEngine::Crank {
         if (g_ActiveProject.isPathInProject(path)) g_ActiveProject.loadResourcePath(path);
 
         ProjectSerialiser serialiser;
-        if (auto res = serialiser.openResource(path.string())) {
-            g_ActiveProject.addResource(res);
-            g_ActiveProject.openScene((*res).uuid);
-        }
+        auto res = serialiser.openResource(path.string());
+        //    g_ActiveProject.addResource(res);
+        //   g_ActiveProject.openScene(res.uuid);
+
 
         return false;
     }
@@ -145,6 +145,6 @@ namespace AnEngine::Crank {
     void FileMenu::SaveActiveScene() {
         AE_PROFILE_FUNCTION()
         ProjectSerialiser serialiser;
-        serialiser.saveResource(activeScene);
+        //     serialiser.saveResource(activeScene);
     }
 }  // namespace AnEngine::Crank

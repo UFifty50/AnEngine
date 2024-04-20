@@ -23,10 +23,19 @@ namespace AnEngine {
     enum class DirectoryEntry { Other, File, Directory };
     enum class FileType { Other, Material, Model, Texture, Shader, Scene };
 
+
     struct FileSystemItem {
         DirectoryEntry entryType;
         AnEngine::UUID uuid;
         std::string name;
+
+
+        bool operator==(const FileSystemItem& other) const { return uuid == other.uuid; }
+    };
+    struct FileSystemItemHasher {
+        size_t operator()(const AnEngine::FileSystemItem file) const {
+            return UUIDHasher{}(file.uuid);
+        }
     };
 
     struct File : public FileSystemItem {
@@ -37,67 +46,54 @@ namespace AnEngine {
             : FileSystemItem{DirectoryEntry::File, uuid, name}, type(type), path(path) {}
     };
 
+    struct DirectoryIterator;
     struct Directory : public FileSystemItem {
-        std::unordered_set<File> files;
-        std::unordered_set<Directory> directories;
+        std::unordered_set<File, FileSystemItemHasher> files;
+        std::unordered_set<Directory, FileSystemItemHasher> directories;
 
         Directory() : FileSystemItem{DirectoryEntry::Directory} {}
-        Directory(AnEngine::UUID uuid, std::string name, std::unordered_set<File> files,
-                  std::unordered_set<Directory> directories)
+        Directory(AnEngine::UUID uuid, std::string name,
+                  std::unordered_set<File, FileSystemItemHasher> files,
+                  std::unordered_set<Directory, FileSystemItemHasher> directories)
             : FileSystemItem{DirectoryEntry::Directory, uuid, name},
               files(files),
               directories(directories) {}
 
-        class Iterator {
-        public:
-            Iterator(const Directory& root) : isEnd(false) {
-                for (const auto& entry : root.directories) dirQueue.push(entry);
-                for (const auto& entry : root.files) fileQueue.push(entry);
-            }
 
-            bool hasNext() const { return !(dirQueue.empty() && fileQueue.empty()); }
-
-            bool operator==(const Iterator& other) {
-                return isEnd == other.isEnd && dirQueue == other.dirQueue &&
-                       fileQueue == other.fileQueue;
-            }
-
-            Iterator& operator++() {
-                if (!dirQueue.empty()) {
-                    auto nextDir = dirQueue.front();
-                    dirQueue.pop();
-                    for (const auto& entry : nextDir.directories) dirQueue.push(entry);
-                    for (const auto& entry : nextDir.files) fileQueue.push(entry);
-                } else if (!fileQueue.empty()) {
-                    fileQueue.pop();
-                } else {
-                    isEnd = true;
-                }
-                return *this;
-            }
-
-            FileSystemItem& operator*() {
-                if (!dirQueue.empty())
-                    return dirQueue.front();
-                else
-                    return fileQueue.front();
-            }
-
-        private:
-            std::queue<Directory> dirQueue;
-            std::queue<File> fileQueue;
-            bool isEnd;
-        };
-
-        Iterator begin() const { return Iterator(*this); }
-        Iterator end() const { return Iterator({}); }
+        DirectoryIterator begin() const;
+        DirectoryIterator end() const;
     };
+
+
+    struct DirectoryIterator {
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = FileSystemItem;
+        using difference_type = std::ptrdiff_t;
+        using pointer = value_type*;
+        using reference = value_type&;
+
+
+        DirectoryIterator(const Directory& root);
+
+        bool operator==(const DirectoryIterator& other) const;
+        DirectoryIterator& operator++(int);
+        FileSystemItem& operator*();
+
+    private:
+        std::queue<Directory*> dirQueue;
+        std::queue<File> fileQueue;
+        bool isEnd;
+    };
+
 
     class Project {
     public:
+        Project() = default;
         static Project newProject(bool is3D);
 
         Resource newScene(std::optional<bool> is3D = std::nullopt);
+
+        bool hasActiveScene() const { return activeSceneID != AnEngine::UUID(nullptr); }
 
         template <typename S>
         std::remove_cvref_t<S>& getActiveScene() {
@@ -109,9 +105,10 @@ namespace AnEngine {
         }
 
         bool isPathInProject(const fs::path& path) {
-            for (auto dirEnt : root) {
-                if (dirEnt.entryType == DirectoryEntry::File) {
-                    File f = *static_cast<File*>(&dirEnt);
+            for (DirectoryIterator dirEnt = root.begin(); dirEnt != root.end(); dirEnt++) {
+                const auto& dirE = *dirEnt;
+                if (dirE.entryType == DirectoryEntry::File) {
+                    const File f = *static_cast<const File*>(&dirE);
                     if (fs::equivalent(f.path, path)) return true;
                 }
             }
@@ -144,8 +141,6 @@ namespace AnEngine {
 
 
     private:
-        Project() = default;
-
         std::string name;
         fs::path path;
         bool is3D;
@@ -158,8 +153,8 @@ namespace AnEngine {
             AnEngine::UUID uuid;
         } meta;
 
-        std::unordered_map<AnEngine::UUID, Resource> resources;
-        AnEngine::UUID activeSceneID;
+        std::unordered_map<AnEngine::UUID, Resource, UUIDHasher> resources;
+        AnEngine::UUID activeSceneID = AnEngine::UUID(nullptr);
 
         Directory root;
 

@@ -10,8 +10,8 @@
 
 #include "Globals.hpp"
 #include "Panels/PropertiesPanel.hpp"
-#include "Scene/Components.hpp"
-#include "Scene/Entity.hpp"
+#include "Project/Resources/Scene/Components.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
 
 
 namespace AnEngine::Crank {
@@ -24,7 +24,8 @@ namespace AnEngine::Crank {
     void ScenesPanel::updateCurrentSceneFromActive() {
         AE_PROFILE_FUNCTION()
 
-        currentScene = g_ActiveScene;
+        if (!g_ActiveProject.hasActiveScene()) return;
+        currentScene = g_ActiveProject.getActiveScene<Scene2D>().asScene();
         selectedEntity = {};  // TODO: set to uuid from file
     }
 

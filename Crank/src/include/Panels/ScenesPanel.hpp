@@ -3,9 +3,9 @@
 
 #include "Core/Core.hpp"
 #include "Panels/Panel.hpp"
-#include "Scene/Components.hpp"
-#include "Scene/Entity.hpp"
-#include "Scene/Scene.hpp"
+#include "Project/Resources/Scene/Components.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
+#include "Project/Resources/Scene/Scene.hpp"
 
 
 namespace AnEngine::Crank {

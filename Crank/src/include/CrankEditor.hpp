@@ -15,10 +15,10 @@
 #include "Panels/ScenesPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
 #include "Panels/ViewportPanel.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
+#include "Project/Resources/Scene/Scene2D.hpp"
 #include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/FrameBuffer.hpp"
-#include "Scene/Entity.hpp"
-#include "Scene/Scene2D.hpp"
 
 
 namespace AnEngine::Crank {
@@ -40,7 +40,7 @@ namespace AnEngine::Crank {
         friend class Panel;
 
     private:
-        Ref<EditorCamera2D> editorCam3D;
+        Ref<EditorCamera2D> editorCam2D;
         Ref<FrameBuffer> frameBuffer;
 
 

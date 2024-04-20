@@ -21,6 +21,7 @@ namespace AnEngine {
         virtual ~Scene() = default;
 
         virtual bool is3D() const = 0;
+        virtual Ref<Scene> asScene() { return Ref<Scene>(this); }
 
         entt::registry& getRegistry() { return entityRegistry; }
 

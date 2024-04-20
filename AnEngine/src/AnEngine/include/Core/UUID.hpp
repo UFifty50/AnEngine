@@ -7,6 +7,8 @@
 #include <string>
 
 #include "Core/Random.hpp"
+#include "Core/Utils/Utils.hpp"
+
 
 namespace AnEngine {
     struct UUID {
@@ -15,8 +17,8 @@ namespace AnEngine {
         static UUID fromStr(const std::string& str) {
             uint32_t id[2];
 
-            id[0] = std::stoull(str.substr(0, 8), nullptr, 16);
-            id[1] = std::stoull(str.substr(9, 8), nullptr, 16);
+            id[0] = std::stoul(str.substr(0, 8), nullptr, 16);
+            id[1] = std::stoul(str.substr(9, 8), nullptr, 16);
 
             return UUID(id[0], id[1]);
         }
@@ -60,5 +62,13 @@ namespace AnEngine {
         }
     };
 }  // namespace AnEngine
+
+struct UUIDHasher {
+    size_t operator()(const AnEngine::UUID& uuid) const {
+        size_t hash1 = std::hash<uint32_t>{}(uuid.id[0]);
+        size_t hash2 = std::hash<uint32_t>{}(uuid.id[1]);
+        return AnEngine::hash_combine(hash1, hash2);
+    }
+};
 
 #endif
