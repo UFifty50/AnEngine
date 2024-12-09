@@ -8,8 +8,8 @@
 #include <unordered_map>
 
 #include "yaml-cpp/yaml.h"
-
 #include "Core/UUID.hpp"
+#include "File/StreamWriter.hpp"
 #include "Project/Resource.hpp"
 #include "Project/Resources/Material.hpp"
 #include "Project/Resources/Scene/Scene.hpp"
@@ -21,44 +21,80 @@ namespace fs = std::filesystem;
 
 namespace AnEngine {
     enum class DirectoryEntry { Other, File, Directory };
+
     enum class FileType { Other, Material, Model, Texture, Shader, Scene };
 
 
     struct FileSystemItem {
         DirectoryEntry entryType;
-        AnEngine::UUID uuid;
+        UUID uuid;
         std::string name;
 
-
         bool operator==(const FileSystemItem& other) const { return uuid == other.uuid; }
-    };
-    struct FileSystemItemHasher {
-        size_t operator()(const AnEngine::FileSystemItem file) const {
-            return UUIDHasher{}(file.uuid);
-        }
+
+        bool isFile() const { return entryType == DirectoryEntry::File; }
+        bool isDirectory() const { return entryType == DirectoryEntry::Directory; }
     };
 
-    struct File : public FileSystemItem {
+    struct FileSystemItemHasher {
+        size_t operator()(const FileSystemItem file) const { return UUIDHasher{}(file.uuid); }
+    };
+
+    struct File : FileSystemItem {
         FileType type;
         fs::path path;
+        UUID parent;
 
-        File(AnEngine::UUID uuid, std::string name, FileType type, fs::path path)
+        File(const std::string& name, const UUID& parentUUID)
+            : FileSystemItem{DirectoryEntry::File, {}, name}, parent(parentUUID) {}
+
+        File(UUID uuid, std::string name, FileType type, fs::path path)
             : FileSystemItem{DirectoryEntry::File, uuid, name}, type(type), path(path) {}
     };
 
     struct DirectoryIterator;
-    struct Directory : public FileSystemItem {
+
+    struct Directory : FileSystemItem {
         std::unordered_set<File, FileSystemItemHasher> files;
         std::unordered_set<Directory, FileSystemItemHasher> directories;
+        UUID parent;
 
-        Directory() : FileSystemItem{DirectoryEntry::Directory} {}
-        Directory(AnEngine::UUID uuid, std::string name,
+        Directory()
+            : FileSystemItem{DirectoryEntry::Directory}, parent(UUID(nullptr)) {}
+
+        Directory(const std::string& name, const UUID& parentUUID)
+            : FileSystemItem{DirectoryEntry::Directory, {}, name}, parent(parentUUID) {}
+
+        Directory(UUID uuid, std::string name, UUID parent,
                   std::unordered_set<File, FileSystemItemHasher> files,
                   std::unordered_set<Directory, FileSystemItemHasher> directories)
             : FileSystemItem{DirectoryEntry::Directory, uuid, name},
               files(files),
-              directories(directories) {}
+              directories(directories),
+              parent(parent) {}
 
+
+        void addDirectory(const std::string& dirName) {
+            directories.insert(Directory(dirName, this->uuid));
+        }
+
+        Directory findSubDir(UUID uuid) const {
+            if (this->uuid == uuid) return *this;
+            for (const Directory& dir : directories) {
+                Directory subDir = dir.findSubDir(uuid);
+                if (subDir.uuid != UUID(nullptr)) return subDir;
+            }
+            return Directory();
+        }
+
+        Directory findContainingDir(UUID uuid) const {
+            for (const Directory& dir : directories) {
+                if (dir.uuid == uuid) return *this;
+                Directory containingDir = dir.findContainingDir(uuid);
+                if (containingDir.uuid != UUID(nullptr)) return containingDir;
+            }
+            return Directory();
+        }
 
         DirectoryIterator begin() const;
         DirectoryIterator end() const;
@@ -77,6 +113,7 @@ namespace AnEngine {
 
         bool operator==(const DirectoryIterator& other) const;
         DirectoryIterator& operator++(int);
+        DirectoryIterator& operator++() { return operator++(0); }
         FileSystemItem& operator*();
 
     private:
@@ -93,23 +130,27 @@ namespace AnEngine {
 
         Resource newScene(std::optional<bool> is3D = std::nullopt);
 
-        bool hasActiveScene() const { return activeSceneID != AnEngine::UUID(nullptr); }
+        Directory getParentOfDirectory(const Directory& dir) const {
+            return root.findSubDir(dir.parent);
+        }
+
+        bool hasActiveScene() const { return activeSceneID != UUID(nullptr); }
 
         template <typename S>
         std::remove_cvref_t<S>& getActiveScene() {
             Resource& scene = resources.at(activeSceneID);
             if (scene.type == Resource::Type::Scene3D)
-                return static_cast<std::remove_cvref_t<S>&>(scene);
-            else
-                return static_cast<std::remove_cvref_t<S>&>(scene);
+                return static_cast<std::remove_cvref_t<
+                    S>&>(scene);
+            return static_cast<std::remove_cvref_t<S>&>(scene);
         }
 
         bool isPathInProject(const fs::path& path) {
-            for (DirectoryIterator dirEnt = root.begin(); dirEnt != root.end(); dirEnt++) {
+            for (DirectoryIterator dirEnt = root.begin(); dirEnt != root.end(); ++dirEnt) {
                 const auto& dirE = *dirEnt;
                 if (dirE.entryType == DirectoryEntry::File) {
                     const File f = *static_cast<const File*>(&dirE);
-                    if (fs::equivalent(f.path, path)) return true;
+                    if (equivalent(f.path, path)) return true;
                 }
             }
         }
@@ -139,6 +180,7 @@ namespace AnEngine {
         //     }
         // }
 
+        Directory& getRootDir() { return root; }
 
     private:
         std::string name;
@@ -150,19 +192,18 @@ namespace AnEngine {
             std::string version;
             std::string created;
             std::string saved;
-            AnEngine::UUID uuid;
+            UUID uuid;
         } meta;
 
-        std::unordered_map<AnEngine::UUID, Resource, UUIDHasher> resources;
-        AnEngine::UUID activeSceneID = AnEngine::UUID(nullptr);
+        std::unordered_map<UUID, Resource, UUIDHasher> resources;
+        UUID activeSceneID = UUID(nullptr);
 
         Directory root;
 
         friend class ProjectSerialiser;
-        friend struct YAML::convert<Project::MetaData>;
+        friend struct YAML::convert<MetaData>;
     };
-
-}  // namespace AnEngine
+} // namespace AnEngine
 
 
 // example YAML project file

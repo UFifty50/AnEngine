@@ -17,7 +17,7 @@ namespace AnEngine::Crank {
     const fs::path g_BaseAssetsDirectory = "assets";
 
     ContentBrowserPanel::ContentBrowserPanel(const std::string& name)
-        : name(name), currentPath(g_BaseAssetsDirectory) {
+        : name(name), currentPath(g_ActiveProject.getRootDir()) {
         AE_PROFILE_FUNCTION()
 
         fileIcon = Texture2D::create("builtins/icons/FileIcon.png");
@@ -31,14 +31,15 @@ namespace AnEngine::Crank {
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("+")) {
                 if (ImGui::MenuItem("New Directory")) {
-                    fs::create_directory(currentPath / "New Directory");
+                    //  fs::create_directory(currentPath / "New Directory");
                     // ProjectSerialiser::createDirectory(currentPath / "New Directory");
+                    currentPath.addDirectory("New Directory");
                 }
                 if (ImGui::MenuItem("New Material")) {
                     Material newMat;
-                    std::string newMatPath =
-                        (currentPath / "New Material.aematl").string();
-                    ProjectSerialiser::saveResource(newMat, newMatPath);
+                    //           std::string newMatPath =
+                    //               (currentPath / "New Material.aematl").string();
+                    //           ProjectSerialiser::saveResource(newMat, newMatPath);
                 }
                 if (ImGui::MenuItem("New Texture")) {
                     AE_CORE_INFO("Create Texture");
@@ -56,14 +57,15 @@ namespace AnEngine::Crank {
         }
 
 
-        if (currentPath != g_BaseAssetsDirectory) {
+        if (currentPath != g_ActiveProject.getRootDir()) {
             if (ImGui::Button("<- Back")) {
-                currentPath = currentPath.parent_path();
+                // currentPath = currentPath.parent_path();
+                currentPath = g_ActiveProject.getParentOfDirectory(currentPath);
             }
             ImGui::SameLine();
         }
 
-        ImGui::Text(currentPath.string().c_str());
+        ImGui::Text(currentPath.name.c_str());
 
 
         float cellSize = thumbSize + paddingWidth;
@@ -89,21 +91,28 @@ namespace AnEngine::Crank {
 
                 uint16_t column = 0;
 
-                for (auto& dirEnt : fs::directory_iterator(currentPath)) {
-                    const fs::path path = dirEnt.path();
-                    const fs::path relPath = fs::relative(path, g_BaseAssetsDirectory);
-                    const std::string relPathName = relPath.filename().string();
+                for (auto& dirEnt : currentPath) {
+                    //         const fs::path path = dirEnt.path();
+                    //         const fs::path relPath = fs::relative(path,
+                    //         g_BaseAssetsDirectory); const std::string relPathName =
+                    //         relPath.filename().string();
+                    File asFile = *static_cast<File*>(&dirEnt);
+                    Directory asDir = *static_cast<Directory*>(&dirEnt);
 
                     Ref<Texture2D> icon;
-                    if (dirEnt.is_directory()) {
+                    if (dirEnt.isDirectory()) {
                         icon = directoryIcon;
-                    } else if (relPath.extension() == ".aematl") {  // TODO: ASSET MANAGER
-                        icon = materialIcon;
+                    } else if (dirEnt.isFile()) {
+                        if (asFile.type == FileType::Material) {
+                            icon = materialIcon;
+                        } else {
+                            icon = fileIcon;
+                        }
                     } else {
                         icon = fileIcon;
                     }
 
-                    ImGui::PushID(relPathName.c_str());
+                    ImGui::PushID(((std::string)dirEnt.uuid).c_str());
 
                     ImGui::TableSetColumnIndex(column);
                     ImGui::ImageButton(labelFromInt(column),
@@ -112,11 +121,13 @@ namespace AnEngine::Crank {
 
                     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
                         const PayloadType type =
-                            path.extension() == ".aematl"    ? PayloadType::Material
-                            : path.extension() == ".aescene" ? PayloadType::Scene
-                                                             : PayloadType::Texture;
+                            asFile.type == FileType::Material ? PayloadType::Material
+                            : asFile.type == FileType::Scene  ? PayloadType::Scene
+                                                              : PayloadType::Texture;
 
-                        const DropPayload* payload = new DropPayload{path, type};
+                        const DropPayload* payload = new DropPayload{
+                            g_ActiveProject.getRootDir().findContainingDir(asFile.parent),
+                            type};
 
                         ImGui::SetDragDropPayload("CONTENTBROWSER_ITEM", payload,
                                                   sizeof(DropPayload));
@@ -129,9 +140,9 @@ namespace AnEngine::Crank {
 
                     if (ImGui::IsItemHovered() &&
                         ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                        if (dirEnt.is_regular_file()) {
-                            selectedItem = dirEnt.path();
-                            AE_CORE_INFO("Selected: {}", selectedItem.string());
+                        if (dirEnt.isFile()) {
+                            selectedItem = asFile;
+                            AE_CORE_INFO("Selected: {}", selectedItem.name);
                         } else if (dirEnt.is_directory()) {
                             currentPath = dirEnt;
                             AE_CORE_INFO("Entered Directory: {}", currentPath.string());

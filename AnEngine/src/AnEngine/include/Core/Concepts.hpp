@@ -53,6 +53,16 @@ concept IndexableContainer = requires(Container c) {
     { c.operator[](size_t{}) } -> std::convertible_to<T>;
 };
 
+template <typename Stream, typename Object>
+concept Serialisable = requires(Stream stream, Object obj) {
+    { Object::Serialise(stream, obj) };
+};
+
+template <typename Stream, typename Object>
+concept Deserialisable = requires(Stream stream, Object obj) {
+    { Object::Deserialise(stream, obj) };
+};
+
 /*
 template <typename T>
 concept Component = std::is_same_v<T, AnEngine::TransformComponent> ||

@@ -46,10 +46,6 @@ namespace AnEngine::Crank {
             materialProperties();
         }
 
-
-        AE_CORE_INFO("type: {0}", selectedItem.type().name());
-
-
         ImGui::PopStyleVar();
     }
 

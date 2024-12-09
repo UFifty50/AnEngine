@@ -1,41 +1,81 @@
 #ifndef FILESTREAM_HPP
 #define FILESTREAM_HPP
 
+#include <filesystem>
 #include <fstream>
-#include <string>
+
+#include "Core/Core.hpp"
+#include "File/StreamReader.hpp"
+#include "File/StreamWriter.hpp"
+
 
 namespace AnEngine {
-    enum class Direction { Input, Output };
-
-
-    template <Direction dir>
-    class FileStream;
-
-    template <>
-    class FileStream<Direction::Input> {
+    class FileStreamWriter final : public StreamWriter {
     public:
-        virtual ~FileStream() = default;
+        FileStreamWriter(const std::string& path);
+        FileStreamWriter(const fs::path& path);
+        FileStreamWriter() : path("") {}
 
-        virtual const std::string readAll() const = 0;
-        virtual void close() = 0;
+        FileStreamWriter(const FileStreamWriter&) = delete;
+        ~FileStreamWriter() override { close(); }
 
-        virtual const std::string& getFilePath() const = 0;
-        virtual const std::string& getFileName() const = 0;
-        virtual const std::string& getFileExtension() const = 0;
+
+        bool writeData(const char* data, size_t size) override;
+        void flush() override { stream.flush(); }
+        void close() override { stream.close(); }
+        void seekPosition(size_t position) override;
+
+        [[nodiscard]] size_t getSeekPosition() override { return stream.tellp(); }
+        [[nodiscard]] bool isStreamBad() const override { return !stream.good(); }
+
+
+        [[nodiscard]] const fs::path& getFilePath() const override { return path; }
+
+        [[nodiscard]] const std::string& getFileName() const override {
+            return path.stem().string();
+        }
+
+        [[nodiscard]] const std::string& getFileExtension() const override {
+            return path.extension().string();
+        }
+
+    private:
+        fs::path path;
+        std::ofstream stream;
     };
 
-    template <>
-    class FileStream<Direction::Output> {
+    class FileStreamReader final : public StreamReader {
     public:
-        virtual ~FileStream() = default;
+        FileStreamReader(const std::string& path);
+        FileStreamReader(const fs::path& path);
+        FileStreamReader(nullptr_t) : path("") {}
 
-        virtual void writeString(const std::string& str) = 0;
-        virtual void close() = 0;
+        FileStreamReader(const FileStreamReader&) = delete;
+        ~FileStreamReader() override { close(); }
 
-        virtual const std::string& getFilePath() const = 0;
-        virtual const std::string& getFileName() const = 0;
-        virtual const std::string& getFileExtension() const = 0;
+
+        void close() override { stream.close(); }
+        bool readData(byte* data, size_t size) override;
+        void seekPosition(size_t position) override;
+
+        [[nodiscard]] size_t getSeekPosition() override { return stream.tellg(); }
+        [[nodiscard]] bool isStreamBad() const override { return !stream.good(); }
+
+
+        [[nodiscard]] const fs::path& getFilePath() const override { return path; }
+
+        [[nodiscard]] const std::string& getFileName() const override {
+            return path.stem().string();
+        }
+
+        [[nodiscard]] const std::string& getFileExtension() const override {
+            return path.extension().string();
+        }
+
+    private:
+        fs::path path;
+        std::ifstream stream;
     };
-}  // namespace AnEngine
+} // namespace AnEngine
 
 #endif

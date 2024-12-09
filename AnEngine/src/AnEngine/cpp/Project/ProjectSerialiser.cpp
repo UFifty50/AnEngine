@@ -3,15 +3,16 @@
 #define NOMINMAX
 #include <entt/entt.hpp>
 
+#include "Project/ProjectSerialiser.hpp"
+
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
 #include <string>
 
-#include "Core/UUID.hpp"
 #include "Globals.hpp"
+#include "Core/UUID.hpp"
 #include "Project/Project.hpp"
-#include "Project/ProjectSerialiser.hpp"
 #include "Project/Resources/Material.hpp"
 #include "Project/Resources/Scene/Components.hpp"
 #include "Project/Resources/Scene/Entity.hpp"
@@ -54,10 +55,8 @@ namespace AnEngine {
     YAML::Emitter& operator<<(YAML::Emitter& outYAML, const Ref<Texture2D> t) {
         AE_PROFILE_FUNCTION()
 
-        if (t)
-            outYAML << t->getPath().string();
-        else
-            outYAML << "None";
+        if (t) outYAML << t->getPath().string();
+        else outYAML << "None";
 
         return outYAML;
     }
@@ -65,7 +64,7 @@ namespace AnEngine {
     YAML::Emitter& operator<<(YAML::Emitter& outYAML, const UUID uuid) {
         AE_PROFILE_FUNCTION();
 
-        outYAML << (std::string)uuid;
+        outYAML << static_cast<std::string>(uuid);
         return outYAML;
     }
 
@@ -103,7 +102,7 @@ namespace AnEngine {
     Project ProjectSerialiser::openProject(const fs::path& path) {
         AE_PROFILE_FUNCTION()
 
-        if (!fs::exists(path)) {
+        if (!exists(path)) {
             AE_CORE_ERROR("Project path does not exist");
             return Project();
         }
@@ -113,21 +112,21 @@ namespace AnEngine {
             return Project();
         }
 
-        Project project = ProjectSerialiser::deserialiseProject(path);
+        Project project = deserialiseProject(path);
 
         // Load materials
-        for (DirectoryIterator f = project.root.begin(); f != project.root.end(); f++) {
+        for (DirectoryIterator f = project.root.begin(); f != project.root.end(); ++f) {
             auto& dirEnt = *f;
             if (dirEnt.entryType != DirectoryEntry::File) continue;
 
             File file = *static_cast<File*>(&dirEnt);
             if (file.type != FileType::Material) continue;
 
-            Resource res = ProjectSerialiser::openResource(file.path);
+            Resource res = openResource(file.path);
             project.resources[res.uuid] = res;
 
             AE_CORE_TRACE("Loaded resource '{0}' with UUID = {1}", res.name,
-                          (std::string)res.uuid);
+                          static_cast<std::string>(res.uuid));
         }
 
         return project;
@@ -159,36 +158,32 @@ namespace AnEngine {
 
         std::function<void(const YAML::Node&, Directory&)> iterateDirectory =
             [&](const YAML::Node& node, Directory& directory) {
-                auto files = node["files"];
-                auto directories = node["directories"];
+            auto files = node["files"];
+            auto directories = node["directories"];
 
-                for (auto file : files) {
-                    UUID uuid = file.first.as<UUID>();
-                    fs::path path = file.second["path"].as<std::string>();
-                    std::string name = file.second["name"].as<std::string>();
-                    std::string type = file.second["type"].as<std::string>();
+            for (auto file : files) {
+                auto uuid = file.first.as<UUID>();
+                fs::path path = file.second["path"].as<std::string>();
+                auto name = file.second["name"].as<std::string>();
+                auto type = file.second["type"].as<std::string>();
 
-                    FileType fileType = FileType::Other;
-                    if (type == "Material") {
-                        fileType = FileType::Material;
-                    } else if (type == "Texture") {
-                        fileType = FileType::Texture;
-                    } else if (type == "Model") {
-                        fileType = FileType::Model;
-                    }
+                auto fileType = FileType::Other;
+                if (type == "Material") { fileType = FileType::Material; } else if (
+                    type == "Texture") { fileType = FileType::Texture; } else if (
+                    type == "Model") { fileType = FileType::Model; }
 
-                    directory.files.insert(File(uuid, name, fileType, path));
-                }
+                directory.files.insert(File(uuid, name, fileType, path));
+            }
 
-                for (auto dir : directories) {
-                    UUID uuid = dir.first.as<UUID>();
-                    std::string name = dir.second["name"].as<std::string>();
-                    Directory subDir;
-                    iterateDirectory(dir.second, subDir);
+            for (auto dir : directories) {
+                auto uuid = dir.first.as<UUID>();
+                auto name = dir.second["name"].as<std::string>();
+                Directory subDir;
+                iterateDirectory(dir.second, subDir);
 
-                    directory.directories.insert(subDir);
-                }
-            };
+                directory.directories.insert(subDir);
+            }
+        };
 
         iterateDirectory(root, project.root);
 
@@ -209,7 +204,7 @@ namespace AnEngine {
             Entity entity = {entityID, scene.get()};
             if (!entity) return;
 
-            ProjectSerialiser::serialiseEntity(outYAML, entity);
+            serialiseEntity(outYAML, entity);
         }
 
         outYAML << YAML::EndSeq;
@@ -224,23 +219,19 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         YAML::Node data = YAML::LoadFile(path);
-        try {
-            if (!data["Scene"]) return false;
-        } catch (std::exception e) {
+        try { if (!data["Scene"]) return false; } catch (std::exception e) {
             AE_CORE_ERROR("Error deserializing scene: {0}", e.what());
             return false;
         }
 
-        std::string sceneName = data["Scene"].as<std::string>();
+        auto sceneName = data["Scene"].as<std::string>();
         AE_CORE_TRACE("Deserialising scene '{0}'", sceneName);
 
         auto entities = data["Entities"];
-        if (!entities) {
-            return false;
-        }
+        if (!entities) { return false; }
 
         for (auto entity : entities) {
-            std::string uuidStr = entity["Entity"].as<std::string>();
+            auto uuidStr = entity["Entity"].as<std::string>();
             auto tagComponent = entity["TagComponent"];
 
             if (!tagComponent) {
@@ -249,7 +240,7 @@ namespace AnEngine {
                 continue;
             }
 
-            std::string name = tagComponent["Tag"].as<std::string>();
+            auto name = tagComponent["Tag"].as<std::string>();
             UUID uuid = UUID::fromStr(uuidStr);
 
             Entity deserialisedEntity = scene->createEntityWithUUID(name, uuid);
@@ -271,8 +262,9 @@ namespace AnEngine {
                 auto& sRC = deserialisedEntity.addComponent<SpriteRendererComponent>();
                 sRC.Mat.colour = material["Colour"].as<glm::vec4>();
 
-                if (material["Texture"].as<std::string>() != "None")
-                    sRC.Mat.texture = Texture2D::create(material["Texture"].as<std::string>());
+                if (material["Texture"].as<std::string>() !=
+                    "None") sRC.Mat.texture = Texture2D::create(
+                                material["Texture"].as<std::string>());
             }
 
             if (auto cameraComponent = entity["CameraComponent"]) {
@@ -316,7 +308,7 @@ namespace AnEngine {
             }
 
             AE_CORE_TRACE("Deserialised entity with name = {0}, ID = {1}", name,
-                          (std::string)uuid);
+                          static_cast<std::string>(uuid));
         }
 
         return true;
@@ -341,10 +333,8 @@ namespace AnEngine {
         outYAML << YAML::BeginMap;
         outYAML << YAML::Key << "Texture" << YAML::Value;
 
-        if (material.texture)
-            outYAML << material.texture->getPath().string();
-        else
-            outYAML << "None";
+        if (material.texture) outYAML << material.texture->getPath().string();
+        else outYAML << "None";
         outYAML << YAML::EndMap;
 
         outYAML << YAML::EndSeq;
@@ -358,9 +348,7 @@ namespace AnEngine {
         AE_PROFILE_FUNCTION()
 
         YAML::Node data;
-        try {
-            data = YAML::LoadFile(path.string());
-        } catch (std::exception e) {
+        try { data = YAML::LoadFile(path.string()); } catch (std::exception e) {
             AE_CORE_ERROR("Error deserializing material: {0}", e.what());
             return Material();
         }
@@ -370,11 +358,11 @@ namespace AnEngine {
             return Material();
         }
 
-        std::string materialName = data["Material"].as<std::string>();
-        std::string uuidStr = data["UUID"].as<std::string>();
+        auto materialName = data["Material"].as<std::string>();
+        auto uuidStr = data["UUID"].as<std::string>();
         UUID uuid = UUID::fromStr(uuidStr);
 
-        Material deserialisedMaterial = Material(materialName, uuid);
+        auto deserialisedMaterial = Material(materialName, uuid);
 
         AE_CORE_TRACE("Deserialising Material with name = {0}, UUID = {1}", materialName,
                       uuidStr);
@@ -502,4 +490,4 @@ namespace AnEngine {
 
         outYAML << YAML::EndMap;
     }
-};  // namespace AnEngine
+}; // namespace AnEngine

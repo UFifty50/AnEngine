@@ -8,7 +8,7 @@
 
 
 namespace AnEngine {
-    Ref<IndexBuffer> IndexBuffer::create(const uint32_t const* indices, uint32_t count) {
+    Ref<IndexBuffer> IndexBuffer::create(const uint32_t *const indices, uint32_t count) {
         AE_PROFILE_FUNCTION()
 
         switch (RenderAPI::getAPI()) {

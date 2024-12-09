@@ -15,7 +15,7 @@ namespace AnEngine::Crank {
     enum class PayloadType { Scene, Texture, Material };
 
     struct DropPayload {
-        const fs::path path;
+        const Directory path;
         const PayloadType type;
 
         ~DropPayload() = default;
@@ -39,13 +39,17 @@ namespace AnEngine::Crank {
 
         virtual std::string getName() override { return name; }
 
-        bool isItemSelected() { return selectedItem != ""; }
-        fs::path getSelectedItem() { return selectedItem; }
+        //  bool isItemSelected() { return selectedItem != ""; }
+        bool isItemSelected() { return !selectedItem.uuid.isNull(); }
+        // fs::path getSelectedItem() { return selectedItem; }
+        File getSelectedItem() { return selectedItem; }
 
     private:
         std::string name;
-        fs::path currentPath;
-        fs::path selectedItem;
+        //  fs::path currentPath;
+        //   fs::path selectedItem;
+        Directory currentPath;
+        File selectedItem;
 
         Ref<Texture2D> fileIcon;
         Ref<Texture2D> materialIcon;

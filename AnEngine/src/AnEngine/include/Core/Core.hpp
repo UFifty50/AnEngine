@@ -1,11 +1,12 @@
 #ifndef CORE_HPP
 #define CORE_HPP
 
+#include <filesystem>
 #include <memory>
 #include <string>
 
-#include "Core/Log.hpp"
 #include "CoreConfig.hpp"
+#include "Core/Log.hpp"
 
 #undef near
 #undef far
@@ -15,29 +16,29 @@
 #endif
 
 #if defined(AE_WIN)
-    #define DEBUG_BREAK() __debugbreak()
-    #if defined(AE_DYN_LINK)
+#define DEBUG_BREAK() __debugbreak()
+#if defined(AE_DYN_LINK)
         #error Dynamic linking not currently supported
-        #if defined(AE_DLL)
+#if defined(AE_DLL)
             #define AE_API __declspec(dllexport)
-        #else
+#else
             #define AE_API __declspec(dllimport)
-        #endif
-    #else
-        #define AE_API
-    #endif
+#endif
+#else
+#define AE_API
+#endif
 #elif defined(AE_LINUX)
     #define DEBUG_BREAK() raise(SIGTRAP)
-    #if defined(AE_DYN_LINK)
+#if defined(AE_DYN_LINK)
         #error Dynamic linking not currently supported
-        #if defined(AE_DLL)
+#if defined(AE_DLL)
             #define AE_API __attribute__((visibility("default")))
-        #else
+#else
             #define AE_API
-        #endif
-    #else
+#endif
+#else
         #define AE_API
-    #endif
+#endif
 #else
     #error No platform defined, or platform not supported
 #endif
@@ -47,14 +48,14 @@
 #endif
 
 #if defined(AE_ENABLE_ASSERTS)
-    #define AE_ASSERT(x, str, ...)                                                  \
+#define AE_ASSERT(x, str, ...)                                                  \
         {                                                                           \
             if (!(x)) {                                                             \
                 AE_CRITICAL("Assertion Failed: {0}", AE_FMT_STR(str, __VA_ARGS__)); \
                 DEBUG_BREAK();                                                      \
             }                                                                       \
         }
-    #define AE_CORE_ASSERT(x, str, ...)                                                  \
+#define AE_CORE_ASSERT(x, str, ...)                                                  \
         {                                                                                \
             if (!(x)) {                                                                  \
                 AE_CORE_CRITICAL("Assertion Failed: {0}", AE_FMT_STR(str, __VA_ARGS__)); \
@@ -88,11 +89,11 @@
      } \
      ImGui::End(); \ profileResults.clear();*/
 #else
-    #define AE_PROFILE_BEGIN_SESSION(name, filepath)
-    #define AE_PROFILE_END_SESSION()
-    #define AE_PROFILE_SCOPE(name)
-    #define AE_PROFILE_FUNCTION()
-    #define PROFILE_UI()
+#define AE_PROFILE_BEGIN_SESSION(name, filepath)
+#define AE_PROFILE_END_SESSION()
+#define AE_PROFILE_SCOPE(name)
+#define AE_PROFILE_FUNCTION()
+#define PROFILE_UI()
 #endif
 
 #define BIT(x) (1 << x)
@@ -101,8 +102,10 @@
 #define BIND_EVENT_FN(fn) \
     [&](auto&&... args) -> decltype(auto) { return fn(std::forward<decltype(args)>(args)...); }
 
+namespace fs = std::filesystem;
+
 namespace AnEngine {
-    typedef uint32_t RenderID;
+    using RenderID = uint32_t;
 
     template <typename T>
     using Ref = std::shared_ptr<T>;
@@ -111,14 +114,12 @@ namespace AnEngine {
     using Scope = std::unique_ptr<T>;
 
     template <typename T, typename... Args>
-    Ref<T> MakeRef(Args&&... args) {
-        return std::make_shared<T>(std::forward<Args>(args)...);
-    }
+    Ref<T> MakeRef(Args&&... args) { return std::make_shared<T>(std::forward<Args>(args)...); }
 
     template <typename T, typename... Args>
     Scope<T> MakeScope(Args&&... args) {
         return std::make_unique<T>(std::forward<Args>(args)...);
     }
-}  // namespace AnEngine
+} // namespace AnEngine
 
 #endif
