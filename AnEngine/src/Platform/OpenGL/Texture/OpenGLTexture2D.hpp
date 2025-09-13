@@ -5,7 +5,7 @@
 
 #include <filesystem>
 
-#include "File/InputFileStream.hpp"
+#include "File/FileStream.hpp"
 #include "Renderer/ShaderUniform.hpp"
 #include "Texture/Texture2D.hpp"
 
@@ -13,49 +13,45 @@
 namespace fs = std::filesystem;
 
 namespace AnEngine {
-    class OpenGLTexture2D : public Texture2D {
-    public:
-        OpenGLTexture2D(const fs::path& path);
-        OpenGLTexture2D(uint32_t width, uint32_t height);
-        virtual ~OpenGLTexture2D();
+class OpenGLTexture2D : public Texture2D {
+public:
+    OpenGLTexture2D(const fs::path& path);
+    OpenGLTexture2D(uint32_t width, uint32_t height);
+    ~OpenGLTexture2D() override;
 
-        inline virtual uint32_t getWidth() const override { return width; }
-        inline virtual uint32_t getHeight() const override { return height; }
+    uint32_t getWidth() const override { return width; }
+    uint32_t getHeight() const override { return height; }
 
-        inline virtual ImageFormat::FileFormat getFileFormat() const override {
-            return fileFormat;
-        }
+    ImageFormat::FileFormat getFileFormat() const override { return fileFormat; }
 
-        inline virtual ImageFormat::PixelFormat getPixelFormat() const override {
-            return pixelFormat;
-        }
+    ImageFormat::PixelFormat getPixelFormat() const override { return pixelFormat; }
 
-        inline virtual Sampler2D getSampler() const override { return Sampler2D{rendererID}; }
-        virtual void setData(void* data, uint32_t size) override;
+    Sampler2D getSampler() const override { return Sampler2D{rendererID}; }
+    void setData(void* data, uint32_t size) override;
 
-        virtual void bind(uint32_t slot) const override;
+    void bind(uint32_t slot) const override;
 
-        virtual bool operator==(const Texture& other) const override {
-            return rendererID == ((OpenGLTexture2D&)other).rendererID;
-        }
+    bool operator==(const Texture& other) const override {
+        return rendererID == ((OpenGLTexture2D&)other).rendererID;
+    }
 
-        virtual fs::path getPath() const override { return file.getFilePath(); }
+    fs::path getPath() const override { return file.getFilePath(); }
 
-        //  Ref<Texture> getSubImage(glm::vec2 coords, glm::vec2 size) const;
+    //  Ref<Texture> getSubImage(glm::vec2 coords, glm::vec2 size) const;
 
-    private:
-        InputFileStream file;
+private:
+    FileStreamReader file;
 
-        uint32_t width;
-        uint32_t height;
+    uint32_t width;
+    uint32_t height;
 
-        RenderID rendererID;
+    RenderID rendererID;
 
-        ImageFormat::FileFormat fileFormat;
-        ImageFormat::PixelFormat pixelFormat;
+    ImageFormat::FileFormat fileFormat;
+    ImageFormat::PixelFormat pixelFormat;
 
-        uint8_t* imageData;
-    };
-};  // namespace AnEngine
+    uint8_t* imageData;
+};
+}; // namespace AnEngine
 
 #endif

@@ -11,84 +11,96 @@
 
 
 namespace AnEngine {
-    class StreamWriter {
-    public:
-        virtual ~StreamWriter() = default;
+class StreamWriter {
+public:
+    virtual ~StreamWriter() = default;
 
-        virtual void close() = 0;
-        virtual void flush() = 0;
-        virtual void seekPosition(size_t position) = 0;
-        [[nodiscard]] virtual size_t getSeekPosition() = 0;
-        [[nodiscard]] virtual bool isStreamBad() const = 0;
+    virtual void open(const std::string& filePath) = 0;
+    virtual void close() = 0;
+    virtual void flush() = 0;
+    virtual void seekPosition(size_t position) = 0;
+    [[nodiscard]] virtual size_t getSeekPosition() = 0;
+    [[nodiscard]] virtual bool isStreamBad() const = 0;
 
-        operator bool() const { return !isStreamBad(); }
+    operator bool() const { return !isStreamBad(); }
 
-        virtual bool writeData(const char* data, size_t size) = 0;
+    virtual void writeBuffer(const Buffer& buffer, bool writeSize = true) {
+        writeRaw(buffer.size);
+        writeData(buffer.data, buffer.size);
+    }
 
-        [[nodiscard]] virtual const fs::path& getFilePath() const = 0;
-        [[nodiscard]] virtual const std::string& getFileName() const = 0;
-        [[nodiscard]] virtual const std::string& getFileExtension() const = 0;
+    virtual void writeString(const std::string& string) {
+        writeRaw(static_cast<uint32_t>(string.size()));
+        writeData(string.data(), string.size());
+    }
 
+    virtual bool writeData(const char* data, size_t size) = 0;
 
-        void writeBuffer(const Buffer& buffer, bool writeSize = true);
-        void writeString(const std::string& string);
+    [[nodiscard]] virtual const fs::path& getFilePath() const = 0;
+    [[nodiscard]] virtual const std::string& getFileName() const = 0;
+    [[nodiscard]] virtual const std::string& getFileExtension() const = 0;
 
-        template <typename T, typename Type = std::remove_cvref_t<T>>
-        void writeRaw(const Type& data) {
-            const bool succeeded =
-                writeData(reinterpret_cast<const char*>(&data), sizeof(Type));
-            AE_CORE_ASSERT(succeeded, "Failed to write to file");
+    template <typename Type>
+    void writeRaw(const Type& data) {
+        state = writeData(reinterpret_cast<const char*>(&data), sizeof(Type)) ? GOOD : BAD;
+        AE_CORE_ASSERT(state == GOOD, "Failed to write to file");
+    }
+
+    template <typename Type>
+        requires std::is_same_v<Type, std::string>
+        || Serialisable<StreamWriter, Type>
+    void writeObject(const Type& object) {
+        if constexpr (std::is_same_v<Type, std::string>()) {
+            writeString(object);
+            return;
         }
 
-        template <typename T, typename Type = std::remove_cvref_t<T>>
-            requires std::is_same_v<Type, std::string>
-                     || Serialisable<StreamWriter, Type>
-        void writeObject(const Type& object) {
-            if constexpr (std::is_same_v<Type, std::string>()) {
-                writeString(object);
-                return;
-            }
+        state = Type::Serialise(this, object) ? GOOD : BAD;
+        AE_CORE_ASSERT(state == GOOD, "Failed to write to file");
+    }
 
-            const bool succeeded = Type::Serialise(this, object);
-            AE_CORE_ASSERT(succeeded, "Failed to write to file");
+    template <typename Key, typename Value>
+    void writeMap(const std::map<Key, Value>& map, const bool writeSize = true) {
+        if (writeSize) { writeRaw(static_cast<uint32_t>(map.size())); }
+
+        for (const auto& [key, value] : map) {
+            if constexpr (std::is_trivial_v<Key>()) writeRaw(key);
+            else writeObject(key);
+
+            if constexpr (std::is_trivial_v<Value>()) writeRaw(value);
+            else writeObject(value);
         }
+    }
 
-        template <typename Key, typename Value>
-        void writeMap(const std::map<Key, Value>& map, const bool writeSize = true) {
-            if (writeSize) { writeRaw(static_cast<uint32_t>(map.size())); }
+    template <typename Key, typename Value>
+    void writeUMap(const std::unordered_map<Key, Value>& map, const bool writeSize = true) {
+        if (writeSize) { writeRaw(static_cast<uint32_t>(map.size())); }
 
-            for (const auto& [key, value] : map) {
-                if constexpr (std::is_trivial_v<Key>()) writeRaw(key);
-                else writeObject(key);
+        for (const auto& [key, value] : map) {
+            if constexpr (std::is_trivial_v<Key>()) writeRaw(key);
+            else writeObject(key);
 
-                if constexpr (std::is_trivial_v<Value>()) writeRaw(value);
-                else writeObject(value);
-            }
+            if constexpr (std::is_trivial_v<Value>()) writeRaw(value);
+            else writeObject(value);
         }
+    }
 
-        template <typename Key, typename Value>
-        void writeMap(const std::unordered_map<Key, Value>& map, const bool writeSize = true) {
-            if (writeSize) { writeRaw(static_cast<uint32_t>(map.size())); }
+    template <typename Type>
+    void writeVector(const std::vector<Type>& vector, const bool writeSize = true) {
+        if (writeSize) { writeRaw(static_cast<uint32_t>(vector.size())); }
 
-            for (const auto& [key, value] : map) {
-                if constexpr (std::is_trivial_v<Key>()) writeRaw(key);
-                else writeObject(key);
-
-                if constexpr (std::is_trivial_v<Value>()) writeRaw(value);
-                else writeObject(value);
-            }
+        for (const Type& element : vector) {
+            if constexpr (std::is_trivial_v<Type>()) writeRaw(element);
+            else writeObject(element);
         }
+    }
 
-        template <typename T, typename Type = std::remove_cvref_t<T>>
-        void writeVector(const std::vector<Type>& vector, const bool writeSize = true) {
-            if (writeSize) { writeRaw(static_cast<uint32_t>(vector.size())); }
-
-            for (const Type& element : vector) {
-                if constexpr (std::is_trivial_v<Type>()) writeRaw(element);
-                else writeObject(element);
-            }
-        }
-    };
+private:
+    enum StreamState : uint8_t {
+        BAD  = 0,
+        GOOD = 1,
+    } state = BAD;
+};
 } // namespace AnEngine
 
 #endif

@@ -2,6 +2,7 @@
 
 #include "Application.hpp"
 
+#include "Window.hpp"
 #include "Core/Input.hpp"
 #include "Core/Log.hpp"
 #include "Core/Random.hpp"
@@ -12,159 +13,152 @@
 #include "Renderer/Renderer3D.hpp"
 #include "Time/Time.hpp"
 #include "Time/TimeStep.hpp"
-#include "Window.hpp"
 
 
 namespace AnEngine {
-    Application::Data Application::applicationData;
+Application::Data Application::applicationData;
 
-    void Application::Init(const std::string& name, RenderAPI::Dimension dimensionality) {
-        AE_PROFILE_FUNCTION()
+void Application::Init(const std::string& name, RenderAPI::Dimension dimensionality) {
+    AE_PROFILE_FUNCTION()
 
-        AE_CORE_ASSERT(!applicationData.initialized, "Application already exists!");
-        applicationData.initialized = true;
+    AE_CORE_ASSERT(!applicationData.initialized, "Application already exists!");
+    applicationData.initialized = true;
 
-        if (RenderAPI::getAPI() == RenderAPI::NoAPI) {
-            std::stringstream msg;
-            msg << "AnEngine::Renderer::setAPI() needs to be called"
-                   "in CreateApplication with one of"
-                << std::endl;
-            msg << "| RenderAPI::OpenGL" << std::endl;
-            msg << "| RenderAPI::DirectX11" << std::endl;
-            msg << "| RenderAPI::DirectX12" << std::endl;
-            msg << "| RenderAPI::Vulkan" << std::endl;
-            AE_CORE_ASSERT(false, msg.str().c_str());
-        }
+    if (RenderAPI::getAPI() == RenderAPI::NoAPI) {
+        std::stringstream msg;
+        msg << "AnEngine::Renderer::setAPI() needs to be called"
+            "in CreateApplication with one of"
+            << std::endl;
+        msg << "| RenderAPI::OpenGL" << std::endl;
+        msg << "| RenderAPI::DirectX11" << std::endl;
+        msg << "| RenderAPI::DirectX12" << std::endl;
+        msg << "| RenderAPI::Vulkan" << std::endl;
+        AE_CORE_ASSERT(false, msg.str());
+    }
 
-        applicationData.window = Scope<Window>(Window::create(WindowProperties(name)));
-        applicationData.window->setEventCallback(&Application::onEvent);
+    applicationData.window = Scope<Window>(Window::create(WindowProperties(name)));
+    applicationData.window->setEventCallback(&Application::onEvent);
 
-        Random::init();
+    Random::init();
 
-        Renderer::init();
-        switch (dimensionality) {
+    Renderer::init();
+    switch (dimensionality) {
             using enum RenderAPI::Dimension;
 
-            case Dim2D:
-                Renderer2D::init();
-            case Dim3D:
-                Renderer3D::init();
-        }
-
-        applicationData.imGuiLayer = MakeRef<ImGuiLayer>();
-        pushOverlay(applicationData.imGuiLayer);
+        case Dim2D: Renderer2D::init();
+        case Dim3D: Renderer3D::init();
     }
 
-    void Application::pushLayer(Ref<Layer> layer) {
-        AE_PROFILE_FUNCTION()
+    applicationData.imGuiLayer = MakeRef<ImGuiLayer>();
+    pushOverlay(applicationData.imGuiLayer);
+}
 
-        applicationData.layerStack.pushLayer(layer);
-        layer->onAttach();
+void Application::pushLayer(Ref<Layer> layer) {
+    AE_PROFILE_FUNCTION()
+
+    applicationData.layerStack.pushLayer(layer);
+    layer->onAttach();
+}
+
+void Application::pushOverlay(Ref<Layer> overlay) {
+    AE_PROFILE_FUNCTION()
+
+    applicationData.layerStack.pushOverlay(overlay);
+    overlay->onAttach();
+}
+
+void Application::onEvent(Event& e) {
+    AE_PROFILE_FUNCTION()
+
+    EventDispatcher dispatcher(e);
+    dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
+    dispatcher.dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
+
+    for (auto it = applicationData.layerStack.end();
+         it != applicationData.layerStack.begin();) {
+        (*--it)->onEvent(e);
+        if (e.handled) break;
     }
+}
 
-    void Application::pushOverlay(Ref<Layer> overlay) {
-        AE_PROFILE_FUNCTION()
+bool Application::OnWindowClose(WindowCloseEvent& closeEvent) {
+    AE_PROFILE_FUNCTION()
 
-        applicationData.layerStack.pushOverlay(overlay);
-        overlay->onAttach();
-    }
+    applicationData.running = false;
+    return true;
+}
 
-    void Application::onEvent(Event& e) {
-        AE_PROFILE_FUNCTION()
+bool Application::OnWindowResize(WindowResizeEvent& resizeEvent) {
+    AE_PROFILE_FUNCTION()
 
-        EventDispatcher dispatcher(e);
-        dispatcher.dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
-        dispatcher.dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::onWindowResize));
-
-        for (auto it = applicationData.layerStack.end();
-             it != applicationData.layerStack.begin();) {
-            (*--it)->onEvent(e);
-            if (e.handled) break;
-        }
-    }
-
-    bool Application::onWindowClose(WindowCloseEvent& closeEvent) {
-        AE_PROFILE_FUNCTION()
-
-        applicationData.running = false;
-        return true;
-    }
-
-    bool Application::onWindowResize(WindowResizeEvent& resizeEvent) {
-        AE_PROFILE_FUNCTION()
-
-        if (resizeEvent.getWidth() == 0 || resizeEvent.getHeight() == 0) {
-            applicationData.minimized = true;
-            return false;
-        }
-
-        applicationData.minimized = false;
-
-        Renderer::onWindowResize(resizeEvent.getWidth(), resizeEvent.getHeight());
-
+    if (resizeEvent.getWidth() == 0 || resizeEvent.getHeight() == 0) {
+        applicationData.minimized = true;
         return false;
     }
 
-    int Application::Run() {
-        AE_PROFILE_FUNCTION()
+    applicationData.minimized = false;
 
-        if (!applicationData.initialized) {
-            std::stringstream msg;
-            msg << "AnEngine::Application::Init() needs to be called after "
-                   "Renderer::setAPI() in CreateApplication"
-                << std::endl;
-            AE_CORE_ASSERT(false, msg.str().c_str());
-            return 1;
+    Renderer::onWindowResize(resizeEvent.getWidth(), resizeEvent.getHeight());
+
+    return false;
+}
+
+int Application::Run() {
+    AE_PROFILE_FUNCTION()
+
+    if (!applicationData.initialized) {
+        std::stringstream msg;
+        msg << "AnEngine::Application::Init() needs to be called after "
+            "Renderer::setAPI() in CreateApplication"
+            << std::endl;
+        AE_CORE_ASSERT(false, msg.str())
+        return 1;
+    }
+
+    while (applicationData.running) {
+        float time = Time::getTime();
+        TimeStep deltaTime = time - applicationData.lastFrameTime;
+        applicationData.lastFrameTime = time;
+
+        if (!applicationData.minimized) {
+            for (Ref<Layer> layer : applicationData.layerStack) { layer->onUpdate(deltaTime); }
         }
 
-        while (applicationData.running) {
-            float time = Time::getTime();
-            TimeStep deltaTime = time - applicationData.lastFrameTime;
-            applicationData.lastFrameTime = time;
+        applicationData.imGuiLayer->begin();
+        for (Ref<Layer> layer : applicationData.layerStack) { layer->onImGuiRender(); }
+        applicationData.imGuiLayer->end();
 
-            if (!applicationData.minimized) {
-                for (Ref<Layer> layer : applicationData.layerStack) {
-                    layer->onUpdate(deltaTime);
-                }
-            }
-
-            applicationData.imGuiLayer->begin();
-            for (Ref<Layer> layer : applicationData.layerStack) {
-                layer->onImGuiRender();
-            }
-            applicationData.imGuiLayer->end();
-
-            applicationData.window->onUpdate();
-        }
-
-        return applicationData.exitCode;
+        applicationData.window->onUpdate();
     }
 
-    void Application::Shutdown(int exitCode) {
-        AE_PROFILE_FUNCTION()
+    return applicationData.exitCode;
+}
 
-        applicationData.running = false;
-        applicationData.exitCode = exitCode;
-    }
+void Application::Shutdown(int exitCode) {
+    AE_PROFILE_FUNCTION()
 
-    int Application::AEmain(int argc, char** argv) {
-        Log::init();
-        applicationData.commandLine = CommandLine(argc, argv);
+    applicationData.running = false;
+    applicationData.exitCode = exitCode;
+}
 
-        AE_PROFILE_BEGIN_SESSION("Startup", "AnEngineProfile-Startup.json");
-        auto app = CreateApplication();
-        AE_PROFILE_END_SESSION()
+int Application::AEmain(int argc, char** argv) {
+    Log::init();
+    applicationData.commandLine = CommandLine(argc, argv);
 
-        AE_PROFILE_BEGIN_SESSION("Runtime", "AnEngineProfile-Runtime.json");
-        int exitCode = app->Run();
-        AE_PROFILE_END_SESSION()
+    AE_PROFILE_BEGIN_SESSION("Startup", "AnEngineProfile-Startup.json");
+    auto app = CreateApplication();
+    AE_PROFILE_END_SESSION()
 
-        AE_PROFILE_BEGIN_SESSION("Shutdown", "AnEngineProfile-Shutdown.json");
-        delete app;
-        AE_PROFILE_END_SESSION()
+    AE_PROFILE_BEGIN_SESSION("Runtime", "AnEngineProfile-Runtime.json");
+    int exitCode = app->Run();
+    AE_PROFILE_END_SESSION()
 
-        AE_PROFILE_END_SESSION()
+    AE_PROFILE_BEGIN_SESSION("Shutdown", "AnEngineProfile-Shutdown.json");
+    delete app;
+    AE_PROFILE_END_SESSION()
 
-        return exitCode;
-    }
-}  // namespace AnEngine
+    AE_PROFILE_END_SESSION()
+
+    return exitCode;
+}
+} // namespace AnEngine

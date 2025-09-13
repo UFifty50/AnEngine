@@ -3,11 +3,10 @@
 
 #include <glm/glm.hpp>
 
-#include "Time/TimeStep.hpp"
+#include "ForwardDecls.hpp"
 
 
-struct Sampler2D;
-
+namespace AnEngine {
 template <typename S>
 concept ScalarGLSLDataType =
     std::is_same_v<S, bool> || std::is_same_v<S, int32_t> ||
@@ -44,7 +43,7 @@ concept TextureGLSLDataType = std::is_same_v<T, Sampler2D>;
 
 template <typename T>
 concept GLSLDataType = ScalarGLSLDataType<T> || VectorGLSLDataType<T> ||
-                       MatrixGLSLDataType<T> || TextureGLSLDataType<T>;
+    MatrixGLSLDataType<T> || TextureGLSLDataType<T>;
 
 
 template <typename T, typename Container>
@@ -62,6 +61,13 @@ template <typename Stream, typename Object>
 concept Deserialisable = requires(Stream stream, Object obj) {
     { Object::Deserialise(stream, obj) };
 };
+
+template <typename Object>
+concept IsComponent = requires {
+    { Object::GetName() } -> std::convertible_to<std::string>;
+    std::is_base_of_v<Component, Object>;
+};
+}
 
 /*
 template <typename T>

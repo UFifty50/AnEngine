@@ -1,127 +1,156 @@
 #ifndef COMPONENTS_HPP
 #define COMPONENTS_HPP
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
+#include <glm/fwd.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include <cstdint>
 #include <functional>
 #include <string>
 
+#include "Core/ForwardDecls.hpp"
+
 #include "Core/UUID.hpp"
 #include "Project/Resources/Material.hpp"
-#include "Project/Resources/Scene/ScriptableEntity.hpp"
 #include "Renderer/Camera/SceneCamera.hpp"
-#include "Texture/Texture2D.hpp"
-#include "Time/TimeStep.hpp"
 
-
-#define ID_COMPONENT_ID 0
-#define TAG_COMPONENT_ID 1
-#define CAMERA_COMPONENT_ID 2
-#define TRANSFORM_COMPONENT_ID 3
-#define OBJECTRENDERER_COMPONENT_ID 4
-#define SPRITERENDERER_COMPONENT_ID 5
-#define NATIVESCRIPT_COMPONENT_ID 6
 
 namespace AnEngine {
-    struct Component {
-        virtual ~Component() = default;
-        constexpr virtual uint32_t getID() = 0;
+struct Component {
+    enum class Type : uint8_t {
+        ID = 0,
+        Tag,
+        Camera,
+        Transform,
+        ObjectRenderer,
+        SpriteRenderer,
+        NativeScript,
     };
 
+    virtual ~Component() = default;
+    constexpr virtual Type getID() = 0;
+    constexpr virtual std::string getName() = 0;
+};
 
-    struct IDComponent : Component {
-        UUID uuid;
+struct IDComponent : Component {
+    UUID uuid;
 
-        IDComponent() = default;
-        IDComponent(UUID id) : uuid(id) {}
-        IDComponent(const IDComponent&) = default;
+    IDComponent() = default;
+    IDComponent(UUID id) : uuid(id) {}
+    IDComponent(const IDComponent&) = default;
 
-        constexpr uint32_t getID() override { return ID_COMPONENT_ID; }
-    };
+    constexpr Type getID() override { return GetID(); }
+    constexpr std::string getName() override { return GetName(); }
 
-    struct TransformComponent : Component {
-        glm::vec3 Position{0.0f};
-        glm::vec3 Rotation{0.0f};
-        glm::vec3 Scale{1.0f};
+    constexpr static Type GetID() { return Type::ID; }
+    constexpr static std::string GetName() { return "IDComponent"; }
+};
 
-        TransformComponent() = default;
-        TransformComponent(const TransformComponent&) = default;
-        TransformComponent(const glm::vec3& position) : Position(position) {}
+struct TransformComponent : Component {
+    glm::vec3 Position{0.0f};
+    glm::vec3 Rotation{0.0f};
+    glm::vec3 Scale{1.0f};
 
-        constexpr virtual uint32_t getID() override { return TRANSFORM_COMPONENT_ID; }
+    TransformComponent() = default;
+    TransformComponent(const TransformComponent&) = default;
+    TransformComponent(const glm::vec3& position) : Position(position) {}
 
-        operator glm::mat4() const {
-            return glm::translate(glm::mat4(1.0f), Position) *
-                   glm::toMat4(glm::quat(Rotation)) * glm::scale(glm::mat4(1.0f), Scale);
-        }
-    };
+    operator glm::mat4() const {
+        return translate(glm::mat4(1.0f), Position) *
+            toMat4(glm::quat(Rotation)) * scale(glm::mat4(1.0f), Scale);
+    }
 
-    struct ObjectRendererComponent : Component {
-        Material ObjMaterial;
+    constexpr Type getID() override { return GetID(); }
+    constexpr std::string getName() override { return GetName(); }
 
-        ObjectRendererComponent() = default;
-        ObjectRendererComponent(const ObjectRendererComponent&) = default;
-        ObjectRendererComponent(const Material& material) : ObjMaterial(material) {}
+    constexpr static Type GetID() { return Type::Transform; }
+    constexpr static std::string GetName() { return "TransformComponent"; }
+};
 
-        constexpr virtual uint32_t getID() override { return OBJECTRENDERER_COMPONENT_ID; }
-    };
+struct ObjectRendererComponent : Component {
+    Material ObjMaterial;
 
-    struct SpriteRendererComponent : Component {
-        Material Mat;
+    ObjectRendererComponent() = default;
+    ObjectRendererComponent(const ObjectRendererComponent&) = default;
+    ObjectRendererComponent(const Material& material) : ObjMaterial(material) {}
 
-        SpriteRendererComponent() = default;
-        SpriteRendererComponent(const SpriteRendererComponent&) = default;
-        SpriteRendererComponent(const Material& material) : Mat(material) {}
+    constexpr Type getID() override { return GetID(); }
+    constexpr std::string getName() override { return GetName(); }
 
-        constexpr virtual uint32_t getID() override { return SPRITERENDERER_COMPONENT_ID; }
-    };
+    constexpr static Type GetID() { return Type::ObjectRenderer; }
+    constexpr static std::string GetName() { return "ObjectRendererComponent"; }
+};
 
-    struct TagComponent : Component {
-        std::string Tag;
+struct SpriteRendererComponent : Component {
+    Material Mat;
 
-        TagComponent() : Tag("Entity") {}
-        TagComponent(const TagComponent&) = default;
-        TagComponent(const std::string& tag) : Tag(tag) {}
+    SpriteRendererComponent() = default;
+    SpriteRendererComponent(const SpriteRendererComponent&) = default;
+    SpriteRendererComponent(const Material& material) : Mat(material) {}
 
-        virtual uint32_t getID() override { return TAG_COMPONENT_ID; }
+    constexpr Type getID() override { return GetID(); }
+    constexpr std::string getName() override { return GetName(); }
 
-        constexpr operator std::string&() { return Tag; }
-    };
+    constexpr static Type GetID() { return Type::SpriteRenderer; }
+    constexpr static std::string GetName() { return "SpriteRendererComponent"; }
+};
 
-    struct CameraComponent : Component {
-        SceneCamera Camera;
-        bool Primary = true;
-        bool FixedAspectRatio = false;
+struct TagComponent : Component {
+    std::string Tag;
 
-        CameraComponent() = default;
-        CameraComponent(const CameraComponent&) = default;
+    TagComponent() : Tag("Entity") {}
+    TagComponent(const TagComponent&) = default;
+    TagComponent(const std::string& tag) : Tag(tag) {}
 
-        constexpr virtual uint32_t getID() override { return CAMERA_COMPONENT_ID; }
-    };
+    constexpr operator std::string&() { return Tag; }
 
-    struct NativeScriptComponent : Component {
-        ScriptableEntity* Instance = nullptr;
-        std::string Name;
+    constexpr Type getID() override { return GetID(); }
+    constexpr std::string getName() override { return GetName(); }
 
-        std::function<void()> instantiateScriptInstance = nullptr;
-        std::function<void()> deleteScriptInstance = nullptr;
+    constexpr static Type GetID() { return Type::Tag; }
+    constexpr static std::string GetName() { return "TagComponent"; }
+};
 
-        NativeScriptComponent(std::string name) : Name(name) {}
+struct CameraComponent : Component {
+    SceneCamera Camera;
+    bool Primary = true;
+    bool FixedAspectRatio = false;
 
-        constexpr virtual uint32_t getID() override { return NATIVESCRIPT_COMPONENT_ID; }
+    CameraComponent() = default;
+    CameraComponent(const CameraComponent&) = default;
 
-        template <class Script>
-        void bind() {
-            instantiateScriptInstance = [&]() { Instance = new Script(); };
-            deleteScriptInstance = [&]() {
-                delete (Script*)Instance;
-                Instance = nullptr;
-            };
-        }
-    };
-}  // namespace AnEngine
+    constexpr Type getID() override { return GetID(); }
+    constexpr std::string getName() override { return GetName(); }
+
+    constexpr static Type GetID() { return Type::Camera; }
+    constexpr static std::string GetName() { return "CameraComponent"; }
+};
+
+struct NativeScriptComponent : Component {
+    ScriptableEntity* Instance = nullptr;
+    std::string Name;
+
+    std::function<void()> instantiateScriptInstance = nullptr;
+    std::function<void()> deleteScriptInstance = nullptr;
+
+    NativeScriptComponent(std::string name) : Name(name) {}
+
+    template <class Script>
+    void bind() {
+        instantiateScriptInstance = [&]() { Instance = new Script(); };
+        deleteScriptInstance = [&]() {
+            delete static_cast<Script*>(Instance);
+            Instance = nullptr;
+        };
+    }
+
+    constexpr Type getID() override { return GetID(); }
+    constexpr std::string getName() override { return GetName(); }
+
+    constexpr static Type GetID() { return Type::NativeScript; }
+    constexpr static std::string GetName() { return "NativeScriptComponent"; }
+};
+} // namespace AnEngine
 
 #endif

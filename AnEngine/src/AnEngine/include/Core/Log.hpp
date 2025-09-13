@@ -4,42 +4,46 @@
 #include "CoreConfig.hpp"
 
 
+#if USE_FMT == 0 && !defined(__cpp_lib_format)
+
+
 #if USE_FMT == 1 || !defined(__cpp_lib_format)
     #include <fmt/format.h>
     #define SPDLOG_FMT_EXTERNAL
+#ifdef AE_WIN
     #define SPDLOG_WCHAR_TO_UTF8_SUPPORT
-    #define AE_FMT_STR(str, ...) fmt::vformat(str, fmt::make_format_args(__VA_ARGS__))
     #define AE_FMT_WSTR(locale, str, ...) \
-        fmt::vformat(locale, std::wstring_view(str), fmt::make_wformat_args(__VA_ARGS__))
+            fmt::vformat(locale, std::wstring_view(str), fmt::make_wformat_args(__VA_ARGS__))
+#endif
+    #define AE_FMT_STR(str, ...) fmt::vformat(str, fmt::make_format_args(__VA_ARGS__))
 #else
     #include <format>
     #define SPDLOG_USE_STD_FORMAT
+#ifdef AE_WIN
     #define SPDLOG_WCHAR_TO_UTF8_SUPPORT
-    #define AE_FMT_STR(str, ...) std::vformat(str, std::make_format_args(__VA_ARGS__))
     #define AE_FMT_WSTR(locale, str, ...) \
-        std::vformat(locale, std::wstring_view(str), std::make_wformat_args(__VA_ARGS__))
+            std::vformat(locale, std::wstring_view(str), std::make_wformat_args(__VA_ARGS__))
+#endif
+    #define AE_FMT_STR(str, ...) std::vformat(str, std::make_format_args(__VA_ARGS__))
 #endif
 
-#include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
 
 
 namespace AnEngine {
-    class Log {
-    private:
-        static std::shared_ptr<spdlog::logger> coreLogger;
-        static std::shared_ptr<spdlog::logger> clientLogger;
+class Log {
+    static std::shared_ptr<spdlog::logger> coreLogger;
+    static std::shared_ptr<spdlog::logger> clientLogger;
 
-    public:
-        static void init();
+public:
+    static void init();
 
-        inline static std::shared_ptr<spdlog::logger>& getCoreLogger() { return coreLogger; }
+    static std::shared_ptr<spdlog::logger>& getCoreLogger() { return coreLogger; }
 
-        inline static std::shared_ptr<spdlog::logger>& getClientLogger() {
-            return clientLogger;
-        }
-    };
-}  // namespace AnEngine
+    static std::shared_ptr<spdlog::logger>& getClientLogger() { return clientLogger; }
+};
+} // namespace AnEngine
 
 
 // core engine logging macros

@@ -8,42 +8,42 @@
 #include <unordered_map>
 
 #include "Core/Core.hpp"
-#include "File/InputFileStream.hpp"
+#include "File/FileStream.hpp"
 
 
 namespace AnEngine {
-    class Shader {
-    public:
-        virtual ~Shader() = default;
+class Shader {
+public:
+    virtual ~Shader() = default;
 
-        static Ref<Shader> create(const std::string& mixedShaderPath,
-                                  const std::string& name = "");
+    static Ref<Shader> Create(const std::string& mixedShaderPath,
+                              const std::string& name = "");
 
 
-        virtual void bind() const = 0;
-        virtual void unbind() const = 0;
+    virtual void bind() const = 0;
+    virtual void unbind() const = 0;
 
-        virtual void uploadUniform(const std::string& name, std::any uniform) = 0;
+    virtual void uploadUniform(const std::string& name, std::any uniform) = 0;
 
-        virtual const std::string& getName() const = 0;
-    };
+    virtual const std::string& getName() const = 0;
+};
 
-    class ShaderLibrary {
-    public:
-        void add(const Ref<Shader>& shader);
-        void add(const std::string& name, const Ref<Shader>& shader);
+class ShaderLibrary {
+public:
+    void add(const Ref<Shader>& shader);
+    void add(const std::string& name, const Ref<Shader>& shader);
 
-        Ref<Shader> load(const std::string& mixedShaderPath);
-        Ref<Shader> load(const std::string& name, const std::string& mixedShaderPath);
+    Ref<Shader> load(const std::string& mixedShaderPath);
+    Ref<Shader> load(const std::string& name, const std::string& mixedShaderPath);
 
-        Ref<Shader> get(const std::string& name);
+    Ref<Shader> get(const std::string& name);
 
-        std::unordered_map<std::string, Ref<Shader>>::iterator begin();
-        std::unordered_map<std::string, Ref<Shader>>::iterator end();
+    std::unordered_map<std::string, Ref<Shader>>::iterator begin();
+    std::unordered_map<std::string, Ref<Shader>>::iterator end();
 
-    private:
-        std::unordered_map<std::string, Ref<Shader>> shaders;
-    };
-}  // namespace AnEngine
+private:
+    std::unordered_map<std::string, Ref<Shader>> shaders;
+};
+} // namespace AnEngine
 
 #endif

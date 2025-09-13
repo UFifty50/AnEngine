@@ -3,32 +3,31 @@
 
 #include <string>
 
-#include "Dockspace.hpp"
 #include "Panels/Panel.hpp"
-#include "Renderer/Renderer2D.hpp"
+#include "Project/Resources/Scene/Entity.hpp"
 
 
 namespace AnEngine::Crank {
-    class StatisticsPanel : public Panel {
-    public:
-        StatisticsPanel() = default;
-        StatisticsPanel(const std::string& name) : name(name) {}
+class StatisticsPanel : public Panel {
+public:
+    StatisticsPanel() = default;
+    StatisticsPanel(const std::string& name) : name(name) {}
 
-        virtual ImGuiWindowFlags beforeRender() override { return 0; }
-        virtual void render() override;
-        virtual void afterRender() override {}
+    ImGuiWindowFlags beforeRender() override { return 0; }
+    void render() override;
+    void afterRender() override {}
 
-        virtual void onClose() override {}
+    void onClose() override {}
 
-        virtual std::string getName() override { return name; }
+    std::string getName() override { return name; }
 
-        void setHoveredEntity(Entity entity) { hoveredEntity = entity; }
-        Entity getHoveredEntity() { return hoveredEntity; }
+    void setHoveredEntity(Entity entity) { hoveredEntity = entity; }
+    Entity getHoveredEntity() { return hoveredEntity; }
 
-    private:
-        std::string name;
-        Entity hoveredEntity;
-    };
-}  // namespace AnEngine::Crank
+private:
+    std::string name;
+    Entity hoveredEntity;
+};
+} // namespace AnEngine::Crank
 
 #endif

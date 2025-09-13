@@ -1,3 +1,4 @@
+require "export-compile-commands"
 include "Dependencies.lua"
 
 workspace "AnEngine"
@@ -13,7 +14,7 @@ group "Dependencies"
     include "AnEngine/vendor/GLFW"
     include "AnEngine/vendor/Glad"
     include "AnEngine/vendor/ImGui"
-    include "AnEngine/vendor/fmt"
+    --include "AnEngine/vendor/fmt"
     include "AnEngine/vendor/ENTT"
     include "AnEngine/vendor/yaml-cpp"
 
@@ -50,15 +51,14 @@ project "AnEngine"
         "%{prj.name}/src/Platform/OpenGL/**.cpp",
     }
 
-    includedirs { 
+    includedirs {
         "%{prj.name}/src/AnEngine/include/",
         "%{prj.name}/src/Platform/",
         "%{prj.name}/src",
-        "%{includeDir.fmt}",
+    --    "%{includeDir.fmt}",
         "%{includeDir.GLFW}",
         "%{includeDir.Glad}",
         "%{includeDir.ImGui}",
-        "%{includeDir.glm}",
         "%{includeDir.stb}",
         "%{includeDir.entt}",
         "%{includeDir.yaml_cpp}",
@@ -79,7 +79,7 @@ project "AnEngine"
         "GLFW",
         "Glad",
         "ImGui",
-        "fmt",
+    --    "fmt",
         "yaml-cpp"
     }
 
@@ -168,7 +168,6 @@ project "AnEngine"
 
     filter "configurations:Release"
         defines { "AE_RELEASE" }
-        flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
 
@@ -180,7 +179,7 @@ project "AnEngine"
 
     filter "configurations:Dist"
         defines { "AE_DIST" }
-        flags { "LinkTimeOptimization" }
+        linktimeoptimization "On"
         runtime "Release"
         optimize "on"
         
@@ -197,6 +196,7 @@ project "Crank"
     staticruntime "off"
     language "C++"
     cppdialect "C++20"
+    linktimeoptimization "On"
 
     links {
         "AnEngine",
@@ -214,7 +214,7 @@ project "Crank"
         "%{includeDir.ImGui}",
         "%{includeDir.entt}",
         "%{includeDir.glm}",
-        "%{includeDir.fmt}",
+    --    "%{includeDir.fmt}",
         "%{includeDir.yaml_cpp}",
         "%{includeDir.ImGuizmo}"
     }
@@ -267,12 +267,11 @@ project "Crank"
 
     filter "configurations:Release"
         defines { "AE_RELEASE" }
-        flags { "LinkTimeOptimization" }
         runtime "Release"
         optimize "on"
 
     filter "configurations:Dist"
         defines { "AE_DIST" }
-        flags { "LinkTimeOptimization" }
+        linktimeoptimization "On"
         runtime "Release"
         optimize "on"

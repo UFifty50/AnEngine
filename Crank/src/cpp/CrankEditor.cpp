@@ -4,8 +4,8 @@
 
 #include "CrankEditor.hpp"
 
-#include "ImGuizmo.h"
 #include "imgui.h"
+#include "ImGuizmo.h"
 #include "imgui_internal.h"
 
 #include "Application.hpp"
@@ -29,200 +29,193 @@
 #include "Project/Resources/Scene/Scene2D.hpp"
 #include "Project/Resources/Scene/Scene3D.hpp"
 #include "Project/Resources/Scene/ScriptableEntity.hpp"
-#include "Renderer/Camera/EditorCamera.hpp"
 #include "Renderer/FrameBuffer.hpp"
 #include "Renderer/RenderCommandQueue.hpp"
 #include "Renderer/Renderer2D.hpp"
 #include "Renderer/Renderer3D.hpp"
+#include "Renderer/Camera/EditorCamera.hpp"
 
 
 namespace AnEngine::Crank {
-    Project g_ActiveProject;
+Project g_ActiveProject;
 
-    Ref<DockSpace> g_DockSpace;
+Ref<DockSpace> g_DockSpace;
 
-    Ref<ScenesPanel> gPanel_SceneHierarchy;
-    Ref<PropertiesPanel> gPanel_Properties;
-    Ref<ViewportPanel> gPanel_Viewport;
-    Ref<ContentBrowserPanel> gPanel_ContentBrowser;
-    Ref<StatisticsPanel> gPanel_Statistics;
+Ref<ScenesPanel> gPanel_SceneHierarchy;
+Ref<PropertiesPanel> gPanel_Properties;
+Ref<ViewportPanel> gPanel_Viewport;
+Ref<ContentBrowserPanel> gPanel_ContentBrowser;
+Ref<StatisticsPanel> gPanel_Statistics;
 
-    Ref<FileMenu> gMenu_FileOps;
+Ref<FileMenu> gMenu_FileOps;
 
-    class CameraController : public ScriptableEntity {
-    public:
-        void onCreate() {
-            auto& pos = getComponent<TransformComponent>().Position;
-            pos.x = Random::getFloat() * 10.0f - 5.0f;
-            pos.y = Random::getFloat() * 10.0f - 5.0f;
-        }
-
-        void onUpdate(TimeStep deltaTime) {
-            auto& pos = getComponent<TransformComponent>().Position;
-            float speed = 2.0f;
-            float zoom = 2.0f;
-
-            if (Input::isKeyPressed(KeyCode::A)) {
-                pos.x -= speed * (zoom / 2) * deltaTime;
-            } else if (Input::isKeyPressed(KeyCode::D)) {
-                pos.x += speed * (zoom / 2) * deltaTime;
-            }
-
-            if (Input::isKeyPressed(KeyCode::W)) {
-                pos.y += speed * (zoom / 2) * deltaTime;
-            } else if (Input::isKeyPressed(KeyCode::S)) {
-                pos.y -= speed * (zoom / 2) * deltaTime;
-            }
-        }
-    };
-
-    CrankEditor::CrankEditor() : Layer("CrankEditor") {}
-
-    void CrankEditor::onAttach() {
-        Application::loadUILayout("assets/layouts/CrankEditorLayout.ini");
-
-        FrameBufferSpec spec = {1280, 720};
-        spec.Attachments = {FrameBufferTexFormat::RGBA8,
-                            FrameBufferTexFormat::RED_INTEGER,
-                            FrameBufferTexFormat::Depth};
-        frameBuffer = FrameBuffer::create(spec);
-
-        //     g_ActiveScene = MakeRef<Scene2D>("Test Scene");
-        g_ActiveProject = Project::newProject(false);
-
-        CameraSpec2D camSpec{30.0f, 1.778f, 0.1f, 1000.0f};
-        editorCam2D = MakeRef<EditorCamera2D>(camSpec);
-
-        g_DockSpace = MakeRef<DockSpace>();
-
-        gPanel_SceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene");
-        gPanel_Properties = MakeRef<PropertiesPanel>("Properties");
-        gPanel_Viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam2D);
-        gPanel_ContentBrowser = MakeRef<ContentBrowserPanel>("Content Browser");
-        gPanel_Statistics = MakeRef<StatisticsPanel>("Statistics");
-
-        gMenu_FileOps = MakeRef<FileMenu>("File");
-
-
-        g_DockSpace->addPanel(gPanel_SceneHierarchy);
-        g_DockSpace->addPanel(gPanel_Properties);
-        g_DockSpace->addPanel(gPanel_Viewport);
-        g_DockSpace->addPanel(gPanel_ContentBrowser);
-        g_DockSpace->addPanel(gPanel_Statistics);
-
-        g_DockSpace->addMenubarMenu(gMenu_FileOps);
-
-
-        CommandLine cmdLine = Application::getCommandLine();
-        /*if (cmdLine.hasArgs()) {
-            std::string projectFilePath = cmdLine.args[0];
-            ProjectSerialiser serialiser(g_ActiveScene);
-            try {
-                serialiser.deserialise(sceneFilePath);
-            } catch (std::runtime_error& e) {
-                AE_CORE_ERROR("Failed to load scene file: {0}", e.what());
-            }
-        }*/
+class CameraController : public ScriptableEntity {
+public:
+    void onCreate() override {
+        auto& pos = getComponent<TransformComponent>().Position;
+        pos.x = Random::getFloat() * 10.0f - 5.0f;
+        pos.y = Random::getFloat() * 10.0f - 5.0f;
     }
 
-    void CrankEditor::onDetach() {}
+    void onUpdate(TimeStep deltaTime) override {
+        auto& pos = getComponent<TransformComponent>().Position;
+        float speed = 2.0f;
+        float zoom = 2.0f;
 
-    void CrankEditor::onUpdate(TimeStep deltaTime) {
-        auto vpSize = g_DockSpace->getViewportSize();
+        if (Input::isKeyPressed(KeyCode::A)) { pos.x -= speed * (zoom / 2) * deltaTime; }
+        else if (Input::isKeyPressed(KeyCode::D)) { pos.x += speed * (zoom / 2) * deltaTime; }
 
-        if (auto fbSpec = frameBuffer->getSpecification();
-            vpSize.x > 0.0f && vpSize.y > 0.0f &&
-            (fbSpec.Width != vpSize.x || fbSpec.Height != vpSize.y)) {
-            frameBuffer->resize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
+        if (Input::isKeyPressed(KeyCode::W)) { pos.y += speed * (zoom / 2) * deltaTime; }
+        else if (Input::isKeyPressed(KeyCode::S)) { pos.y -= speed * (zoom / 2) * deltaTime; }
+    }
+};
 
-            editorCam2D->setViewportSize(vpSize.x, vpSize.y);
+CrankEditor::CrankEditor() : Layer("CrankEditor") {}
 
-            if (g_ActiveProject.hasActiveScene()) {
-                // g_ActiveScene->onResize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
-                g_ActiveProject.getActiveScene<Scene2D>().onResize((uint32_t)vpSize.x,
-                                                                   (uint32_t)vpSize.y);
-            }
+void CrankEditor::onAttach() {
+    Application::loadUILayout("assets/layouts/CrankEditorLayout.ini");
+
+    FrameBufferSpec spec = {1280, 720};
+    spec.Attachments = {
+        FrameBufferTexFormat::RGBA8,
+        FrameBufferTexFormat::RED_INTEGER,
+        FrameBufferTexFormat::Depth
+    };
+    frameBuffer = FrameBuffer::create(spec);
+
+    //     g_ActiveScene = MakeRef<Scene2D>("Test Scene");
+    g_ActiveProject = Project::NewProject(false);
+
+    CameraSpec2D camSpec{30.0f, 1.778f, 0.1f, 1000.0f};
+    editorCam2D = MakeRef<EditorCamera2D>(camSpec);
+
+    g_DockSpace = MakeRef<DockSpace>();
+
+    gPanel_SceneHierarchy = MakeRef<ScenesPanel>("Unnamed Scene");
+    gPanel_Properties = MakeRef<PropertiesPanel>("Properties");
+    gPanel_Viewport = MakeRef<ViewportPanel>("Viewport", frameBuffer, editorCam2D);
+    gPanel_ContentBrowser = MakeRef<ContentBrowserPanel>("Content Browser");
+    gPanel_Statistics = MakeRef<StatisticsPanel>("Statistics");
+
+    gMenu_FileOps = MakeRef<FileMenu>("File");
+
+
+    g_DockSpace->addPanel(gPanel_SceneHierarchy);
+    g_DockSpace->addPanel(gPanel_Properties);
+    g_DockSpace->addPanel(gPanel_Viewport);
+    g_DockSpace->addPanel(gPanel_ContentBrowser);
+    g_DockSpace->addPanel(gPanel_Statistics);
+
+    g_DockSpace->addMenubarMenu(gMenu_FileOps);
+
+
+    CommandLine cmdLine = Application::getCommandLine();
+    /*if (cmdLine.hasArgs()) {
+        std::string projectFilePath = cmdLine.args[0];
+        ProjectSerialiser serialiser(g_ActiveScene);
+        try {
+            serialiser.deserialise(sceneFilePath);
+        } catch (std::runtime_error& e) {
+            AE_CORE_ERROR("Failed to load scene file: {0}", e.what());
         }
+    }*/
+}
 
-        // if (dockSpace->isViewportFocused())
-        editorCam2D->onUpdate(deltaTime);
+void CrankEditor::onDetach() {}
 
-        Renderer2D::resetStats();
-        Renderer2D::getStats().lastFrameTime = deltaTime.getMilliseconds();
+void CrankEditor::onUpdate(TimeStep deltaTime) {
+    auto vpSize = g_DockSpace->getViewportSize();
 
-        frameBuffer->bind();
-        RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1.0f});
-        RenderCommandQueue::clear();
+    if (auto fbSpec = frameBuffer->getSpecification();
+        vpSize.x > 0.0f && vpSize.y > 0.0f &&
+        (fbSpec.Width != vpSize.x || fbSpec.Height != vpSize.y)) {
+        frameBuffer->resize(static_cast<uint32_t>(vpSize.x), static_cast<uint32_t>(vpSize.y));
 
-        frameBuffer->clearColourAttachment(1, -1);
+        editorCam2D->setViewportSize(vpSize.x, vpSize.y);
 
         if (g_ActiveProject.hasActiveScene()) {
-            g_ActiveProject.getActiveScene<Scene2D>().onUpdateEditor(deltaTime,
-                                                                     editorCam2D);
-            // g_ActiveScene->onUpdateEditor(deltaTime, editorCam3D);
-            //  activeScene->onUpdateRuntime(deltaTime);
-
-            auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
-            if (g_DockSpace->isMouseInViewport()) {
-                int32_t pixel = frameBuffer->readPixels(
-                    1, {mouseX, mouseY}, {1, 1}, FrameBufferTexFormat::RED_INTEGER)[0];
-                hoveredEntity =
-                    pixel == -1
-                        ? Entity()
-                        : Entity(
-                              (entt::entity)pixel,
-                              g_ActiveProject.getActiveScene<Scene2D>().asScene().get());
-                gPanel_Statistics->setHoveredEntity(hoveredEntity);
-            }
+            // g_ActiveScene->onResize((uint32_t)vpSize.x, (uint32_t)vpSize.y);
+            g_ActiveProject.getActiveScene().asScene()->onResize(static_cast<uint32_t>(vpSize.x),
+                                                                 static_cast<uint32_t>(vpSize.y));
         }
-
-
-        frameBuffer->unBind();
     }
 
-    void CrankEditor::onImGuiRender() { g_DockSpace->render(); }
+    // if (dockSpace->isViewportFocused())
+    editorCam2D->onUpdate(deltaTime);
 
-    void CrankEditor::onEvent(Event& event) {
-        editorCam2D->onEvent(event);
+    Renderer2D::resetStats();
+    Renderer2D::getStats().lastFrameTime = deltaTime.getMilliseconds();
 
-        EventDispatcher dispatcher(event);
-        dispatcher.dispatch<KeyPressedEvent>(BIND_EVENT_FN(CrankEditor::onKeyPressed));
-        dispatcher.dispatch<MouseButtonPressedEvent>(
-            BIND_EVENT_FN(CrankEditor::OnMouseClick));
-    }
+    frameBuffer->bind();
+    RenderCommandQueue::clearColour({0.1f, 0.1f, 0.1f, 1.0f});
+    RenderCommandQueue::clear();
 
-    bool CrankEditor::onKeyPressed(KeyPressedEvent& kpEvent) {
-        bool ctrl = Input::isKeyPressed(KeyCode::LeftControl) ||
-                    Input::isKeyPressed(KeyCode::RightControl);
-        bool shift = Input::isKeyPressed(KeyCode::LeftShift) ||
-                     Input::isKeyPressed(KeyCode::RightShift);
+    frameBuffer->clearColourAttachment(1, -1);
 
-        switch (kpEvent.getKeyCode()) {
-            case KeyCode::S:
-                if (ctrl && shift) FileMenu::SaveActiveScene();
-                break;
+    if (g_ActiveProject.hasActiveScene()) {
+        g_ActiveProject.getActiveScene().asScene()->onUpdateEditor(deltaTime,
+            editorCam2D);
+        // g_ActiveScene->onUpdateEditor(deltaTime, editorCam3D);
+        //  activeScene->onUpdateRuntime(deltaTime);
 
-            case KeyCode::N:
-                if (ctrl && !shift) FileMenu::NewScene();
-                break;
-
-            case KeyCode::O:
-                if (ctrl && !shift)
-                    if (!FileMenu::OpenSceneMenu())
-                        AE_CORE_ERROR("Failed to open scene.");
-                break;
+        auto [mouseX, mouseY] = g_DockSpace->getMousePosInViewport(true);
+        if (g_DockSpace->isMouseInViewport()) {
+            int32_t pixel = frameBuffer->readPixels(
+                1, {mouseX, mouseY}, {1, 1}, FrameBufferTexFormat::RED_INTEGER)[0];
+            hoveredEntity =
+                pixel == -1
+                    ? Entity()
+                    : Entity(
+                        static_cast<entt::entity>(pixel),
+                        g_ActiveProject.getActiveScene().asScene().get());
+            gPanel_Statistics->setHoveredEntity(hoveredEntity);
         }
-
-        return true;
     }
 
-    bool CrankEditor::OnMouseClick(MouseButtonPressedEvent& mcEvent) {
-        if (mcEvent.getMouseButton() == MouseCode::ButtonLeft) {
-            if (g_DockSpace->isMouseInViewport() && !ImGuizmo::IsOver())
-                gPanel_SceneHierarchy->setSelectedEntity(hoveredEntity);
-        }
 
-        return true;
+    frameBuffer->unBind();
+}
+
+void CrankEditor::onImGuiRender() { g_DockSpace->render(); }
+
+void CrankEditor::onEvent(Event& event) {
+    editorCam2D->onEvent(event);
+
+    EventDispatcher dispatcher(event);
+    dispatcher.dispatch<KeyPressedEvent>(BIND_EVENT_FN(CrankEditor::onKeyPressed));
+    dispatcher.dispatch<MouseButtonPressedEvent>(
+        BIND_EVENT_FN(CrankEditor::OnMouseClick));
+}
+
+bool CrankEditor::onKeyPressed(KeyPressedEvent& kpEvent) {
+    bool ctrl = Input::isKeyPressed(KeyCode::LeftControl) ||
+        Input::isKeyPressed(KeyCode::RightControl);
+    bool shift = Input::isKeyPressed(KeyCode::LeftShift) ||
+        Input::isKeyPressed(KeyCode::RightShift);
+
+    switch (kpEvent.getKeyCode()) {
+        case KeyCode::S: if (ctrl && shift) FileMenu::SaveActiveScene();
+            break;
+
+        case KeyCode::N: if (ctrl && !shift) FileMenu::NewScene();
+            break;
+
+        case KeyCode::O: if (ctrl && !shift)
+                if (!FileMenu::OpenSceneMenu())
+                    AE_CORE_ERROR("Failed to open scene.");
+            break;
     }
 
-}  // namespace AnEngine::Crank
+    return true;
+}
+
+bool CrankEditor::OnMouseClick(MouseButtonPressedEvent& mcEvent) {
+    if (mcEvent.getMouseButton() == MouseCode::ButtonLeft) {
+        if (g_DockSpace->isMouseInViewport() && !ImGuizmo::IsOver())
+            gPanel_SceneHierarchy->
+                setSelectedEntity(hoveredEntity);
+    }
+
+    return true;
+}
+} // namespace AnEngine::Crank

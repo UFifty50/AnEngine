@@ -445,3 +445,5 @@ AnEngine/vendor/VulkanSDK
 Crank/assets/cache
 
 Dependencies.lua
+
+.idea/

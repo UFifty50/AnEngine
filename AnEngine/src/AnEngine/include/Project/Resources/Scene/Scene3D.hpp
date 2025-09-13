@@ -12,46 +12,38 @@
 
 
 namespace AnEngine {
-    class Entity;
-    struct Component;
-    namespace Crank {
-        class ScenesPanel;
-    };
+class Scene3D : public Scene {
+public:
+    ~Scene3D() override = default;
 
-    class Scene3D : public Scene, public Resource {
-    public:
-        ~Scene3D() = default;
+    static Resource Create(const std::string& name = "") {
+        return static_cast<Resource>(Scene3D(name));
+    }
 
-        static Resource create(const std::string& name = "") {
-            return static_cast<Resource>(Scene3D(name));
-        }
+    void empty() {
+        name = "";
+        entityRegistry->clear();
+    }
 
-        void empty() {
-            Resource::name = "";
-            entityRegistry.clear();
-        }
+    const std::string& getName() const override { return name; }
+    void setName(const std::string& newName) override { name = newName; }
 
-        virtual bool is3D() const override { return true; }
+    Entity& createEntity(const std::string& name = "") override;
+    Entity& createEntityWithUUID(const std::string& name, UUID id) override;
+    void destroyEntity(Entity& entity) override;
+    void onResize(uint32_t width, uint32_t height) override;
 
-        virtual const std::string& getName() const override { return Resource::name; }
-        virtual void setName(const std::string& newName) override { Resource::name = newName; }
+    void onUpdateEditor(TimeStep deltaTime,
+                        const Ref<EditorCamera>& camera) override;
+    void onUpdateRuntime(TimeStep deltaTime) override;
 
-        virtual Entity& createEntity(const std::string& name = "") override;
-        virtual Entity& createEntityWithUUID(const std::string& name, UUID id) override;
-        virtual void destroyEntity(Entity& entity) override;
-        virtual void onResize(uint32_t width, uint32_t height) override;
+    Entity getPrimaryCamera();
 
-        virtual void onUpdateEditor(TimeStep deltaTime,
-                                    const Ref<EditorCamera>& camera) override;
-        virtual void onUpdateRuntime(TimeStep deltaTime) override;
+private:
+    Scene3D(const std::string& name = "") : Scene{Type::Scene3D, {}, name} {}
 
-        Entity getPrimaryCamera();
-
-    private:
-        Scene3D(const std::string& name = "") : Resource{Resource::Type::Scene3D, {}, name} {}
-
-        virtual void onComponentAdded(Entity& e, Component& component) override;
-    };
-}  // namespace AnEngine
+    void onComponentAdded(Entity& e, Component& component) override;
+};
+} // namespace AnEngine
 
 #endif

@@ -10,72 +10,73 @@
 
 
 namespace AnEngine {
-    class FileStreamWriter final : public StreamWriter {
-    public:
-        FileStreamWriter(const std::string& path);
-        FileStreamWriter(const fs::path& path);
-        FileStreamWriter() : path("") {}
+class FileStreamWriter final : public StreamWriter {
+public:
+    FileStreamWriter(const std::string& path);
+    FileStreamWriter(const fs::path& path);
+    FileStreamWriter() : path("") {}
 
-        FileStreamWriter(const FileStreamWriter&) = delete;
-        ~FileStreamWriter() override { close(); }
-
-
-        bool writeData(const char* data, size_t size) override;
-        void flush() override { stream.flush(); }
-        void close() override { stream.close(); }
-        void seekPosition(size_t position) override;
-
-        [[nodiscard]] size_t getSeekPosition() override { return stream.tellp(); }
-        [[nodiscard]] bool isStreamBad() const override { return !stream.good(); }
+    FileStreamWriter(const FileStreamWriter&) = delete;
+    ~FileStreamWriter() override { close(); }
 
 
-        [[nodiscard]] const fs::path& getFilePath() const override { return path; }
+    bool writeData(const char* data, size_t size) override;
 
-        [[nodiscard]] const std::string& getFileName() const override {
-            return path.stem().string();
-        }
+    void open(const std::string& filePath) override { stream.open(filePath); }
+    void close() override { stream.close(); }
+    void flush() override { stream.flush(); }
+    void seekPosition(size_t position) override;
 
-        [[nodiscard]] const std::string& getFileExtension() const override {
-            return path.extension().string();
-        }
+    [[nodiscard]] size_t getSeekPosition() override { return stream.tellp(); }
+    [[nodiscard]] bool isStreamBad() const override { return !stream.good(); }
+    [[nodiscard]] bool isStreamOpen() const { return stream.is_open(); }
 
-    private:
-        fs::path path;
-        std::ofstream stream;
-    };
+    [[nodiscard]] const fs::path& getFilePath() const override { return path; }
 
-    class FileStreamReader final : public StreamReader {
-    public:
-        FileStreamReader(const std::string& path);
-        FileStreamReader(const fs::path& path);
-        FileStreamReader(nullptr_t) : path("") {}
+    [[nodiscard]] const std::string& getFileName() const override { return path.stem().string(); }
 
-        FileStreamReader(const FileStreamReader&) = delete;
-        ~FileStreamReader() override { close(); }
+    [[nodiscard]] const std::string& getFileExtension() const override {
+        return path.extension().string();
+    }
 
+private:
+    fs::path path;
+    std::ofstream stream;
+};
 
-        void close() override { stream.close(); }
-        bool readData(byte* data, size_t size) override;
-        void seekPosition(size_t position) override;
+class FileStreamReader final : public StreamReader {
+public:
+    FileStreamReader(const std::string& path);
+    FileStreamReader(const fs::path& path);
+    FileStreamReader(nullptr_t) : path("") {}
 
-        [[nodiscard]] size_t getSeekPosition() override { return stream.tellg(); }
-        [[nodiscard]] bool isStreamBad() const override { return !stream.good(); }
+    FileStreamReader(const FileStreamReader&) = delete;
+    ~FileStreamReader() override { close(); }
 
+    void open(const std::string& filePath) override { stream.open(filePath); }
+    void close() override { stream.close(); }
+    void seekPosition(size_t position) override;
+    uint32_t getSize() override;
 
-        [[nodiscard]] const fs::path& getFilePath() const override { return path; }
+    bool readData(char* data, uint32_t size) override;
+    void readAll(std::string& str) override;
 
-        [[nodiscard]] const std::string& getFileName() const override {
-            return path.stem().string();
-        }
+    [[nodiscard]] size_t getSeekPosition() override { return stream.tellg(); }
+    [[nodiscard]] bool isStreamBad() const override { return !stream.good(); }
+    [[nodiscard]] bool isStreamOpen() const { return stream.is_open(); }
 
-        [[nodiscard]] const std::string& getFileExtension() const override {
-            return path.extension().string();
-        }
+    [[nodiscard]] const fs::path& getFilePath() const override { return path; }
 
-    private:
-        fs::path path;
-        std::ifstream stream;
-    };
+    [[nodiscard]] const std::string& getFileName() const override { return path.stem().string(); }
+
+    [[nodiscard]] const std::string& getFileExtension() const override {
+        return path.extension().string();
+    }
+
+private:
+    fs::path path;
+    std::ifstream stream;
+};
 } // namespace AnEngine
 
 #endif

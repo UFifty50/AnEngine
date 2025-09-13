@@ -34,7 +34,7 @@ namespace AnEngine {
         extern Ref<StatisticsPanel> gPanel_Statistics;
 
 
-        extern const fs::path g_BaseAssetsDirectory;
+        extern const fs::rooPath g_BaseAssetsDirectory;
     }  // namespace Crank
 #endif
 };  // namespace AnEngine

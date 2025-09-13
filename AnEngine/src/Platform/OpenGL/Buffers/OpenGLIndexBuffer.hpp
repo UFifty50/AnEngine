@@ -6,20 +6,19 @@
 
 
 namespace AnEngine {
-    class OpenGLIndexBuffer : public IndexBuffer {
-    private:
-        RenderID rendererID;
-        uint32_t count;
+class OpenGLIndexBuffer : public IndexBuffer {
+    RenderID rendererID;
+    uint32_t count;
 
-    public:
-        OpenGLIndexBuffer(const uint32_t const* indices, uint32_t count);
-        virtual ~OpenGLIndexBuffer();
+public:
+    OpenGLIndexBuffer(const uint32_t* indices, uint32_t count);
+    ~OpenGLIndexBuffer() override;
 
-        virtual uint32_t getCount() const override;
+    uint32_t getCount() const override;
 
-        virtual void bind() const override;
-        virtual void unBind() const override;
-    };
-}  // namespace AnEngine
+    void bind() const override;
+    void unBind() const override;
+};
+} // namespace AnEngine
 
 #endif

@@ -6,74 +6,77 @@
 #include <glad/glad.h>
 
 #include <any>
+#include <filesystem>
 #include <string>
 
 #include "Core/Core.hpp"
-#include "File/InputFileStream.hpp"
+#include "File/FileStream.hpp"
 #include "Renderer/Shader.hpp"
 
 
+namespace fs = std::filesystem;
+
 namespace AnEngine {
-    class OpenGLShader : public Shader {
-    public:
-        OpenGLShader(InputFileStream& mixedShaderStream, const std::string& name = "");
-        ~OpenGLShader();
+class OpenGLShader : public Shader {
+public:
+    OpenGLShader(FileStreamReader& mixedShaderStream, const std::string& shaderName = "");
+    ~OpenGLShader() override;
 
-        virtual void bind() const override;
-        virtual void unbind() const override;
+    void bind() const override;
+    void unbind() const override;
 
-        virtual void uploadUniform(const std::string& name, std::any uniform) override;
+    void uploadUniform(const std::string& name, std::any uniform) override;
 
-        virtual const std::string& getName() const override { return name; }
+    const std::string& getName() const override { return name; }
 
-    private:
-        RenderID rendererID = NULL;
-        std::string name;
-        std::string filePath;
-        std::unordered_map<GLenum, std::vector<uint32_t>> vulkanSPRIV;
-        std::unordered_map<GLenum, std::vector<uint32_t>> openglSPRIV;
-        std::unordered_map<GLenum, std::string> openglSource;
+private:
+    RenderID rendererID = NULL;
+    std::string name;
+    fs::path filePath;
+    std::unordered_map<GLenum, std::vector<uint32_t>> vulkanSPRIV;
+    std::unordered_map<GLenum, std::vector<uint32_t>> openglSPRIV;
+    std::unordered_map<GLenum, std::string> openglSource;
 
-        std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
+    std::unordered_map<GLenum, std::string> preProcess(const std::string& source);
 
-        void compileOrGetVulkanBinaries(
-            const std::unordered_map<GLenum, std::string>& shaderSources);
+    void compileOrGetVulkanBinaries(
+        const std::unordered_map<GLenum, std::string>& shaderSources);
 
-        void compileOrGetOpenGLBinaries();
+    void compileOrGetOpenGLBinaries();
 
-        GLuint createProgram();
+    GLuint createProgram();
 
-        void reflect(GLenum shaderType, const std::vector<uint32_t>& spirvCode);
+    void reflect(GLenum shaderType, const std::vector<uint32_t>& spirvCode);
+};
+
+class ShaderParser {
+public:
+    ShaderParser(const std::string& mixedShaderSrc);
+
+    void parse();
+    std::unordered_map<GLenum, std::string> getShaders() const;
+
+private:
+    enum StrCode : uint8_t {
+        VERTEX   = 0,
+        FRAGMENT = 1,
+        GEOMETRY = 2,
+        COMPUTE  = 5,
+        UNKNOWN  = 255
     };
 
-    class ShaderParser {
-    public:
-        ShaderParser(const std::string& mixedShaderSrc);
+    std::string mixedShaderSrc;
+    GLenum shaderType;
+    std::unordered_map<GLenum, std::string> shaders;
 
-        void parse();
-        std::unordered_map<GLenum, std::string> getShaders() const;
-
-    private:
-        enum StrCode : uint8_t {
-            VERTEX = 0,
-            FRAGMENT = 1,
-            GEOMETRY = 2,
-            COMPUTE = 5,
-            UNKNOWN = 255
-        };
-
-        std::string mixedShaderSrc;
-        GLenum shaderType;
-        std::unordered_map<GLenum, std::string> shaders;
-
-        StrCode hashedType(const std::string& type) {
-            if (type == "vertex") return VERTEX;
-            if (type == "fragment" || type == "pixel") return FRAGMENT;
-            if (type == "geometry") return GEOMETRY;
-            if (type == "compute") return COMPUTE;
-            return UNKNOWN;
-        }
-    };
-}  // namespace AnEngine
+    static StrCode HashedType(const std::string& type) {
+        if (type == "vertex") return VERTEX;
+        if (type == "fragment" || type == "pixel") return FRAGMENT;
+        if (type == "geometry") return GEOMETRY;
+        if (type == "compute") return COMPUTE;
+        return UNKNOWN;
+    }
+};
+} // namespace AnEngine
 
 #endif

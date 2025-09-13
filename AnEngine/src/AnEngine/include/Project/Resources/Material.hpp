@@ -13,33 +13,33 @@
 
 
 namespace AnEngine {
-    struct Material : Resource {
-        glm::vec4 colour{1.0f};
-        Ref<Texture2D> texture{nullptr};
-        // TODO: Ref<Texture2D> Albedo{nullptr};
-        // TODO: Ref<Texture2D> Normal{nullptr};
-        // TODO: Ref<Texture2D> Specular{nullptr};
-        // TODO: Ref<Texture2D> Emissive{nullptr};
-        // TODO: Ref<Shader> shader{nullptr};
+struct Material : Resource {
+    glm::vec4 colour{1.0f};
+    Ref<Texture2D> texture{nullptr};
+    // TODO: Ref<Texture2D> Albedo{nullptr};
+    // TODO: Ref<Texture2D> Normal{nullptr};
+    // TODO: Ref<Texture2D> Specular{nullptr};
+    // TODO: Ref<Texture2D> Emissive{nullptr};
+    // TODO: Ref<Shader> shader{nullptr};
 
 
-        Material(std::string name = "Unnamed Material")
-            : Resource{Resource::Type::Material, {}, name} {}
-        Material(std::string name, AnEngine::UUID uuid)
-            : Resource{Resource::Type::Material, uuid, name} {}
-        Material(nullptr_t) : Resource{Resource::Type::Material, nullptr, ""} {}
-        ~Material() = default;
+    Material(const std::string& name = "Unnamed Material")
+        : Resource{Type::Material, {}, name} {}
 
-        std::optional<Ref<Texture2D>> getTexture() const {
-            if (texture)
-                return texture;
-            else
-                return std::nullopt;
-        }
+    Material(const std::string& name, const UUID uuid)
+        : Resource{Type::Material, uuid, name} {}
 
-        bool isNull() { return uuid.isNull(); }
-        bool operator==(const Material& other) const { return uuid == other.uuid; };
-    };
-};  // namespace AnEngine
+    Material(nullptr_t) : Resource{Type::Material, nullptr, ""} {}
+    ~Material() = default;
+
+    std::optional<Ref<Texture2D>> getTexture() const {
+        if (texture) return texture;
+        return std::nullopt;
+    }
+
+    bool isNull() { return uuid.isNull(); }
+    bool operator==(const Material& other) const { return uuid == other.uuid; };
+};
+}; // namespace AnEngine
 
 #endif

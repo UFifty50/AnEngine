@@ -4,46 +4,46 @@
 #include <mutex>
 #include <string>
 
-#include "File/OutputFileStream.hpp"
+#include "File/FileStream.hpp"
 
 
 namespace AnEngine {
-    struct ProfileResult {
-        std::string Name;
-        long long start;
-        long long end;
-        uint32_t threadID;
-    };
+struct ProfileResult {
+    std::string Name;
+    long long start;
+    long long end;
+    uint32_t threadID;
+};
 
-    class Instrumentor {
-    public:
-        Instrumentor(const Instrumentor&) = delete;
-        Instrumentor(Instrumentor&&) = delete;
-        void beginSession(const std::string& name,
-                          const std::string& filepath = "results.json");
-        void endSession();
-        void writeProfile(const ProfileResult& result);
+class Instrumentor {
+public:
+    Instrumentor(const Instrumentor&) = delete;
+    Instrumentor(Instrumentor&&) = delete;
+    void beginSession(const std::string& name,
+                      const std::string& filepath = "results.json");
+    void endSession();
+    void writeProfile(const ProfileResult& result);
 
-        void writeHeader();
-        void writeFooter();
+    void writeHeader();
+    void writeFooter();
 
-        static Instrumentor& Get() {
-            static Instrumentor instance;
-            return instance;
-        }
+    static Instrumentor& Get() {
+        static Instrumentor instance;
+        return instance;
+    }
 
-    private:
-        Instrumentor() : activeSession(false), profileCount(0) {}
-        ~Instrumentor() { endSession(); }
+private:
+    Instrumentor() : profileCount(0), activeSession(false) {}
+    ~Instrumentor() { endSession(); }
 
 
-        // state
-        std::string sessionName = "None";
-        OutputFileStream outputFile;
-        int profileCount;
-        bool activeSession;
-        std::mutex _lock;
-    };
-};  // namespace AnEngine
+    // state
+    std::string sessionName = "None";
+    FileStreamWriter outputFile;
+    int profileCount;
+    bool activeSession;
+    std::mutex _lock;
+};
+}; // namespace AnEngine
 
 #endif
